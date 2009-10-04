@@ -21,10 +21,26 @@ background.fill((250, 250, 250))
 
 selected = None
 class Pawn(pygame.sprite.Sprite):
-	def __init__(self,gameMap,xloc,yloc):
+	def __init__(self,gameMap,x,y):
+		self.gameMap = gameMap
 		pygame.sprite.Sprite.__init__(self)
-		self.x,self.y = convertGridPosition(gameMap,xloc,yloc)
+		self.x,self.y = convertGridPosition(self.gameMap,x,y)
 		self.image = pygame.image.load("wizard.png");
+		self.startTile = None
+	def setPos(self,x,y):
+		self.x,self.y = convertGridPosition(self.gameMap,x,y)
+		self.startTile.pawn = None
+		self.gameMap.getTile((x,y)).pawn = self
+	def attack(self,x,y):
+		print "Testing if we can attack this tile"
+		tiles = self.gameMap.getTileSet((self.startTile.xloc,self.startTile.yloc))
+		for tile in tiles:
+			if(tile.isAdjacent((x,y))):
+				#The attacked tile is adjacent to a tile in our starting set
+				self.gameMap.getTile((x,y)).setPlayer(self.startTile.player)
+				return True
+		return False
+			
 		
 class Villager(Pawn):
 	def __init__(self,gameMap,xloc,yloc):
@@ -76,6 +92,15 @@ class Tile(pygame.sprite.Sprite):
 			return 1
 	def getAdjacent(self,direction):
 		return getAdjacent(self.xloc,self.yloc,direction)
+	def isAdjacent(self,point):
+		print "Checking for adjacency."
+		for dir in range(6):
+			target = self.getAdjacent(dir)
+			if(target == point):
+				print "Target was adjacent to this square"
+				return True
+		return False
+			
 	def select(self):
 		#print "Selecting tile."
 		pygame.draw.polygon(background,pygame.Color("#000000"),self.getHex(),1)
@@ -123,8 +148,13 @@ class Map():
 				
 		return retval
 		
+	def hexDropped(self,carry,x,y):
+		clickedTile = self.tiles[y][x]
+		carry.setPos(x,y)
+		print "Set the position of the carry to ",x,"X",y
 		
 	def getTile(self,point):
+		print "doing a tile lookup with ",point
 		return self.tiles[point[1]][point[0]]
 		
 			
@@ -167,7 +197,6 @@ def main():
 	gameMap = Map()
 	mouseCarrying = None
 	
-	
 
 	if pygame.font:
 		font = pygame.font.Font(None, 36)
@@ -181,11 +210,11 @@ def main():
 	
 	pawns = []
 	pawns.append(gameMap.tiles[3][7].addPawn(Villager(gameMap,7,3)))
+	
 
-	while 1:
+	while True:
 		clock.tick(60)
 		#Handle Input Events
-		print "Carrying a ",mouseCarrying
 		if True:
 			for event in pygame.event.get():
 				if event.type == QUIT:
@@ -201,7 +230,26 @@ def main():
 								if tile.checkHexCollision(pygame.mouse.get_pos()):
 									
 									mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
+									if mouseCarrying:
+										mouseCarrying.startTile = tile
+										print "I have set the startTile of the carry."
 									break
+				elif event.type == MOUSEBUTTONUP:
+					if mouseCarrying != None:
+						for row in gameMap.tiles:
+							for tile in row:
+								if tile.rect.collidepoint(pygame.mouse.get_pos()):
+									if tile.checkHexCollision(pygame.mouse.get_pos()):
+										if(mouseCarrying.attack(tile.xloc,tile.yloc)):
+											gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
+										else:
+											mouseCarrying.x,mouseCarrying.y = mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc
+						mouseCarrying = None
+				elif event.type == MOUSEMOTION:
+					if mouseCarrying != None:
+						mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()
+						mouseCarrying.x -= 5
+						mouseCarrying.y -= 5
 		allsprites.update()
 
 		#Draw Everything
