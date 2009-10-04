@@ -7,7 +7,7 @@ from pygame.locals import *
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
-tilesize = 30
+tilesize = 32
 
 pygame.init()
 screen = pygame.display.set_mode((640,480))
@@ -20,22 +20,34 @@ background = background.convert()
 background.fill((250, 250, 250))
 
 selected = None
-
-
-class Tile(pygame.sprite.Sprite):
-	def __init__(self,xloc,yloc,x,y):
+class Pawn(pygame.sprite.Sprite):
+	def __init__(self,gameMap,xloc,yloc):
 		pygame.sprite.Sprite.__init__(self)
-		#self.image = pygame.Surface([tilesize, tilesize])
-		self.x = x
-		self.y = y
-		self.xloc = xloc
-		self.yloc = yloc
-		self.player = random.randint(0,5)
-		self.color = pygame.Color(playerColors[self.player])
-		self.rect = self.draw()
-		self.selected = 0
+		self.x,self.y = convertGridPosition(gameMap,xloc,yloc)
+		self.image = pygame.image.load("wizard.png");
+		
+class Villager(Pawn):
+	def __init__(self,gameMap,xloc,yloc):
+		Pawn.__init__(self,gameMap,xloc,yloc)
+	
 		
 
+class Tile(pygame.sprite.Sprite):
+	def __init__(self,gameMap,xloc,yloc):
+		pygame.sprite.Sprite.__init__(self)
+		#self.image = pygame.Surface([tilesize, tilesize])
+		self.x,self.y = convertGridPosition(gameMap,xloc,yloc)
+		self.xloc = xloc
+		self.yloc = yloc
+		self.setPlayer(random.randint(0,5))
+		self.rect = self.draw()
+		self.selected = False
+		self.pawn = None
+		
+
+	def setPlayer(self,player):
+		self.player = player
+		self.color = pygame.Color(playerColors[self.player])
 		
 	def draw(self):
 		rect = pygame.draw.polygon(background,self.color,self.getHex(),0)
@@ -67,11 +79,14 @@ class Tile(pygame.sprite.Sprite):
 	def select(self):
 		#print "Selecting tile."
 		pygame.draw.polygon(background,pygame.Color("#000000"),self.getHex(),1)
-		self.selected = 1
+		self.selected = True
 	def deselect(self):
 		#print "Deselecting tile"
 		self.draw()
-		self.selected = 0
+		self.selected = False
+	def addPawn(self,pawn):
+		self.pawn = pawn
+		return pawn
 			
 
 class Map():
@@ -88,20 +103,26 @@ class Map():
 			
 			row = [None]*self.width
 			for x in range(self.width):
-				row[x] = Tile(x,y,x*1.5*tilesize+y%2*tilesize*.75+self.x,y*tilesize/2+self.y)
+				row[x] = Tile(self,x,y)
 				self.alltiles.append(row[x])
 			self.tiles.append(row)		
 			
 	def hexClicked(self,x,y):
-		#self.tiles[y][x].color = pygame.Color(0,0,0)
-		#self.tiles[y][x].draw()
-		print "Tried to flip color of tile:",self.tiles[y][x].xloc,"X",self.tiles[y][x].yloc
+		retval = None
+		print "Clicked tile:",self.tiles[y][x].xloc,"X",self.tiles[y][x].yloc
+		clickedTile = self.tiles[y][x]
+		if(clickedTile.pawn != None):
+			retval = clickedTile.pawn
+		
 		selectedSet = self.getTileSet((x,y))
 		for tile in selectedSet:
 			if(tile.selected == 0): 
 				tile.select()
 			else: 
 				tile.deselect()
+				
+		return retval
+		
 		
 	def getTile(self,point):
 		return self.tiles[point[1]][point[0]]
@@ -126,10 +147,10 @@ class Map():
 						toSearch.append(considered)
 					if considered not in found:
 						found.append(considered)
-				else:
-					#print "Wasn't same color (",tile.player,"!=",self.getTile(tile.getAdjacent(i)).player,")"
 		#print "Our search found: ",found
 		return found
+		
+	
 	
 def getHexAt(x,y):
 	s = tilesize
@@ -137,13 +158,15 @@ def getHexAt(x,y):
 	r = .75
 	return ((x+l*s,y), (x+r*s,y), (x+s,y+s/2), (x+r*s,y+s), (x+l*s,y+s), (x,y+s/2))
 	
-
+def convertGridPosition(map,x,y):
+	return (x*1.5*tilesize+y%2*tilesize*.75+map.x,y*tilesize/2+map.y)
 		
 def main():
 	
 
 	gameMap = Map()
-	wizard = pygame.image.load("wizard.png");
+	mouseCarrying = None
+	
 	
 
 	if pygame.font:
@@ -155,30 +178,36 @@ def main():
 	clock = pygame.time.Clock()
 	allsprites = pygame.sprite.RenderPlain(())
 	
+	
+	pawns = []
+	pawns.append(gameMap.tiles[3][7].addPawn(Villager(gameMap,7,3)))
 
 	while 1:
 		clock.tick(60)
 		#Handle Input Events
-		for event in pygame.event.get():
-			if event.type == QUIT:
-				return
-			elif event.type == KEYDOWN and event.key == K_ESCAPE:
-				return
-			elif event.type == MOUSEBUTTONDOWN:
-				#print "Looking for collisions"
-				for row in gameMap.tiles:
-					for tile in row:
-						if tile.rect.collidepoint(pygame.mouse.get_pos()):
-							
-							if tile.checkHexCollision(pygame.mouse.get_pos()):
+		print "Carrying a ",mouseCarrying
+		if True:
+			for event in pygame.event.get():
+				if event.type == QUIT:
+					return
+				elif event.type == KEYDOWN and event.key == K_ESCAPE:
+					return
+				elif event.type == MOUSEBUTTONDOWN:
+					#print "Looking for collisions"
+					for row in gameMap.tiles:
+						for tile in row:
+							if tile.rect.collidepoint(pygame.mouse.get_pos()):
 								
-								gameMap.hexClicked(tile.xloc,tile.yloc)
-								break
+								if tile.checkHexCollision(pygame.mouse.get_pos()):
+									
+									mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
+									break
 		allsprites.update()
 
 		#Draw Everything
 		screen.blit(background, (0, 0))
-		screen.blit(wizard,(100,100))
+		for pawn in pawns:
+			screen.blit(pawn.image,(pawn.x,pawn.y))
 		allsprites.draw(screen)
 		pygame.display.flip()
 
