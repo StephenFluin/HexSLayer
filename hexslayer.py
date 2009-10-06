@@ -1,8 +1,10 @@
 #!/usr/bin/python
 
-import pygame
-import random
+import pygame, random
 from pygame.locals import *
+
+from pawns import *
+from hexmath import *
 
 
 if not pygame.font: print 'Warning, fonts disabled'
@@ -19,45 +21,12 @@ background = pygame.Surface(screen.get_size())
 background = background.convert()
 background.fill((250, 250, 250))
 
-renders = []
+
 
 selected = None
 
 
-class Pawn(pygame.sprite.Sprite):
-	def __init__(self,gameMap,x,y):
-		self.gameMap = gameMap
-		pygame.sprite.Sprite.__init__(self)
-		self.x,self.y = convertGridPosition(self.gameMap,x,y)
-		self.image = pygame.image.load("wizard.png")
-		self.startTile = None
-	def setPos(self,x,y):
-		self.x,self.y = convertGridPosition(self.gameMap,x,y)
-		self.startTile.pawn = None
-		self.gameMap.getTile((x,y)).pawn = self
-		self.gameMap.getTile((x,y)).draw()
-	def attack(self,x,y):
-		#print "Testing if we can attack this tile"
-		#print "Returning the pawn to " , self.startTile.xloc,"X",self.startTile.yloc
-		tiles = self.gameMap.getTileSet((self.startTile.xloc,self.startTile.yloc))
-		for tile in tiles:
-			if(tile.isAdjacent((x,y))):
-				#The attacked tile is adjacent to a tile in our starting set
-				if self.gameMap.getTile((x,y)).village:
-					if (self.gameMap.getTile((x,y)).player != self.startTile.player):
-						renders.remove(self.gameMap.getTile((x,y)).village)
-						self.gameMap.getTile((x,y)).village = None
-					else:
-						return False
-				self.gameMap.getTile((x,y)).setPlayer(self.startTile.player)
-				self.gameMap.cleanUpGame()
-				return True
-		return False
-			
-		
-class Villager(Pawn):
-	def __init__(self,gameMap,xloc,yloc):
-		Pawn.__init__(self,gameMap,xloc,yloc)
+
 
 class Village(pygame.sprite.Sprite):
 	def __init__(self,gameMap,xloc,yloc):
@@ -66,7 +35,7 @@ class Village(pygame.sprite.Sprite):
 		self.xloc = xloc
 		self.yloc = yloc
 		self.image = pygame.image.load("village.png")
-		renders.append(self)
+		gameMap.renders.append(self)
 		
 
 class Tile(pygame.sprite.Sprite):
@@ -147,6 +116,8 @@ class Map():
 		
 		self.tiles = []
 		self.alltiles = []
+		self.renders = []
+		self.selectedSet = []
 		
 		for y in range(self.height):
 			
@@ -163,16 +134,19 @@ class Map():
 		if(clickedTile.pawn != None):
 			retval = clickedTile.pawn
 		
-		selectedSet = self.getTileSet((x,y))
+		for tile in self.selectedSet:
+			tile.deselect()
+		self.selectedSet = self.getTileSet((x,y))
 		shouldDeselect = clickedTile.selected
 		if not retval:
-			for tile in selectedSet:
+			for tile in self.selectedSet:
 				if(shouldDeselect): 
 					tile.deselect()
-					print "Deselecting tile"
+					
+					self.selectedSet = None
 				else: 
 					tile.select()
-					print "Selecting tile"
+					
 					
 		return retval
 		
@@ -232,20 +206,13 @@ class Map():
 					dest.village = Village(dest.gameMap,dest.xloc,dest.yloc)
 				while len(villages) > 1 or ( len(villages) > 0 and len(realm) < 2):
 					dest = villages.pop(random.randrange(len(villages)))
-					renders.remove(dest.village)
+					self.renders.remove(dest.village)
 					dest.village = None
 				
 		
 	
 	
-def getHexAt(x,y):
-	s = tilesize
-	l = .25
-	r = .75
-	return ((x+l*s,y), (x+r*s,y), (x+s,y+s/2), (x+r*s,y+s), (x+l*s,y+s), (x,y+s/2))
-	
-def convertGridPosition(map,x,y):
-	return (x*1.5*tilesize+y%2*tilesize*.75+map.x,y*tilesize/2+map.y)
+
 		
 def main():
 	
@@ -265,7 +232,7 @@ def main():
 	
 	
 	
-	renders.append(gameMap.tiles[3][7].addPawn(Villager(gameMap,7,3)))
+	gameMap.renders.append(gameMap.tiles[3][7].addPawn(Villager(gameMap,7,3)))
 	gameMap.cleanUpGame()
 
 	while True:
@@ -305,35 +272,17 @@ def main():
 				elif event.type == MOUSEMOTION:
 					if mouseCarrying != None:
 						mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()
-						mouseCarrying.x -= 15
-						mouseCarrying.y -= 15
+						mouseCarrying.x -= 5
+						mouseCarrying.y -= 5
 		allsprites.update()
 
 		#Draw Everything
 		screen.blit(background, (0, 0))
-		for pawn in renders:
+		for pawn in gameMap.renders:
 			screen.blit(pawn.image,(pawn.x,pawn.y))
 		allsprites.draw(screen)
 		pygame.display.flip()
 
-# adjacency works as:	NW		N		NE		SE		S	SW
-# 1,2 is different like:	-1,-1	0,-2		0,-1		0,1		0,2	-1,1
-# 0,3 is different like:	0,-1		0,-2		1,-1		1,1		0,2	0,1
-# 1,3 is different like:	0,-1		0,-2		1,-1		1,1		0,2	0,1
-# 1,4 is different like:	-1,-1	0,-2		0,-1		0,1		0,2	-1,1
-def isAdjacent(x1,y1,x2,y2):
-	for i in range(6):
-		if getAdjacent(x1,y1,i) == (x2,y2):
-			return 1
-	return 0
-
-# We define 0 as north, then go clockwise.
-def getAdjacent(x,y,direction):
-	evenYChanges = ((0,-2),(0,-1),(0,1),(0,2),(-1,1),(-1,-1))
-	oddYChanges = ((0,-2),(1,-1),(1,1),(0,2),(0,1),(0,-1))
-	dirChanges=(evenYChanges,oddYChanges)
-	change = dirChanges[y % 2][direction]
-	return (x+change[0],y+change[1])
 
 
 
