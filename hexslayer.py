@@ -31,8 +31,10 @@ class Pawn(pygame.sprite.Sprite):
 		self.x,self.y = convertGridPosition(self.gameMap,x,y)
 		self.startTile.pawn = None
 		self.gameMap.getTile((x,y)).pawn = self
+		self.gameMap.getTile((x,y)).draw()
 	def attack(self,x,y):
 		print "Testing if we can attack this tile"
+		print "Returning the pawn to " , self.startTile.xloc,"X",self.startTile.yloc
 		tiles = self.gameMap.getTileSet((self.startTile.xloc,self.startTile.yloc))
 		for tile in tiles:
 			if(tile.isAdjacent((x,y))):
@@ -67,6 +69,7 @@ class Tile(pygame.sprite.Sprite):
 		
 	def draw(self):
 		rect = pygame.draw.polygon(background,self.color,self.getHex(),0)
+		pygame.draw.polygon(background,pygame.Color("#000000"),self.getHex(),1)
 		#pygame.display.update()
 		
 		return rect
@@ -93,7 +96,7 @@ class Tile(pygame.sprite.Sprite):
 	def getAdjacent(self,direction):
 		return getAdjacent(self.xloc,self.yloc,direction)
 	def isAdjacent(self,point):
-		print "Checking for adjacency."
+		#print "Checking for adjacency."
 		for dir in range(6):
 			target = self.getAdjacent(dir)
 			if(target == point):
@@ -103,7 +106,7 @@ class Tile(pygame.sprite.Sprite):
 			
 	def select(self):
 		#print "Selecting tile."
-		pygame.draw.polygon(background,pygame.Color("#000000"),self.getHex(),1)
+		pygame.draw.polygon(background,pygame.Color("#FFFFFF"),self.getHex(),1)
 		self.selected = True
 	def deselect(self):
 		#print "Deselecting tile"
@@ -140,12 +143,13 @@ class Map():
 			retval = clickedTile.pawn
 		
 		selectedSet = self.getTileSet((x,y))
-		for tile in selectedSet:
-			if(tile.selected == 0): 
-				tile.select()
-			else: 
-				tile.deselect()
-				
+		if not retval:
+			for tile in selectedSet:
+				if(tile.selected == 0): 
+					tile.select()
+				else: 
+					tile.deselect()
+					
 		return retval
 		
 	def hexDropped(self,carry,x,y):
@@ -154,7 +158,8 @@ class Map():
 		print "Set the position of the carry to ",x,"X",y
 		
 	def getTile(self,point):
-		print "doing a tile lookup with ",point
+		if point[1] < 0 or point[1] >= self.height or point[0] < 0 or point[0] > self.width:
+			return None
 		return self.tiles[point[1]][point[0]]
 		
 			
@@ -171,7 +176,7 @@ class Map():
 		
 			for i in range(6):
 				considered = self.getTile(searching.getAdjacent(i))
-				if searching.player == considered.player:
+				if considered and searching.player == considered.player:
 					#print "Was same color"
 					if considered not in searched and considered not in toSearch:
 						toSearch.append(considered)
@@ -235,15 +240,16 @@ def main():
 										print "I have set the startTile of the carry."
 									break
 				elif event.type == MOUSEBUTTONUP:
-					if mouseCarrying != None:
+					if mouseCarrying:
 						for row in gameMap.tiles:
 							for tile in row:
 								if tile.rect.collidepoint(pygame.mouse.get_pos()):
 									if tile.checkHexCollision(pygame.mouse.get_pos()):
 										if(mouseCarrying.attack(tile.xloc,tile.yloc)):
+											print "Attack of this square was successful, dropping player there."
 											gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
 										else:
-											mouseCarrying.x,mouseCarrying.y = mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc
+											mouseCarrying.setPos( mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc)
 						mouseCarrying = None
 				elif event.type == MOUSEMOTION:
 					if mouseCarrying != None:
