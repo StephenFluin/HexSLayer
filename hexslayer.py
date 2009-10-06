@@ -19,13 +19,17 @@ background = pygame.Surface(screen.get_size())
 background = background.convert()
 background.fill((250, 250, 250))
 
+renders = []
+
 selected = None
+
+
 class Pawn(pygame.sprite.Sprite):
 	def __init__(self,gameMap,x,y):
 		self.gameMap = gameMap
 		pygame.sprite.Sprite.__init__(self)
 		self.x,self.y = convertGridPosition(self.gameMap,x,y)
-		self.image = pygame.image.load("wizard.png");
+		self.image = pygame.image.load("wizard.png")
 		self.startTile = None
 	def setPos(self,x,y):
 		self.x,self.y = convertGridPosition(self.gameMap,x,y)
@@ -33,13 +37,20 @@ class Pawn(pygame.sprite.Sprite):
 		self.gameMap.getTile((x,y)).pawn = self
 		self.gameMap.getTile((x,y)).draw()
 	def attack(self,x,y):
-		print "Testing if we can attack this tile"
-		print "Returning the pawn to " , self.startTile.xloc,"X",self.startTile.yloc
+		#print "Testing if we can attack this tile"
+		#print "Returning the pawn to " , self.startTile.xloc,"X",self.startTile.yloc
 		tiles = self.gameMap.getTileSet((self.startTile.xloc,self.startTile.yloc))
 		for tile in tiles:
 			if(tile.isAdjacent((x,y))):
 				#The attacked tile is adjacent to a tile in our starting set
+				if self.gameMap.getTile((x,y)).village:
+					if (self.gameMap.getTile((x,y)).player != self.startTile.player):
+						renders.remove(self.gameMap.getTile((x,y)).village)
+						self.gameMap.getTile((x,y)).village = None
+					else:
+						return False
 				self.gameMap.getTile((x,y)).setPlayer(self.startTile.player)
+				self.gameMap.cleanUpGame()
 				return True
 		return False
 			
@@ -47,7 +58,15 @@ class Pawn(pygame.sprite.Sprite):
 class Villager(Pawn):
 	def __init__(self,gameMap,xloc,yloc):
 		Pawn.__init__(self,gameMap,xloc,yloc)
-	
+
+class Village(pygame.sprite.Sprite):
+	def __init__(self,gameMap,xloc,yloc):
+		pygame.sprite.Sprite.__init__(self)
+		self.x,self.y = convertGridPosition(gameMap,xloc,yloc)
+		self.xloc = xloc
+		self.yloc = yloc
+		self.image = pygame.image.load("village.png")
+		renders.append(self)
 		
 
 class Tile(pygame.sprite.Sprite):
@@ -61,6 +80,8 @@ class Tile(pygame.sprite.Sprite):
 		self.rect = self.draw()
 		self.selected = False
 		self.pawn = None
+		self.village = None
+		self.gameMap = gameMap
 		
 
 	def setPlayer(self,player):
@@ -100,7 +121,7 @@ class Tile(pygame.sprite.Sprite):
 		for dir in range(6):
 			target = self.getAdjacent(dir)
 			if(target == point):
-				print "Target was adjacent to this square"
+				#print "Target was adjacent to this square"
 				return True
 		return False
 			
@@ -143,22 +164,26 @@ class Map():
 			retval = clickedTile.pawn
 		
 		selectedSet = self.getTileSet((x,y))
+		shouldDeselect = clickedTile.selected
 		if not retval:
 			for tile in selectedSet:
-				if(tile.selected == 0): 
-					tile.select()
-				else: 
+				if(shouldDeselect): 
 					tile.deselect()
+					print "Deselecting tile"
+				else: 
+					tile.select()
+					print "Selecting tile"
 					
 		return retval
 		
 	def hexDropped(self,carry,x,y):
 		clickedTile = self.tiles[y][x]
 		carry.setPos(x,y)
-		print "Set the position of the carry to ",x,"X",y
+		#print "Set the position of the carry to ",x,"X",y
 		
 	def getTile(self,point):
-		if point[1] < 0 or point[1] >= self.height or point[0] < 0 or point[0] > self.width:
+		#print "Looking for",point
+		if point[1] < 0 or point[1] >= self.height or point[0] < 0 or point[0] >= self.width:
 			return None
 		return self.tiles[point[1]][point[0]]
 		
@@ -184,6 +209,32 @@ class Map():
 						found.append(considered)
 		#print "Our search found: ",found
 		return found
+		
+	# Adds, splits villages
+	# @TODO, clean up this method, it is super redudant (checks each set once for each tile in the set)
+	def cleanUpGame(self):
+		for row in self.tiles:
+			for tile in row:
+				realm = self.getTileSet(tile.getPoint())
+				villagecount = 0
+				villages = []
+				# Count villages
+				for spot in realm:
+					if(spot.village):
+						villagecount += 1
+						villages.append(spot)
+						#print "found village at ",spot.getPoint()
+						
+				#print "Found ",villagecount,"villages in this realm of ",len(realm),", ",len(villages)," of which were villages"
+				#Add a village if none found
+				if villagecount == 0 and len(realm) > 1:
+					dest =realm[random.randrange(len(realm))]
+					dest.village = Village(dest.gameMap,dest.xloc,dest.yloc)
+				while len(villages) > 1 or ( len(villages) > 0 and len(realm) < 2):
+					dest = villages.pop(random.randrange(len(villages)))
+					renders.remove(dest.village)
+					dest.village = None
+				
 		
 	
 	
@@ -213,9 +264,9 @@ def main():
 	allsprites = pygame.sprite.RenderPlain(())
 	
 	
-	pawns = []
-	pawns.append(gameMap.tiles[3][7].addPawn(Villager(gameMap,7,3)))
 	
+	renders.append(gameMap.tiles[3][7].addPawn(Villager(gameMap,7,3)))
+	gameMap.cleanUpGame()
 
 	while True:
 		clock.tick(60)
@@ -237,7 +288,7 @@ def main():
 									mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
 									if mouseCarrying:
 										mouseCarrying.startTile = tile
-										print "I have set the startTile of the carry."
+										#print "I have set the startTile of the carry."
 									break
 				elif event.type == MOUSEBUTTONUP:
 					if mouseCarrying:
@@ -260,7 +311,7 @@ def main():
 
 		#Draw Everything
 		screen.blit(background, (0, 0))
-		for pawn in pawns:
+		for pawn in renders:
 			screen.blit(pawn.image,(pawn.x,pawn.y))
 		allsprites.draw(screen)
 		pygame.display.flip()
