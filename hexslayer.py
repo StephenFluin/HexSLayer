@@ -305,8 +305,8 @@ def main():
 				elif event.type == MOUSEMOTION:
 					if mouseCarrying != None:
 						mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()
-						mouseCarrying.x -= 5
-						mouseCarrying.y -= 5
+						mouseCarrying.x -= 15
+						mouseCarrying.y -= 15
 		allsprites.update()
 
 		#Draw Everything
