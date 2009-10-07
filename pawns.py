@@ -9,6 +9,7 @@ class Pawn(pygame.sprite.Sprite):
 		self.x,self.y = convertGridPosition(self.gameMap,x,y)
 		self.image = pygame.image.load("wizard.png")
 		self.startTile = None
+		self.moved = False
 		
 	def setPos(self,x,y):
 		self.x,self.y = convertGridPosition(self.gameMap,x,y)

@@ -5,6 +5,7 @@ from pygame.locals import *
 
 from pawns import *
 from hexmath import *
+from controls import *
 
 
 if not pygame.font: print 'Warning, fonts disabled'
@@ -34,6 +35,7 @@ class Village(pygame.sprite.Sprite):
 		self.x,self.y = convertGridPosition(gameMap,xloc,yloc)
 		self.xloc = xloc
 		self.yloc = yloc
+		self.balance = 5
 		self.image = pygame.image.load("village.png")
 		gameMap.renders.append(self)
 		
@@ -114,10 +116,14 @@ class Map():
 		self.x = 5
 		self.y = 30
 		
+		self.selectedSetIncome = 0
+		self.selectedSetBalance = 0
+		
 		self.tiles = []
 		self.alltiles = []
 		self.renders = []
 		self.selectedSet = []
+		self.infoBar = None
 		
 		for y in range(self.height):
 			
@@ -134,18 +140,12 @@ class Map():
 		if(clickedTile.pawn != None):
 			retval = clickedTile.pawn
 		
-		for tile in self.selectedSet:
-			tile.deselect()
-		self.selectedSet = self.getTileSet((x,y))
-		shouldDeselect = clickedTile.selected
+		
 		if not retval:
 			for tile in self.selectedSet:
-				if(shouldDeselect): 
-					tile.deselect()
-					
-					self.selectedSet = None
-				else: 
-					tile.select()
+				tile.deselect()
+			self.selectedSet = self.getTileSet((x,y))
+			self.selectSet(self.selectedSet)
 					
 					
 		return retval
@@ -160,6 +160,21 @@ class Map():
 		if point[1] < 0 or point[1] >= self.height or point[0] < 0 or point[0] >= self.width:
 			return None
 		return self.tiles[point[1]][point[0]]
+		
+	def selectSet(self,set):
+		income = 0
+		balance = 0
+		for tile in self.selectedSet:
+			tile.select()
+			income += 1
+			if(tile.village):
+				balance = tile.village.balance
+				print "Just set balance of current selection"
+		if(income == 1):
+			income = 0
+		self.changeIncome(income, balance)
+
+			
 		
 			
 	
@@ -189,6 +204,7 @@ class Map():
 	def cleanUpGame(self):
 		for row in self.tiles:
 			for tile in row:
+				tile.deselect()
 				realm = self.getTileSet(tile.getPoint())
 				villagecount = 0
 				villages = []
@@ -208,7 +224,16 @@ class Map():
 					dest = villages.pop(random.randrange(len(villages)))
 					self.renders.remove(dest.village)
 					dest.village = None
-				
+					
+	def income(self):
+		return self.selectedSetIncome
+	def balance(self):
+		return self.selectedSetBalance
+	def changeIncome(self,income,balance):
+		self.selectedSetIncome = income
+		self.selectedSetBalance = balance
+		self.infobar.draw()
+		self.store.draw()
 		
 	
 	
@@ -230,9 +255,14 @@ def main():
 	clock = pygame.time.Clock()
 	allsprites = pygame.sprite.RenderPlain(())
 	
+	background.blit(pygame.image.load("endturn.png"),(400,450))
 	
 	
+	gameMap.infobar = VillageData(gameMap,25,455)
+	gameMap.store = PurchaseUnits(gameMap,250,450)
 	gameMap.renders.append(gameMap.tiles[3][7].addPawn(Villager(gameMap,7,3)))
+	gameMap.renders.append(gameMap.infobar)
+	gameMap.renders.append(gameMap.store)
 	gameMap.cleanUpGame()
 
 	while True:
@@ -272,8 +302,8 @@ def main():
 				elif event.type == MOUSEMOTION:
 					if mouseCarrying != None:
 						mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()
-						mouseCarrying.x -= 5
-						mouseCarrying.y -= 5
+						mouseCarrying.x -= 15
+						mouseCarrying.y -= 15
 		allsprites.update()
 
 		#Draw Everything
