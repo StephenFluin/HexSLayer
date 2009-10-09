@@ -16,11 +16,14 @@ pygame.init()
 screen = pygame.display.set_mode((640,480))
 pygame.display.set_caption('HexSLayer')
 
-playerColors = ("#003DF5","#FF3366","#66FF33","#33FFCC","#FFCC33","#FF6633")
+playerColors = ("#66FF33","#003DF5","#FF3366","#33FFCC","#FFCC33","#FF6633")
 
 background = pygame.Surface(screen.get_size())
 background = background.convert()
 background.fill((250, 250, 250))
+
+infobarLocation =(25,455)
+storeLocation = (325,450)
 
 
 
@@ -116,13 +119,15 @@ class Map():
 		self.x = 5
 		self.y = 30
 		
+		self.turn = 0
 		self.selectedSetIncome = 0
-		self.selectedSetBalance = 0
+		self.selectedSetUpkeep = 0
 		
 		self.tiles = []
 		self.alltiles = []
 		self.renders = []
 		self.selectedSet = []
+		self.selectedVillage = None
 		self.infoBar = None
 		
 		for y in range(self.height):
@@ -137,15 +142,15 @@ class Map():
 		retval = None
 		print "Clicked tile:",self.tiles[y][x].xloc,"X",self.tiles[y][x].yloc
 		clickedTile = self.tiles[y][x]
-		if(clickedTile.pawn != None):
+		if(clickedTile.pawn != None and clickedTile.pawn.moved == False):
 			retval = clickedTile.pawn
+			
 		
 		
 		if not retval:
 			for tile in self.selectedSet:
 				tile.deselect()
-			self.selectedSet = self.getTileSet((x,y))
-			self.selectSet(self.selectedSet)
+			self.selectSet((x,y))
 					
 					
 		return retval
@@ -161,18 +166,24 @@ class Map():
 			return None
 		return self.tiles[point[1]][point[0]]
 		
-	def selectSet(self,set):
+	def selectSet(self,point):
+		self.selectedSet = self.getTileSet(point)
+		
 		income = 0
 		balance = 0
+		upkeep = 0
 		for tile in self.selectedSet:
 			tile.select()
 			income += 1
+			if tile.pawn:
+				upkeep += tile.pawn.upkeep
 			if(tile.village):
 				balance = tile.village.balance
-				print "Just set balance of current selection"
+				self.selectedVillage = tile.village
 		if(income == 1):
 			income = 0
-		self.changeIncome(income, balance)
+		self.selectedSetUpkeep = upkeep
+		self.changeIncome(income)
 
 			
 		
@@ -204,7 +215,6 @@ class Map():
 	def cleanUpGame(self):
 		for row in self.tiles:
 			for tile in row:
-				tile.deselect()
 				realm = self.getTileSet(tile.getPoint())
 				villagecount = 0
 				villages = []
@@ -224,18 +234,33 @@ class Map():
 					dest = villages.pop(random.randrange(len(villages)))
 					self.renders.remove(dest.village)
 					dest.village = None
+		if(self.selectedSet):
+			self.selectSet((self.selectedVillage.xloc,self.selectedVillage.yloc))
 					
-	def income(self):
-		return self.selectedSetIncome
-	def balance(self):
-		return self.selectedSetBalance
-	def changeIncome(self,income,balance):
+
+	def changeIncome(self,income):
 		self.selectedSetIncome = income
-		self.selectedSetBalance = balance
 		self.infobar.draw()
 		self.store.draw()
 		
-	
+	def newTurn(self):
+		#End turn case
+		for row in self.tiles:
+			for tile in row:
+				if tile.village:
+					realm = self.getTileSet((tile.xloc,tile.yloc))
+					tile.village.balance += len(realm)
+					for space in realm:
+						if space.pawn:
+							tile.village.balance -= space.pawn.upkeep
+					if tile.selected:
+						self.selectedSetBalance = tile.village.balance
+				if tile.pawn:
+					tile.pawn.moved = False
+		self.turn += 1
+		pygame.display.set_caption("HexSLayer - Turn " + str(self.turn))
+		self.infobar.draw()
+		self.store.draw()
 	
 
 		
@@ -258,12 +283,13 @@ def main():
 	background.blit(pygame.image.load("endturn.png"),(400,450))
 	
 	
-	gameMap.infobar = VillageData(gameMap,25,455)
-	gameMap.store = PurchaseUnits(gameMap,250,450)
-	gameMap.renders.append(gameMap.tiles[3][7].addPawn(Villager(gameMap,7,3)))
+	gameMap.infobar = VillageData(gameMap,infobarLocation[0],infobarLocation[1])
+	gameMap.store = PurchaseUnits(gameMap,storeLocation[0],storeLocation[1])
 	gameMap.renders.append(gameMap.infobar)
 	gameMap.renders.append(gameMap.store)
 	gameMap.cleanUpGame()
+	
+	gameMap.newTurn()
 
 	while True:
 		clock.tick(60)
@@ -287,6 +313,15 @@ def main():
 										mouseCarrying.startTile = tile
 										#print "I have set the startTile of the carry."
 									break
+					x,y =pygame.mouse.get_pos()
+					if(x>400 and y > 450):
+						gameMap.newTurn()
+					if(x<400 and x > 250 and y > 450):
+						print "Spawning a new villager, and deducting from bank."
+						mouseCarrying = Villager(gameMap,350,450)
+						gameMap.selectedVillage.balance -= 10
+						mouseCarrying.startTile = gameMap.selectedSet[0]
+						gameMap.renders.append(mouseCarrying)
 				elif event.type == MOUSEBUTTONUP:
 					if mouseCarrying:
 						for row in gameMap.tiles:

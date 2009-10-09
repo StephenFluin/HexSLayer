@@ -10,12 +10,12 @@ class VillageData(pygame.sprite.Sprite):
 
 		self.draw()
 	def draw(self):
-		self.image = pygame.Surface((250,30))
+		self.image = pygame.Surface((325,30))
 		self.image.fill(pygame.Color("#FFFFFF"))
-		if(self.gameMap.income() > 0):
-			msg = "Village Income:"+str(self.gameMap.income())
-			if(self.gameMap.balance() > 0):
-				msg += "  Balance:"+str(self.gameMap.balance())
+		if(self.gameMap.selectedSetIncome > 0):
+			msg = "Village Income:+"+str(self.gameMap.selectedSetIncome)+",-"+str(self.gameMap.selectedSetUpkeep)+"="+str(self.gameMap.selectedSetIncome-self.gameMap.selectedSetUpkeep)
+			if(self.gameMap.selectedVillage.balance > 0):
+				msg += "  Balance:"+str(self.gameMap.selectedVillage.balance)
 				
 			font = pygame.font.Font(None, 22)
 			text = font.render(msg,1,(10,10,10))
@@ -29,9 +29,9 @@ class PurchaseUnits(pygame.sprite.Sprite):
 		self.income = 0
 		self.draw()
 	def draw(self):
-		self.image = pygame.Surface((75,30))
+		self.image = pygame.Surface((50,30))
 		self.image.fill(pygame.Color("#FFFFFF"))
-		if(self.gameMap.balance() >= 5):
+		if(self.gameMap.selectedVillage and self.gameMap.selectedVillage.balance >= 10):
 			# TODO: Make sure this doesn't load on each call of draw
 			self.image.blit(pygame.image.load("villager.png"),(0,0))
 			
