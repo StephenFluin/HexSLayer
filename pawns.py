@@ -1,3 +1,8 @@
+# Pawns Classfiles
+# provides objects representing different pawns that can be placed on the game board.
+#
+#
+
 import pygame, random
 from pygame.locals import *
 from hexmath import *
