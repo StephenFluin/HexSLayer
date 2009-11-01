@@ -287,6 +287,25 @@ class Map():
 		pygame.display.set_caption("HexSLayer - Turn %s" % (str(self.turn)))
 		self.infobar.draw()
 		self.store.draw()
+		
+		self.runAI()
+		
+	# Process AI calls for each player. 
+	# TODO Make this use a model of handing an AI class a gamemap and have the AI take a single turn.
+	def runAI(self):
+		for player in playerColors[1:]:
+			print "Running ai for %s" % (player)
+			
+			# buy units where appropriate
+			for row in self.tiles:
+				for tile in row:
+					realm = self.getTileSet(tile.getPoint())
+					for t in realm:
+						if t.village and t.village.balance > 10:
+							print "TODO Buy village on this spot"
+						
+
+			
 	
 
 		
