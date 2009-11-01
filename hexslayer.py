@@ -56,6 +56,7 @@ class Tile(pygame.sprite.Sprite):
 		self.pawn = None
 		self.village = None
 		self.gameMap = gameMap
+		self.grave = None
 		
 
 	def setPlayer(self,player):
@@ -140,7 +141,7 @@ class Map():
 			
 	def hexClicked(self,x,y):
 		retval = None
-		print "Clicked tile:",self.tiles[y][x].xloc,"X",self.tiles[y][x].yloc
+		#print "Clicked tile: %sx%s" % (self.tiles[y][x].xloc,self.tiles[y][x].yloc)
 		clickedTile = self.tiles[y][x]
 		if(clickedTile.pawn != None and clickedTile.pawn.moved == False):
 			retval = clickedTile.pawn
@@ -245,20 +246,45 @@ class Map():
 		
 	def newTurn(self):
 		#End turn case
+		print "End of turn %s" % (self.turn)
+		
+		#Remove graven images
+		for row in self.tiles:
+			for tile in row:
+				if tile.grave:
+					self.renders.remove(tile.grave)
+					tile.grave = None
+					#print "Removed a grave."
+		
+		#For each set, add balance to village, and remove upkeeps
 		for row in self.tiles:
 			for tile in row:
 				if tile.village:
 					realm = self.getTileSet((tile.xloc,tile.yloc))
+					#print "Village balance was %s " %(tile.village.balance),
 					tile.village.balance += len(realm)
 					for space in realm:
 						if space.pawn:
 							tile.village.balance -= space.pawn.upkeep
 					if tile.selected:
 						self.selectedSetBalance = tile.village.balance
+					#print "Village balance became %s" % (tile.village.balance)
+					
+					# Kill all of the pawns in case of negative balance
+					if tile.village.balance < 0:
+						for space in realm:
+							if space.pawn:
+								self.renders.remove(space.pawn)
+								space.pawn = None
+								space.grave = Grave(self,space.x,space.y)
+								self.renders.append(space.grave)
+								#print "Removed a pawn and added a grave."
+								tile.village.balance = 0
+					
 				if tile.pawn:
 					tile.pawn.moved = False
 		self.turn += 1
-		pygame.display.set_caption("HexSLayer - Turn " + str(self.turn))
+		pygame.display.set_caption("HexSLayer - Turn %s" % (str(self.turn)))
 		self.infobar.draw()
 		self.store.draw()
 	
@@ -329,7 +355,7 @@ def main():
 								if tile.rect.collidepoint(pygame.mouse.get_pos()):
 									if tile.checkHexCollision(pygame.mouse.get_pos()):
 										if(mouseCarrying.attack(tile.xloc,tile.yloc)):
-											print "Attack of this square was successful, dropping player there."
+											#print "Attack of this square was successful, dropping player there."
 											gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
 										else:
 											mouseCarrying.setPos( mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc)
