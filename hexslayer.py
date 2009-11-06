@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import pygame, random
+import pygame, random, time
 from pygame.locals import *
 
 from pawns import *
@@ -62,6 +62,7 @@ class Tile(pygame.sprite.Sprite):
 	def setPlayer(self,player):
 		self.player = player
 		self.color = pygame.Color(playerColors[self.player])
+		self.draw()
 		
 	def draw(self):
 		rect = pygame.draw.polygon(background,self.color,self.getHex(),0)
@@ -91,6 +92,8 @@ class Tile(pygame.sprite.Sprite):
 			return 1
 	def getAdjacent(self,direction):
 		return getAdjacent(self.xloc,self.yloc,direction)
+	def getAdjacentTile(self,direction):
+		return self.gameMap.getTile(self.getAdjacent(direction))
 	def isAdjacent(self,point):
 		#print "Checking for adjacency."
 		for dir in range(6):
@@ -235,7 +238,7 @@ class Map():
 					dest = villages.pop(random.randrange(len(villages)))
 					self.renders.remove(dest.village)
 					dest.village = None
-		if(self.selectedSet):
+		if(self.selectedSet and self.selectedVillage):
 			self.selectSet((self.selectedVillage.xloc,self.selectedVillage.yloc))
 					
 
@@ -293,7 +296,9 @@ class Map():
 	# Process AI calls for each player. 
 	# TODO Make this use a model of handing an AI class a gamemap and have the AI take a single turn.
 	def runAI(self):
-		for player in range(1,5):
+		#0-5 means you have an AI-only game, 1-5 means player 0 is human.
+		#The game currently has no protections from cheating, but do we need them if all of the AI's have moved every turn?
+		for player in range(0,5):
 			print "Running ai for player %s" % (player)
 			
 			# buy units where appropriate
@@ -303,7 +308,7 @@ class Map():
 						realm = self.getTileSet(tile.getPoint())
 						# TODO: This is really really innefficient (n^2 rather than n)
 						for t in realm:
-							if t.village and t.village.balance >= 10 and not tile.pawn and not tile.grave and not tile.village:
+							if t.village and t.village.balance >= 30 and not tile.pawn and not tile.grave and not tile.village:
 								t.village.balance -= 10
 								tile.pawn = Villager(self,tile.xloc,tile.yloc)
 								self.renders.append(tile.pawn)
@@ -312,6 +317,33 @@ class Map():
 								if t.village:
 									#print "didn't buy anything, because %s is the balance" % (t.village.balance)
 									nothing = None
+			# move units where appropriate
+			for row in self.tiles:
+				for tile in row:
+					
+					if tile.player == player and tile.pawn and not tile.pawn.moved:
+						set = self.getTileSet(tile.getPoint())
+						for candidate in set:
+							direction = random.randint(0,5)
+							for i in range(0,6):
+								dest = candidate.getAdjacentTile((direction + i) % 6)
+								if not(not dest or dest.player == tile.player or dest.xloc < 0 or dest.yloc < 0 or dest.xloc >= self.width or dest.yloc >= self.height):
+									break
+								if i == 5:
+									dest = None
+								
+							
+						if dest:
+							tile.pawn.startTile = tile
+							if tile.pawn.attack(dest.xloc,dest.yloc):
+								tile.pawn.moved = True
+								tile.pawn.setPos(dest.xloc,dest.yloc)
+						else:
+							print "No candidate for attack."
+							
+						
+
+						
 						
 							
 						
@@ -404,6 +436,7 @@ def main():
 			screen.blit(pawn.image,(pawn.x,pawn.y))
 		allsprites.draw(screen)
 		pygame.display.flip()
+		gameMap.newTurn()
 
 
 
