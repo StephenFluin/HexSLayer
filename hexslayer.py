@@ -227,29 +227,37 @@ class Map():
 	# Adds, splits villages
 	# @TODO, clean up this method, it is super redudant (checks each set once for each tile in the set)
 	def cleanUpGame(self):
-		print "Cleaning up the game, all realms should be set properly still."
+		#clean all realms
 		for row in self.tiles:
 			for tile in row:
-				tile.realm = self.getTileSet(tile.getPoint())
-				villagecount = 0
-				villages = []
-				# Count villages
-				for spot in tile.realm:
-					if(spot.village):
-						villagecount += 1
-						villages.append(spot)
-						#print "found village at ",spot.getPoint()
-						
-				#print "Found ",villagecount,"villages in this realm of ",len(realm),", ",len(villages)," of which were villages"
-				#Add a village if none found, this means the city has been split, reset the realm on tiles in the new realm.
-				if villagecount == 0 and len(tile.realm) > 1:
-					dest =tile.realm[random.randrange(len(tile.realm))]
-					dest.village = Village(dest.gameMap,dest.xloc,dest.yloc)
-				
-				while len(villages) > 1 or ( len(villages) > 0 and len(tile.realm) < 2):
-					dest = villages.pop(random.randrange(len(villages)))
-					self.renders.remove(dest.village)
-					dest.village = None
+				tile.realm = None
+		
+		
+		for row in self.tiles:
+			for tile in row:
+				# Only clean and update if realm hasn't already been handled
+				if not tile.realm:
+					tile.realm = self.getTileSet(tile.getPoint())
+					villagecount = 0
+					villages = []
+					# Count villages
+					for spot in tile.realm:
+						spot.realm = tile.realm
+						if(spot.village):
+							villagecount += 1
+							villages.append(spot)
+							#print "found village at ",spot.getPoint()
+							
+					#print "Found ",villagecount,"villages in this realm of ",len(realm),", ",len(villages)," of which were villages"
+					#Add a village if none found, this means the city has been split, reset the realm on tiles in the new realm.
+					if villagecount == 0 and len(tile.realm) > 1:
+						dest =tile.realm[random.randrange(len(tile.realm))]
+						dest.village = Village(dest.gameMap,dest.xloc,dest.yloc)
+					
+					while len(villages) > 1 or ( len(villages) > 0 and len(tile.realm) < 2):
+						dest = villages.pop(random.randrange(len(villages)))
+						self.renders.remove(dest.village)
+						dest.village = None
 		if(self.selectedSet and self.selectedVillage):
 			self.selectSet((self.selectedVillage.xloc,self.selectedVillage.yloc))
 		

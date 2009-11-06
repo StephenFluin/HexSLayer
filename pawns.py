@@ -29,7 +29,7 @@ class Pawn(pygame.sprite.Sprite):
 		#print "Testing if we can attack this tile"
 		#print "Returning the pawn to " , self.startTile.xloc,"X",self.startTile.yloc
 		dest = self.gameMap.getTile((x,y))
-		print "Attacking tile at %sx%s, which belongs to player %s" % (x,y,dest.player)
+		#print "Attacking tile at %sx%s, which belongs to player %s" % (x,y,dest.player)
 		tiles = self.gameMap.getTileSet((self.startTile.xloc,self.startTile.yloc))
 		for tile in tiles:
 			if(tile.isAdjacent((x,y))):
