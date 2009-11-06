@@ -42,10 +42,10 @@ class Pawn(pygame.sprite.Sprite):
 					if (dest.player != self.startTile.player):
 						if self.level > dest.pawn.level:
 							self.gameMap.renders.remove(dest.pawn)
+							dest.pawn = None
 						else:
 							self.moved = False
 							return False
-						dest.pawn = None
 					else:
 						print "This player is moving a character onto another character, why?!!?!!!!!!!!!!!!!!!!!!!!!!!"
 						# Handle upgrades by replacing dest
@@ -74,6 +74,11 @@ class Pawn(pygame.sprite.Sprite):
 						return False
 				
 				#Normal attack case adjacent opponent square without village will get here.
+				#clear realms for re-allocation in cleanup.
+				if dest.realm:
+					for spot in dest.realm:
+						spot.realm = None
+				
 				dest.setPlayer(self.startTile.player)
 				self.gameMap.cleanUpGame()
 				

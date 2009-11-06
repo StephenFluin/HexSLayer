@@ -41,12 +41,8 @@ class Village(pygame.sprite.Sprite):
 		self.balance = 5
 		self.image = pygame.image.load("village.png")
 		gameMap.renders.append(self)
-		
-class Realm(list):
-	def __init__(self):
-		self.size = 0
-		self.elements = []
-	
+
+
 	
 
 class Tile(pygame.sprite.Sprite):
@@ -56,8 +52,7 @@ class Tile(pygame.sprite.Sprite):
 		self.x,self.y = convertGridPosition(gameMap,xloc,yloc)
 		self.xloc = xloc
 		self.yloc = yloc
-		self.setPlayer(random.randint(0,5))
-		self.rect = self.draw()
+		
 		self.selected = False
 		self.pawn = None
 		self.village = None
@@ -65,24 +60,16 @@ class Tile(pygame.sprite.Sprite):
 		self.grave = None
 		self.realm = None
 		
+		self.setPlayer(random.randint(0,5))
+		
+		self.rect = self.draw()
+		
 
 	# Changes the owner of a tile, redraws, and fixes the realm.
 	def setPlayer(self,player):
 		self.player = player
 		self.color = pygame.Color(playerColors[self.player])
-		self.draw()
-		
-		
-		self.realm.remove(self)
-		
-		realm = self.gameMap.getTileSet(self.getPoint())
-		if len(realm) > 1:
-			if realm[0] == self:
-				self.realm = realm[1].realm
-			else:
-				self.realm = realm[0].realm
-			self.realm.append(self)
-			
+		self.draw()	
 		
 		
 	def draw(self):
@@ -135,13 +122,7 @@ class Tile(pygame.sprite.Sprite):
 	def addPawn(self,pawn):
 		self.pawn = pawn
 		return pawn
-	def buyVillager(self):
-		gameMap.getTileSet
-		if not self.village or self.village.balance < 10:
-			return None
-		else:
-			self.village.balance -= 10
-			return Villager(self.gameMap,0,0)
+	
 			
 
 class Map():
@@ -169,19 +150,7 @@ class Map():
 				row[x] = Tile(self,x,y)
 				self.alltiles.append(row[x])
 			self.tiles.append(row)
-			
-		# setup Realms for newly created tiles.
-		for row in self.tiles:
-			for tile in row:
-				if not tile.realm:
-					realm = self.getTileSet(tile.getPoint())
-					if len(realm) > 1:
-						
-						kingdom = Realm()
-						kingdom.size = len(realm)
-						kingdom.elements = realm
-						for spot in kingdom:
-							spot.realm = kingdom
+
 			
 	def hexClicked(self,x,y):
 		retval = None
@@ -261,11 +230,11 @@ class Map():
 		print "Cleaning up the game, all realms should be set properly still."
 		for row in self.tiles:
 			for tile in row:
-				realm = self.getTileSet(tile.getPoint())
+				tile.realm = self.getTileSet(tile.getPoint())
 				villagecount = 0
 				villages = []
 				# Count villages
-				for spot in realm:
+				for spot in tile.realm:
 					if(spot.village):
 						villagecount += 1
 						villages.append(spot)
@@ -273,15 +242,11 @@ class Map():
 						
 				#print "Found ",villagecount,"villages in this realm of ",len(realm),", ",len(villages)," of which were villages"
 				#Add a village if none found, this means the city has been split, reset the realm on tiles in the new realm.
-				if villagecount == 0 and len(realm) > 1:
-					dest =realm[random.randrange(len(realm))]
+				if villagecount == 0 and len(tile.realm) > 1:
+					dest =tile.realm[random.randrange(len(tile.realm))]
 					dest.village = Village(dest.gameMap,dest.xloc,dest.yloc)
-					for spot in realm:
-						spot.realm = realm
 				
-				
-				
-				while len(villages) > 1 or ( len(villages) > 0 and len(realm) < 2):
+				while len(villages) > 1 or ( len(villages) > 0 and len(tile.realm) < 2):
 					dest = villages.pop(random.randrange(len(villages)))
 					self.renders.remove(dest.village)
 					dest.village = None
@@ -311,7 +276,7 @@ class Map():
 		for row in self.tiles:
 			for tile in row:
 				if tile.village:
-					realm = self.getTileSet((tile.xloc,tile.yloc))
+					realm = tile.realm
 					#print "Village balance was %s " %(tile.village.balance),
 					tile.village.balance += len(realm)
 					for space in realm:
@@ -353,12 +318,13 @@ class Map():
 			for row in self.tiles:
 				for tile in row:
 					if tile.player == player:
-						realm = self.getTileSet(tile.getPoint())
+						realm = tile.realm
 						# TODO: This is really really innefficient (n^2 rather than n)
 						for t in realm:
 							if t.village and t.village.balance >= 30 and not tile.pawn and not tile.grave and not tile.village:
 								
-								tile.pawn = tile.buyVillager()
+								tile.pawn = Villager(self,tile.xloc,tile.yloc)
+								t.village.balance -= 10
 								self.renders.append(tile.pawn)
 								print "Bought a simple pawn and placed at %sx%s for the tile at %sx%s" % (tile.x,tile.y,tile.xloc,tile.yloc)
 							else:
