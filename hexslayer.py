@@ -42,6 +42,12 @@ class Village(pygame.sprite.Sprite):
 		self.image = pygame.image.load("village.png")
 		gameMap.renders.append(self)
 		
+class Realm(list):
+	def __init__(self):
+		self.size = 0
+		self.elements = []
+	
+	
 
 class Tile(pygame.sprite.Sprite):
 	def __init__(self,gameMap,xloc,yloc):
@@ -57,12 +63,27 @@ class Tile(pygame.sprite.Sprite):
 		self.village = None
 		self.gameMap = gameMap
 		self.grave = None
+		self.realm = None
 		
 
+	# Changes the owner of a tile, redraws, and fixes the realm.
 	def setPlayer(self,player):
 		self.player = player
 		self.color = pygame.Color(playerColors[self.player])
 		self.draw()
+		
+		
+		self.realm.remove(self)
+		
+		realm = self.gameMap.getTileSet(self.getPoint())
+		if len(realm) > 1:
+			if realm[0] == self:
+				self.realm = realm[1].realm
+			else:
+				self.realm = realm[0].realm
+			self.realm.append(self)
+			
+		
 		
 	def draw(self):
 		rect = pygame.draw.polygon(background,self.color,self.getHex(),0)
@@ -114,6 +135,13 @@ class Tile(pygame.sprite.Sprite):
 	def addPawn(self,pawn):
 		self.pawn = pawn
 		return pawn
+	def buyVillager(self):
+		gameMap.getTileSet
+		if not self.village or self.village.balance < 10:
+			return None
+		else:
+			self.village.balance -= 10
+			return Villager(self.gameMap,0,0)
 			
 
 class Map():
@@ -140,7 +168,20 @@ class Map():
 			for x in range(self.width):
 				row[x] = Tile(self,x,y)
 				self.alltiles.append(row[x])
-			self.tiles.append(row)		
+			self.tiles.append(row)
+			
+		# setup Realms for newly created tiles.
+		for row in self.tiles:
+			for tile in row:
+				if not tile.realm:
+					realm = self.getTileSet(tile.getPoint())
+					if len(realm) > 1:
+						
+						kingdom = Realm()
+						kingdom.size = len(realm)
+						kingdom.elements = realm
+						for spot in kingdom:
+							spot.realm = kingdom
 			
 	def hexClicked(self,x,y):
 		retval = None
@@ -217,6 +258,7 @@ class Map():
 	# Adds, splits villages
 	# @TODO, clean up this method, it is super redudant (checks each set once for each tile in the set)
 	def cleanUpGame(self):
+		print "Cleaning up the game, all realms should be set properly still."
 		for row in self.tiles:
 			for tile in row:
 				realm = self.getTileSet(tile.getPoint())
@@ -230,16 +272,22 @@ class Map():
 						#print "found village at ",spot.getPoint()
 						
 				#print "Found ",villagecount,"villages in this realm of ",len(realm),", ",len(villages)," of which were villages"
-				#Add a village if none found
+				#Add a village if none found, this means the city has been split, reset the realm on tiles in the new realm.
 				if villagecount == 0 and len(realm) > 1:
 					dest =realm[random.randrange(len(realm))]
 					dest.village = Village(dest.gameMap,dest.xloc,dest.yloc)
+					for spot in realm:
+						spot.realm = realm
+				
+				
+				
 				while len(villages) > 1 or ( len(villages) > 0 and len(realm) < 2):
 					dest = villages.pop(random.randrange(len(villages)))
 					self.renders.remove(dest.village)
 					dest.village = None
 		if(self.selectedSet and self.selectedVillage):
 			self.selectSet((self.selectedVillage.xloc,self.selectedVillage.yloc))
+		
 					
 
 	def changeIncome(self,income):
@@ -309,8 +357,8 @@ class Map():
 						# TODO: This is really really innefficient (n^2 rather than n)
 						for t in realm:
 							if t.village and t.village.balance >= 30 and not tile.pawn and not tile.grave and not tile.village:
-								t.village.balance -= 10
-								tile.pawn = Villager(self,tile.xloc,tile.yloc)
+								
+								tile.pawn = tile.buyVillager()
 								self.renders.append(tile.pawn)
 								print "Bought a simple pawn and placed at %sx%s for the tile at %sx%s" % (tile.x,tile.y,tile.xloc,tile.yloc)
 							else:

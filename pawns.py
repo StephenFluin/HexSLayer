@@ -100,6 +100,8 @@ class Villager(Pawn):
 		Pawn.__init__(self,gameMap,xloc,yloc,1)
 		self.image = pygame.image.load("villager.png")
 		self.upkeep = 2
+		
+	
 
 class Grave(pygame.sprite.Sprite):
 	def __init__(self,gameMap,x,y):
