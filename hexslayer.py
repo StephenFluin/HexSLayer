@@ -293,16 +293,27 @@ class Map():
 	# Process AI calls for each player. 
 	# TODO Make this use a model of handing an AI class a gamemap and have the AI take a single turn.
 	def runAI(self):
-		for player in playerColors[1:]:
-			print "Running ai for %s" % (player)
+		for player in range(1,5):
+			print "Running ai for player %s" % (player)
 			
 			# buy units where appropriate
 			for row in self.tiles:
 				for tile in row:
-					realm = self.getTileSet(tile.getPoint())
-					for t in realm:
-						if t.village and t.village.balance > 10:
-							print "TODO Buy village on this spot"
+					if tile.player == player:
+						realm = self.getTileSet(tile.getPoint())
+						# TODO: This is really really innefficient (n^2 rather than n)
+						for t in realm:
+							if t.village and t.village.balance >= 10 and not tile.pawn and not tile.grave and not tile.village:
+								t.village.balance -= 10
+								tile.pawn = Villager(self,tile.xloc,tile.yloc)
+								self.renders.append(tile.pawn)
+								print "Bought a simple pawn and placed at %sx%s for the tile at %sx%s" % (tile.x,tile.y,tile.xloc,tile.yloc)
+							else:
+								if t.village:
+									#print "didn't buy anything, because %s is the balance" % (t.village.balance)
+									nothing = None
+						
+							
 						
 
 			
@@ -369,6 +380,7 @@ def main():
 						gameMap.renders.append(mouseCarrying)
 				elif event.type == MOUSEBUTTONUP:
 					if mouseCarrying:
+						print "At mouse up, Mousecarrying is %s" % (mouseCarrying)
 						for row in gameMap.tiles:
 							for tile in row:
 								if tile.rect.collidepoint(pygame.mouse.get_pos()):

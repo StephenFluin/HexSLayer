@@ -23,6 +23,7 @@ class Pawn(pygame.sprite.Sprite):
 		self.gameMap.getTile((x,y)).draw()
 		
 	def attack(self,x,y):
+		print "Attacking tile at %sx%s" % (x,y)
 		#print "Testing if we can attack this tile"
 		#print "Returning the pawn to " , self.startTile.xloc,"X",self.startTile.yloc
 		dest = self.gameMap.getTile((x,y))
@@ -45,7 +46,8 @@ class Pawn(pygame.sprite.Sprite):
 						# Handle upgrades by replacing dest
 						if self.level == 1 and dest.pawn.level <= 4:
 							
-							while self.level <= dest.pawn.level:
+							while self.level <= dest.pawn.level and self != dest.pawn:
+								print "Upgrading because self level is %s and dest pawn level is %s." % (self.level, dest.pawn.level)
 								self.upgrade()
 							self.gameMap.renders.remove(dest.pawn)
 							
@@ -83,7 +85,7 @@ class Pawn(pygame.sprite.Sprite):
 			self.image = pygame.image.load("knight.png")
 			self.upkeep = 50
 			
-		
+# Takes in tile coordinates, not x/y coordinates
 class Villager(Pawn):
 	def __init__(self,gameMap,xloc,yloc):
 		Pawn.__init__(self,gameMap,xloc,yloc,1)
