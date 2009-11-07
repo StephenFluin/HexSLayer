@@ -1,6 +1,10 @@
+#
+# HexSLayer
+# copyright (C) Stephen Fluin 2009
+#
+
 # Pawns Classfiles
 # provides objects representing different pawns that can be placed on the game board.
-#
 #
 
 import pygame, random
@@ -34,21 +38,15 @@ class Pawn(pygame.sprite.Sprite):
 		for tile in tiles:
 			if(tile.isAdjacent((x,y))):
 				#The attacked tile is adjacent to a tile in our starting set
+				
+				
+				
+				#Newly organized version of attack code
+				# Step 1. Check if just moving within my realm and allow
 				if dest.player != self.startTile.player:
 					self.moved = True
-					
-				# Check if it is a unit and handle cases
-				if dest.pawn:
-					if (dest.player != self.startTile.player):
-						if self.level > dest.pawn.level:
-							self.gameMap.renders.remove(dest.pawn)
-							dest.pawn = None
-						else:
-							self.moved = False
-							return False
-					else:
-						print "This player is moving a character onto another character, why?!!?!!!!!!!!!!!!!!!!!!!!!!!"
-						# Handle upgrades by replacing dest
+				else:
+					if dest.pawn and dest.pawn != self: 
 						if self.level == 1 and dest.pawn.level <= 4:
 							
 							while self.level <= dest.pawn.level and self != dest.pawn:
@@ -59,26 +57,43 @@ class Pawn(pygame.sprite.Sprite):
 							self.gameMap.renders.remove(dest.pawn)
 							
 							return True
+						return False
 						
-							
-							
-						return False
+						
+					return True
 					
-				# Check if it is a village to prevent moving pawn into friendly villages
+				
+				# Step 2. Block movement by more powerful units
+				fail = False
+				if dest.pawn and dest.pawn.level >= self.level:
+					fail = True
+				for i in range(0,6):
+					if dest.getAdjacentTile(i) and dest.getAdjacentTile(i).player == dest.player and  dest.getAdjacentTile(i).pawn and dest.getAdjacentTile(i).pawn.level >= self.level:
+						fail = True
+				
+				# Step 3. Block movement by villages
+				if self.level < 2:
+					if dest.village:
+						fail = True
+					for i in range(0,6):
+						if dest.getAdjacentTile(i) and dest.getAdjacentTile(i).player == dest.player and  dest.getAdjacentTile(i).village:
+							fail = True
+						
+				if fail:
+					self.moved = False
+					return False
+					
+				# Step 4. Kill whatever is left with your movement.
+				if dest.pawn:
+					self.gameMap.renders.remove(dest.pawn)
+					dest.pawn = None
 				if dest.village:
-					
-					if (dest.player != self.startTile.player):
-						self.gameMap.renders.remove(dest.village)
-						dest.village = None
-					else:
-						return False
+					self.gameMap.renders.remove(dest.village)
+					dest.village = None
 				
-				#Normal attack case adjacent opponent square without village will get here.
-				#clear realms for re-allocation in cleanup.
-				if dest.realm:
-					for spot in dest.realm:
-						spot.realm = None
 				
+
+			
 				dest.setPlayer(self.startTile.player)
 				self.gameMap.cleanUpGame()
 				
@@ -98,6 +113,13 @@ class Pawn(pygame.sprite.Sprite):
 		elif self.level == 4:
 			self.image = pygame.image.load("knight.png")
 			self.upkeep = 50
+	def kill(tile):
+		
+		self.gameMap.renders.remove(self)
+		tile.pawn = None
+		tile.grave = Grave(self.gameMap,tile.x,tile.y)
+		self.gameMap.renders.append(tile.grave)
+		#print "Removed a pawn and added a grave."
 			
 # Takes in tile coordinates, not x/y coordinates
 class Villager(Pawn):

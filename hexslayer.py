@@ -1,4 +1,8 @@
 #!/usr/bin/python
+#
+# HexSLayer
+# copyright (C) Stephen Fluin 2009
+#
 
 import pygame, random, time
 from pygame.locals import *
@@ -127,8 +131,8 @@ class Tile(pygame.sprite.Sprite):
 
 class Map():
 	def __init__(self):
-		self.width = 13
-		self.height = 25
+		self.width = 5#13
+		self.height = 10#25
 		self.x = 5
 		self.y = 30
 		
@@ -294,15 +298,15 @@ class Map():
 						self.selectedSetBalance = tile.village.balance
 					#print "Village balance became %s" % (tile.village.balance)
 					
+					# Kill any pawns without a village
+					if tile.pawn and len(tile.realm) == 1:
+						tile.pawn.kill(tile)
+					
 					# Kill all of the pawns in case of negative balance
 					if tile.village.balance < 0:
 						for space in realm:
 							if space.pawn:
-								self.renders.remove(space.pawn)
-								space.pawn = None
-								space.grave = Grave(self,space.x,space.y)
-								self.renders.append(space.grave)
-								#print "Removed a pawn and added a grave."
+								pawn.kill(space)
 								tile.village.balance = 0
 					
 				if tile.pawn:
@@ -319,7 +323,7 @@ class Map():
 	def runAI(self):
 		#0-5 means you have an AI-only game, 1-5 means player 0 is human.
 		#The game currently has no protections from cheating, but do we need them if all of the AI's have moved every turn?
-		for player in range(0,5):
+		for player in range(1,5):
 			print "Running ai for player %s" % (player)
 			
 			# buy units where appropriate
@@ -458,7 +462,9 @@ def main():
 			screen.blit(pawn.image,(pawn.x,pawn.y))
 		allsprites.draw(screen)
 		pygame.display.flip()
-		gameMap.newTurn()
+		
+		# Only add the following line if you want AI-Only mode.
+		#gameMap.newTurn()
 
 
 

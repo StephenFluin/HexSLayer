@@ -1,3 +1,7 @@
+#
+# HexSLayer
+# copyright (C) Stephen Fluin 2009
+#
 import pygame, random
 from pygame.locals import *
 from hexmath import *
