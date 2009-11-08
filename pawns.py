@@ -40,12 +40,13 @@ class Pawn(pygame.sprite.Sprite):
 				#The attacked tile is adjacent to a tile in our starting set
 				
 				
-				
 				#Newly organized version of attack code
 				# Step 1. Check if just moving within my realm and allow
 				if dest.player != self.startTile.player:
 					self.moved = True
 				else:
+					if dest.village:
+						return False
 					if dest.pawn and dest.pawn != self: 
 						if self.level == 1 and dest.pawn.level <= 4:
 							
@@ -113,7 +114,7 @@ class Pawn(pygame.sprite.Sprite):
 		elif self.level == 4:
 			self.image = pygame.image.load("knight.png")
 			self.upkeep = 50
-	def kill(tile):
+	def kill(self,tile):
 		
 		self.gameMap.renders.remove(self)
 		tile.pawn = None

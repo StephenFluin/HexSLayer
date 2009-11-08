@@ -10,6 +10,7 @@ from pygame.locals import *
 from pawns import *
 from hexmath import *
 from controls import *
+from ai import *
 
 
 if not pygame.font: print 'Warning, fonts disabled'
@@ -131,8 +132,8 @@ class Tile(pygame.sprite.Sprite):
 
 class Map():
 	def __init__(self):
-		self.width = 5#13
-		self.height = 10#25
+		self.width = 7#13
+		self.height = 16#25
 		self.x = 5
 		self.y = 30
 		
@@ -146,6 +147,7 @@ class Map():
 		self.selectedSet = []
 		self.selectedVillage = None
 		self.infoBar = None
+		self.players = []
 		
 		for y in range(self.height):
 			
@@ -154,6 +156,11 @@ class Map():
 				row[x] = Tile(self,x,y)
 				self.alltiles.append(row[x])
 			self.tiles.append(row)
+		
+		# Add some AIs to the game.
+		for i in range(0,5):
+			self.players.append(NaiveAI())
+		self.players.append(AIPlus())
 
 			
 	def hexClicked(self,x,y):
@@ -306,7 +313,7 @@ class Map():
 					if tile.village.balance < 0:
 						for space in realm:
 							if space.pawn:
-								pawn.kill(space)
+								space.pawn.kill(space)
 								tile.village.balance = 0
 					
 				if tile.pawn:
@@ -321,51 +328,12 @@ class Map():
 	# Process AI calls for each player. 
 	# TODO Make this use a model of handing an AI class a gamemap and have the AI take a single turn.
 	def runAI(self):
-		#0-5 means you have an AI-only game, 1-5 means player 0 is human.
+		#0-6 means you have an AI-only game, 1-6 means player 0 is human.
 		#The game currently has no protections from cheating, but do we need them if all of the AI's have moved every turn?
-		for player in range(1,5):
-			print "Running ai for player %s" % (player)
+		for player in range(0,6):
+			#print "Running ai for player %s" % (player)
+			self.players[player].takeTurn(self,player)
 			
-			# buy units where appropriate
-			for row in self.tiles:
-				for tile in row:
-					if tile.player == player:
-						realm = tile.realm
-						# TODO: This is really really innefficient (n^2 rather than n)
-						for t in realm:
-							if t.village and t.village.balance >= 30 and not tile.pawn and not tile.grave and not tile.village:
-								
-								tile.pawn = Villager(self,tile.xloc,tile.yloc)
-								t.village.balance -= 10
-								self.renders.append(tile.pawn)
-								print "Bought a simple pawn and placed at %sx%s for the tile at %sx%s" % (tile.x,tile.y,tile.xloc,tile.yloc)
-							else:
-								if t.village:
-									#print "didn't buy anything, because %s is the balance" % (t.village.balance)
-									nothing = None
-			# move units where appropriate
-			for row in self.tiles:
-				for tile in row:
-					
-					if tile.player == player and tile.pawn and not tile.pawn.moved:
-						set = self.getTileSet(tile.getPoint())
-						for candidate in set:
-							direction = random.randint(0,5)
-							for i in range(0,6):
-								dest = candidate.getAdjacentTile((direction + i) % 6)
-								if not(not dest or dest.player == tile.player or dest.xloc < 0 or dest.yloc < 0 or dest.xloc >= self.width or dest.yloc >= self.height):
-									break
-								if i == 5:
-									dest = None
-								
-							
-						if dest:
-							tile.pawn.startTile = tile
-							if tile.pawn.attack(dest.xloc,dest.yloc):
-								tile.pawn.moved = True
-								tile.pawn.setPos(dest.xloc,dest.yloc)
-						else:
-							print "No candidate for attack."
 							
 						
 
@@ -464,7 +432,8 @@ def main():
 		pygame.display.flip()
 		
 		# Only add the following line if you want AI-Only mode.
-		#gameMap.newTurn()
+		gameMap.newTurn()
+		time.sleep(3)
 
 
 
