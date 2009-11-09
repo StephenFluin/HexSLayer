@@ -3,7 +3,8 @@
 # copyright (C) Stephen Fluin 2009
 #
 
-# AIs
+# AIs placed in a modular framework. They don't currently leverage state, but they could.
+
 
 from pawns import *
 
