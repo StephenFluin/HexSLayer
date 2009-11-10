@@ -43,5 +43,16 @@ class PurchaseUnits(pygame.sprite.Sprite):
 		#if(self.gameMap.balance() > 8):
 				# TODO: Castles
 		
+class GameOver(pygame.sprite.Sprite):
+	def __init__(self,x,y):
+		pygame.sprite.Sprite.__init__(self)
+		self.x,self.y = x,y
+		self.draw()
+	def draw(self):
+		self.image = pygame.Surface((600,60))
+		self.image.fill(pygame.Color("#FFFFFF"))
+		font = pygame.font.Font(None,40)
+		text = font.render("Someone won! Congratulations!",1,(10,10,10))
+		self.image.blit(text,(10,10))
 		
 		

@@ -138,6 +138,7 @@ class Map():
 		self.y = 30
 		
 		self.turn = 0
+		self.gameOver = False
 		self.selectedSetIncome = 0
 		self.selectedSetUpkeep = 0
 		
@@ -269,8 +270,16 @@ class Map():
 						dest = villages.pop(random.randrange(len(villages)))
 						self.renders.remove(dest.village)
 						dest.village = None
+		#compensate for "human" selections.
 		if(self.selectedSet and self.selectedVillage):
 			self.selectSet((self.selectedVillage.xloc,self.selectedVillage.yloc))
+		
+		#Check for endgame situation
+		if len(self.tiles[0][0].realm) == self.width * self.height:
+			print "Player %s won the game!" % (self.tiles[0][0].player)
+			self.renders.append(GameOver(50,300))
+			self.gameOver = True
+			
 		
 					
 
@@ -432,8 +441,9 @@ def main():
 		pygame.display.flip()
 		
 		# Only add the following line if you want AI-Only mode.
-		gameMap.newTurn()
-		time.sleep(1)
+		if not gameMap.gameOver:
+			gameMap.newTurn()
+		#time.sleep(1)
 
 
 

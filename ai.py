@@ -99,8 +99,8 @@ class AIPlus(AI):
 						print "Combining because we found %s+ level 1s for  %s" % (len(army),player)
 						dest = army[1][0].getPoint()
 						army[0][1].startTile = army[0][0]
-						if army[0][1].attack(dest[0],dest[1]):
-							tile.pawn.setPos(dest[0],dest[1])
+						if army[0][1].attack(dest[0],dest[1]) :
+							army[0][1].setPos(dest[0],dest[1])
 						print "Finished the combining process."
 					#else:
 						#print "Large army wasn't detected,%s in the army." % (len(army))
@@ -111,6 +111,7 @@ class AIPlus(AI):
 			for tile in row:
 				
 				if tile.player == player and tile.pawn and not tile.pawn.moved:
+					target = None
 					for candidate in tile.realm:
 						direction = random.randint(0,6)
 						for i in range(0,6):
@@ -126,4 +127,4 @@ class AIPlus(AI):
 							tile.pawn.moved = True
 							tile.pawn.setPos(target.xloc,target.yloc)
 					else:
-						print "No candidate for attack."
+						print "No candidate for attack, I bet we won!"
