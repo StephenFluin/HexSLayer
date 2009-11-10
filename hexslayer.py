@@ -433,7 +433,7 @@ def main():
 		
 		# Only add the following line if you want AI-Only mode.
 		gameMap.newTurn()
-		time.sleep(3)
+		time.sleep(1)
 
 
 
