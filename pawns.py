@@ -19,6 +19,7 @@ class Pawn(pygame.sprite.Sprite):
 		self.startTile = None
 		self.moved = False
 		self.level = level
+		self.bounce = 0
 		
 	def setPos(self,x,y):
 		self.x,self.y = convertGridPosition(self.gameMap,x,y)

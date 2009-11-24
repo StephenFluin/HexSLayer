@@ -44,6 +44,7 @@ class Village(pygame.sprite.Sprite):
 		self.xloc = xloc
 		self.yloc = yloc
 		self.balance = 5
+		self.bounce = 0
 		self.image = pygame.image.load("village.png")
 		gameMap.renders.append(self)
 
@@ -326,7 +327,10 @@ class Map():
 								tile.village.balance = 0
 					
 				if tile.pawn:
+					
 					tile.pawn.moved = False
+					if(len(tile.realm) == 1):
+						tile.pawn.kill(tile)
 		self.turn += 1
 		pygame.display.set_caption("HexSLayer - Turn %s" % (str(self.turn)))
 		self.infobar.draw()
@@ -339,7 +343,7 @@ class Map():
 	def runAI(self):
 		#0-6 means you have an AI-only game, 1-6 means player 0 is human.
 		#The game currently has no protections from cheating, but do we need them if all of the AI's have moved every turn?
-		for player in range(0,6):
+		for player in range(1,6):
 			#print "Running ai for player %s" % (player)
 			self.players[player].takeTurn(self,player)
 			
@@ -391,19 +395,20 @@ def main():
 					return
 				elif event.type == KEYDOWN and event.key == K_ESCAPE:
 					return
-				elif event.type == MOUSEBUTTONDOWN:
+				elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
 					#print "Looking for collisions"
-					for row in gameMap.tiles:
-						for tile in row:
-							if tile.rect.collidepoint(pygame.mouse.get_pos()):
-								
-								if tile.checkHexCollision(pygame.mouse.get_pos()):
+					if not mouseCarrying:
+						for row in gameMap.tiles:
+							for tile in row:
+								if tile.rect.collidepoint(pygame.mouse.get_pos()):
 									
-									mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
-									if mouseCarrying:
-										mouseCarrying.startTile = tile
-										#print "I have set the startTile of the carry."
-									break
+									if tile.checkHexCollision(pygame.mouse.get_pos()):
+										
+										mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
+										if mouseCarrying:
+											mouseCarrying.startTile = tile
+											#print "I have set the startTile of the carry."
+										break
 					x,y =pygame.mouse.get_pos()
 					if(x>400 and y > 450):
 						gameMap.newTurn()
@@ -413,7 +418,7 @@ def main():
 						gameMap.selectedVillage.balance -= 10
 						mouseCarrying.startTile = gameMap.selectedSet[0]
 						gameMap.renders.append(mouseCarrying)
-				elif event.type == MOUSEBUTTONUP:
+				elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
 					if mouseCarrying:
 						print "At mouse up, Mousecarrying is %s" % (mouseCarrying)
 						for row in gameMap.tiles:
@@ -433,16 +438,31 @@ def main():
 						mouseCarrying.y -= 15
 		allsprites.update()
 
+		
 		#Draw Everything
 		screen.blit(background, (0, 0))
 		for pawn in gameMap.renders:
-			screen.blit(pawn.image,(pawn.x,pawn.y))
+			
+			bounce = -8
+			if isinstance(pawn,Pawn) and not pawn.moved:
+				pawn.bounce += .5
+				pawn.bounce = pawn.bounce % 16
+				bounce += pawn.bounce
+			elif isinstance(pawn,Village) and pawn.balance >= 10:
+				pawn.bounce += .5
+				pawn.bounce = pawn.bounce % 16
+				bounce += pawn.bounce
+			else:
+				bounce = 0
+				
+			
+			screen.blit(pawn.image,(pawn.x,pawn.y+bounce))
 		allsprites.draw(screen)
 		pygame.display.flip()
 		
 		# Only add the following line if you want AI-Only mode.
-		if not gameMap.gameOver:
-			gameMap.newTurn()
+		#if not gameMap.gameOver:
+			#gameMap.newTurn()
 		#time.sleep(1)
 
 
