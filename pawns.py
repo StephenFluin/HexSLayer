@@ -20,12 +20,20 @@ class Pawn(pygame.sprite.Sprite):
 		self.moved = False
 		self.level = level
 		self.bounce = 0
+		self.player = -1
+		
+		
+		
 		
 	def setPos(self,x,y):
 		self.x,self.y = convertGridPosition(self.gameMap,x,y)
 		self.startTile.pawn = None
 		self.gameMap.getTile((x,y)).pawn = self
 		self.gameMap.getTile((x,y)).draw()
+		
+		# Is this good enough to set the player for all pawns?
+		if(self.gameMap.getTile((x,y))):
+			self.player = self.gameMap.getTile((x,y)).player
 		
 	# Returns true if attack was successful (movement taken, or false if nothing happened)
 	# Should handle moving of sprites, reallocation of space, destruction of victims.

@@ -44,15 +44,30 @@ class PurchaseUnits(pygame.sprite.Sprite):
 				# TODO: Castles
 		
 class GameOver(pygame.sprite.Sprite):
-	def __init__(self,x,y):
+	def __init__(self,x,y,winner):
 		pygame.sprite.Sprite.__init__(self)
 		self.x,self.y = x,y
+		
+		self.winner = winner
+		print "Winner of game is %s." % (self.winner)
 		self.draw()
 	def draw(self):
 		self.image = pygame.Surface((600,60))
 		self.image.fill(pygame.Color("#FFFFFF"))
 		font = pygame.font.Font(None,40)
-		text = font.render("Someone won! Congratulations!",1,(10,10,10))
+		text = font.render("Player %s won! Congratulations!" % (self.winner),1,(10,10,10))
+		self.image.blit(text,(10,10))
+		
+class ScoreCard(pygame.sprite.Sprite):
+	def __init__(self,gameMap,x,y):
+		pygame.sprite.Sprite.__init__(self)
+		self.x,self.y = x,y
+		self.draw()
+	def draw(self):
+		self.image = pygame.Surface((200,400))
+		self.image.fill(pygame.Color("#FFFFFF"))
+		font = pygame.font.Font(None,18)
+		text = font.render("Player 1 is Green",1,(10,10,10))
 		self.image.blit(text,(10,10))
 		
 		

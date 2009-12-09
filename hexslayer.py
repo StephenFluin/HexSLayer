@@ -7,10 +7,7 @@
 import pygame, random, time
 from pygame.locals import *
 
-from pawns import *
-from hexmath import *
-from controls import *
-from ai import *
+
 
 
 if not pygame.font: print 'Warning, fonts disabled'
@@ -22,6 +19,7 @@ screen = pygame.display.set_mode((640,480))
 pygame.display.set_caption('HexSLayer')
 
 playerColors = ("#66FF33","#003DF5","#FF3366","#33FFCC","#FFCC33","#FF6633")
+playerNames = ("Human Player", "AI 1", "AI 2", "AI 3", "AI 4", "AI 5")
 
 background = pygame.Surface(screen.get_size())
 background = background.convert()
@@ -29,7 +27,12 @@ background.fill((250, 250, 250))
 
 infobarLocation =(25,455)
 storeLocation = (325,450)
+scoreLocation = (450,30)
 
+from pawns import *
+from hexmath import *
+from controls import *
+from ai import *
 
 
 selected = None
@@ -47,6 +50,7 @@ class Village(pygame.sprite.Sprite):
 		self.bounce = 0
 		self.image = pygame.image.load("village.png")
 		gameMap.renders.append(self)
+		self.player = gameMap.getTile((xloc,yloc)).player
 
 
 	
@@ -276,9 +280,10 @@ class Map():
 			self.selectSet((self.selectedVillage.xloc,self.selectedVillage.yloc))
 		
 		#Check for endgame situation
+		#@TODO! We currently assume the map has a [0][0] tile.
 		if len(self.tiles[0][0].realm) == self.width * self.height:
 			print "Player %s won the game!" % (self.tiles[0][0].player)
-			self.renders.append(GameOver(50,300))
+			self.renders.append(GameOver(50,300,self.tiles[0][0].player))
 			self.gameOver = True
 			
 		
@@ -380,8 +385,10 @@ def main():
 	
 	gameMap.infobar = VillageData(gameMap,infobarLocation[0],infobarLocation[1])
 	gameMap.store = PurchaseUnits(gameMap,storeLocation[0],storeLocation[1])
+	gameMap.score = ScoreCard(gameMap,scoreLocation[0],scoreLocation[1])
 	gameMap.renders.append(gameMap.infobar)
 	gameMap.renders.append(gameMap.store)
+	gameMap.renders.append(gameMap.score)
 	gameMap.cleanUpGame()
 	
 	gameMap.newTurn()
@@ -440,17 +447,19 @@ def main():
 
 		
 		#Draw Everything
+		#Only bounce villages/pawns belonging to player.
 		screen.blit(background, (0, 0))
+		bounceHeight = 14
 		for pawn in gameMap.renders:
 			
-			bounce = -8
-			if isinstance(pawn,Pawn) and not pawn.moved:
-				pawn.bounce += .5
-				pawn.bounce = pawn.bounce % 16
+			bounce = -bounceHeight/2
+			if isinstance(pawn,Pawn) and not pawn.moved and pawn.player == 0:
+				pawn.bounce += .25
+				pawn.bounce = pawn.bounce % bounceHeight
 				bounce += pawn.bounce
-			elif isinstance(pawn,Village) and pawn.balance >= 10:
-				pawn.bounce += .5
-				pawn.bounce = pawn.bounce % 16
+			elif isinstance(pawn,Village) and pawn.balance >= 10 and pawn.player == 0:
+				pawn.bounce += .25
+				pawn.bounce = pawn.bounce % bounceHeight
 				bounce += pawn.bounce
 			else:
 				bounce = 0
