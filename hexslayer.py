@@ -391,6 +391,8 @@ def main():
 	gameMap.cleanUpGame()
 	
 	gameMap.newTurn()
+	
+	sparks = pygame.image.load("sparks.png")
 
 	while True:
 		clock.tick(60)
@@ -462,8 +464,8 @@ def main():
 				bounce += pawn.bounce
 			else:
 				bounce = 0
-				
-			
+			i = random.randint(0,6)
+			screen.blit(sparks,(pawn.x,pawn.y),pygame.Rect((i*30,0),(30,30)))
 			screen.blit(pawn.image,(pawn.x,pawn.y+bounce))
 		allsprites.draw(screen)
 		pygame.display.flip()

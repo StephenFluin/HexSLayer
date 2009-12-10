@@ -128,7 +128,7 @@ class Pawn(pygame.sprite.Sprite):
 		self.gameMap.renders.remove(self)
 		tile.pawn = None
 		tile.grave = Grave(self.gameMap,tile.x,tile.y)
-		self.gameMap.renders.append(tile.grave)
+		self.gameMap.renders.insert(0,tile.grave)
 		#print "Removed a pawn and added a grave."
 			
 # Takes in tile coordinates, not x/y coordinates
