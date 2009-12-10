@@ -8,11 +8,20 @@
 
 from pawns import *
 
+
+
 class AI():
 	def takeTurn(self, gameMap,player):
 		return
-		
+
+class HumanIntelligence(AI):
+	def getName(self):
+		return "You"
+	def takeTurn(self,gameMap,player):
+		return
 class NaiveAI(AI):
+	def getName(self):
+		return "Naive AI"
 	def takeTurn(self,gameMap,player):
 		# buy units where appropriate
 		for row in gameMap.tiles:
@@ -58,10 +67,16 @@ class NaiveAI(AI):
 
 						
 class SleepAI(AI):
+	def getName(self):
+		return "SleepAI"
+		
 	def takeTurn(self,gameMap,player):
 		return
 
 class AIPlus(AI):
+	def getName(self):
+		return "AIPlus"
+		
 	def takeTurn(self,gameMap,player):
 		# buy units where appropriate
 		for row in gameMap.tiles:

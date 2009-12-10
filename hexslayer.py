@@ -12,31 +12,26 @@ from pygame.locals import *
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
-tilesize = 32
 
-pygame.init()
-screen = pygame.display.set_mode((640,480))
-pygame.display.set_caption('HexSLayer')
 
-playerColors = ("#66FF33","#003DF5","#FF3366","#33FFCC","#FFCC33","#FF6633")
-playerNames = ("Human Player", "AI 1", "AI 2", "AI 3", "AI 4", "AI 5")
 
-background = pygame.Surface(screen.get_size())
-background = background.convert()
-background.fill((250, 250, 250))
-
-infobarLocation =(25,455)
-storeLocation = (325,450)
-scoreLocation = (450,30)
 
 from pawns import *
 from hexmath import *
+from hexconfig import *
 from controls import *
 from ai import *
 
 
 selected = None
 
+pygame.init()
+screen = pygame.display.set_mode((640,480))
+pygame.display.set_caption('HexSLayer')
+
+background = pygame.Surface(screen.get_size())
+background = background.convert()
+background.fill((250, 250, 250))
 
 
 
@@ -162,9 +157,12 @@ class Map():
 				row[x] = Tile(self,x,y)
 				self.alltiles.append(row[x])
 			self.tiles.append(row)
-		
+			
+		# Add Human to the game.
+		self.players.append(HumanIntelligence())
+				
 		# Add some AIs to the game.
-		for i in range(0,5):
+		for i in range(0,4):
 			self.players.append(NaiveAI())
 		self.players.append(AIPlus())
 
@@ -283,7 +281,7 @@ class Map():
 		#@TODO! We currently assume the map has a [0][0] tile.
 		if len(self.tiles[0][0].realm) == self.width * self.height:
 			print "Player %s won the game!" % (self.tiles[0][0].player)
-			self.renders.append(GameOver(50,300,self.tiles[0][0].player))
+			self.renders.append(GameOver(self,50,300,self.tiles[0][0].player))
 			self.gameOver = True
 			
 		
@@ -346,9 +344,10 @@ class Map():
 	# Process AI calls for each player. 
 	# TODO Make this use a model of handing an AI class a gamemap and have the AI take a single turn.
 	def runAI(self):
-		#0-6 means you have an AI-only game, 1-6 means player 0 is human.
 		#The game currently has no protections from cheating, but do we need them if all of the AI's have moved every turn?
-		for player in range(1,6):
+		#yes, we will need protections for the networked versions, also, if the AI wants to save money, we need to stop
+		#others from spending their gold.
+		for player in range(0,6):
 			#print "Running ai for player %s" % (player)
 			self.players[player].takeTurn(self,player)
 			

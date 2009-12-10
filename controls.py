@@ -5,6 +5,7 @@
 import pygame, random
 from pygame.locals import *
 from hexmath import *
+from hexconfig import *
 
 class VillageData(pygame.sprite.Sprite):
 	def __init__(self,gameMap,x,y):
@@ -44,10 +45,10 @@ class PurchaseUnits(pygame.sprite.Sprite):
 				# TODO: Castles
 		
 class GameOver(pygame.sprite.Sprite):
-	def __init__(self,x,y,winner):
+	def __init__(self,gameMap,x,y,winner):
 		pygame.sprite.Sprite.__init__(self)
 		self.x,self.y = x,y
-		
+		self.gameMap = gameMap
 		self.winner = winner
 		print "Winner of game is %s." % (self.winner)
 		self.draw()
@@ -55,19 +56,25 @@ class GameOver(pygame.sprite.Sprite):
 		self.image = pygame.Surface((600,60))
 		self.image.fill(pygame.Color("#FFFFFF"))
 		font = pygame.font.Font(None,40)
-		text = font.render("Player %s won! Congratulations!" % (self.winner),1,(10,10,10))
+		text = font.render("Player %s (%s) won! Congratulations!" % (self.winner,self.gameMap.players[self.winner].getName()),1,(10,10,10))
 		self.image.blit(text,(10,10))
 		
 class ScoreCard(pygame.sprite.Sprite):
 	def __init__(self,gameMap,x,y):
 		pygame.sprite.Sprite.__init__(self)
 		self.x,self.y = x,y
+		
+		self.gameMap = gameMap
 		self.draw()
 	def draw(self):
 		self.image = pygame.Surface((200,400))
 		self.image.fill(pygame.Color("#FFFFFF"))
-		font = pygame.font.Font(None,18)
-		text = font.render("Player 1 is Green",1,(10,10,10))
-		self.image.blit(text,(10,10))
+		size = 18
+		font = pygame.font.Font(None,size)
+		for i in range(0,6):
+			
+			text = font.render("%s" % (self.gameMap.players[i].getName()),True,(10,10,10))
+			self.image.blit(text,(30,10+(size+10)*i))
+			pygame.draw.rect(self.image,pygame.Color(playerColors[i]),pygame.Rect(0,(size+10)*i+10,15,15))
 		
 		

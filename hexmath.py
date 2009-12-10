@@ -3,8 +3,7 @@
 # copyright (C) Stephen Fluin 2009
 #
 
-# TODO figure out a way to make this more organized
-tilesize = 32
+from hexconfig import *
 
 def getHexAt(x,y):
 	s = tilesize
