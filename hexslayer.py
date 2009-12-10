@@ -42,7 +42,7 @@ class Village(pygame.sprite.Sprite):
 		self.xloc = xloc
 		self.yloc = yloc
 		self.balance = 5
-		self.bounce = 0
+		self.spin = 0
 		self.image = pygame.image.load("village.png")
 		gameMap.renders.append(self)
 		self.player = gameMap.getTile((xloc,yloc)).player
@@ -448,25 +448,20 @@ def main():
 
 		
 		#Draw Everything
-		#Only bounce villages/pawns belonging to player.
+		# A nice spinning graphic 
 		screen.blit(background, (0, 0))
-		bounceHeight = 14
 		for pawn in gameMap.renders:
-			
-			bounce = -bounceHeight/2
 			if isinstance(pawn,Pawn) and not pawn.moved and pawn.player == 0:
-				pawn.bounce += .25
-				pawn.bounce = pawn.bounce % bounceHeight
-				bounce += pawn.bounce
+				new = True
 			elif isinstance(pawn,Village) and pawn.balance >= 10 and pawn.player == 0:
-				pawn.bounce += .25
-				pawn.bounce = pawn.bounce % bounceHeight
-				bounce += pawn.bounce
+				new = True
 			else:
-				bounce = 0
+				new = False
 			i = random.randint(0,6)
-			screen.blit(sparks,(pawn.x,pawn.y),pygame.Rect((i*30,0),(30,30)))
-			screen.blit(pawn.image,(pawn.x,pawn.y+bounce))
+			if new:
+				pawn.spin += 1
+				screen.blit(pygame.transform.rotate(sparks,pawn.spin),(pawn.x,pawn.y))
+			screen.blit(pawn.image,(pawn.x,pawn.y))
 		allsprites.draw(screen)
 		pygame.display.flip()
 		

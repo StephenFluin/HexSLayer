@@ -19,7 +19,7 @@ class Pawn(pygame.sprite.Sprite):
 		self.startTile = None
 		self.moved = False
 		self.level = level
-		self.bounce = 0
+		self.spin = 0
 		self.player = -1
 		
 		
