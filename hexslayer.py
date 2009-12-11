@@ -242,7 +242,7 @@ class Map():
 		
 	# Return a list of tiles counts for all players.
 	def countTiles(self):
-		counts = range(0,len(playerColors))
+		counts = [0,0,0,0,0,0]
 		for row in self.tiles:
 			for tile in row:
 				counts[tile.player] += 1
@@ -449,6 +449,7 @@ def main():
 							for tile in row:
 								if tile.rect.collidepoint(pygame.mouse.get_pos()):
 									if tile.checkHexCollision(pygame.mouse.get_pos()):
+										
 										validDrop = True
 										if(mouseCarrying.attack(tile.xloc,tile.yloc)):
 											#print "Attack of this square was successful, dropping player there."

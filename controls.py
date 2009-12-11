@@ -77,5 +77,6 @@ class ScoreCard(pygame.sprite.Sprite):
 			text = font.render("%s - %s" % (self.gameMap.players[i].getName(),tileCounts[i]),True,(10,10,10))
 			self.image.blit(text,(30,10+(size+10)*i))
 			pygame.draw.rect(self.image,pygame.Color(playerColors[i]),pygame.Rect(0,(size+10)*i+10,15,15))
+		self.image.blit(font.render("Turn %s" % (self.gameMap.turn),True,(10,10,10)),(30,(size+10)*6+10))
 		
 		

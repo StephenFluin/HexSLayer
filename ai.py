@@ -90,7 +90,7 @@ class AIPlus(AI):
 							tile.pawn = Villager(gameMap,tile.xloc,tile.yloc)
 							t.village.balance -= 10
 							gameMap.renders.append(tile.pawn)
-							print "Bought a simple pawn and placed at %sx%s for the tile at %sx%s" % (tile.x,tile.y,tile.xloc,tile.yloc)
+							#print "Bought a simple pawn and placed at %sx%s for the tile at %sx%s" % (tile.x,tile.y,tile.xloc,tile.yloc)
 								
 								
 							
@@ -111,12 +111,12 @@ class AIPlus(AI):
 							#print "Counted a unit in the army of %s from %sx%s." % (player,t.xloc,t.yloc)
 					if len(army) > 2:
 
-						print "Combining because we found %s+ level 1s for  %s" % (len(army),player)
+						#print "Combining because we found %s+ level 1s for  %s" % (len(army),player)
 						dest = army[1][0].getPoint()
 						army[0][1].startTile = army[0][0]
 						if army[0][1].attack(dest[0],dest[1]) :
 							army[0][1].setPos(dest[0],dest[1])
-						print "Finished the combining process."
+						#print "Finished the combining process."
 					#else:
 						#print "Large army wasn't detected,%s in the army." % (len(army))
 		
