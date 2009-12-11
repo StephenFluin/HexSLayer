@@ -472,8 +472,10 @@ def main():
 				new = False
 			i = random.randint(0,6)
 			if new:
-				pawn.spin += 1
-				screen.blit(pygame.transform.rotate(sparks,pawn.spin),(pawn.x,pawn.y))
+				pawn.spin += 2
+				offset = abs(pawn.spin % 90 - 45)/7.5 - 6
+				
+				screen.blit(pygame.transform.rotate(sparks,pawn.spin),(pawn.x+offset,pawn.y+offset))
 			screen.blit(pawn.image,(pawn.x,pawn.y))
 		allsprites.draw(screen)
 		pygame.display.flip()
