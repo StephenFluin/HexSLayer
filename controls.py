@@ -71,9 +71,10 @@ class ScoreCard(pygame.sprite.Sprite):
 		self.image.fill(pygame.Color("#FFFFFF"))
 		size = 18
 		font = pygame.font.Font(None,size)
+		tileCounts = self.gameMap.countTiles()
 		for i in range(0,6):
 			
-			text = font.render("%s" % (self.gameMap.players[i].getName()),True,(10,10,10))
+			text = font.render("%s - %s" % (self.gameMap.players[i].getName(),tileCounts[i]),True,(10,10,10))
 			self.image.blit(text,(30,10+(size+10)*i))
 			pygame.draw.rect(self.image,pygame.Color(playerColors[i]),pygame.Rect(0,(size+10)*i+10,15,15))
 		

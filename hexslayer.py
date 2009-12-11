@@ -239,6 +239,16 @@ class Map():
 		#print "Our search found: ",found
 		return found
 		
+	# Return a list of tiles counts for all players.
+	def countTiles(self):
+		counts = range(0,len(playerColors))
+		for row in self.tiles:
+			for tile in row:
+				counts[tile.player] += 1
+		print "After counting all of the tiles, we have: %s." % (counts)
+		return counts
+				
+	
 	# Adds, splits villages
 	# @TODO, clean up this method, it is super redudant (checks each set once for each tile in the set)
 	def cleanUpGame(self):
@@ -336,10 +346,13 @@ class Map():
 						tile.pawn.kill(tile)
 		self.turn += 1
 		pygame.display.set_caption("HexSLayer - Turn %s" % (str(self.turn)))
+		self.runAI()
+		
 		self.infobar.draw()
 		self.store.draw()
+		self.score.draw()
 		
-		self.runAI()
+		
 		
 	# Process AI calls for each player. 
 	# TODO Make this use a model of handing an AI class a gamemap and have the AI take a single turn.
