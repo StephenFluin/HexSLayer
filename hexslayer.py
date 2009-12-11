@@ -28,6 +28,7 @@ selected = None
 pygame.init()
 screen = pygame.display.set_mode((640,480))
 pygame.display.set_caption('HexSLayer')
+pygame.display.set_icon(pygame.image.load("gameicon.png"))
 
 background = pygame.Surface(screen.get_size())
 background = background.convert()
@@ -245,7 +246,7 @@ class Map():
 		for row in self.tiles:
 			for tile in row:
 				counts[tile.player] += 1
-		print "After counting all of the tiles, we have: %s." % (counts)
+		#print "After counting all of the tiles, we have: %s." % (counts)
 		return counts
 				
 	
@@ -435,23 +436,33 @@ def main():
 						gameMap.newTurn()
 					if(x<400 and x > 250 and y > 450):
 						print "Spawning a new villager, and deducting from bank."
-						mouseCarrying = Villager(gameMap,350,450)
-						gameMap.selectedVillage.balance -= 10
-						mouseCarrying.startTile = gameMap.selectedSet[0]
-						gameMap.renders.append(mouseCarrying)
+						if gameMap.selectedVillage.balance >= 10:
+							mouseCarrying = Villager(gameMap,350,450)
+							gameMap.selectedVillage.balance -= 10
+							mouseCarrying.startTile = gameMap.selectedSet[0]
+							gameMap.renders.append(mouseCarrying)
 				elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
 					if mouseCarrying:
 						print "At mouse up, Mousecarrying is %s" % (mouseCarrying)
+						validDrop = False
 						for row in gameMap.tiles:
 							for tile in row:
 								if tile.rect.collidepoint(pygame.mouse.get_pos()):
 									if tile.checkHexCollision(pygame.mouse.get_pos()):
+										validDrop = True
 										if(mouseCarrying.attack(tile.xloc,tile.yloc)):
 											#print "Attack of this square was successful, dropping player there."
 											gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
+											
 										else:
 											mouseCarrying.setPos( mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc)
-						mouseCarrying = None
+											
+												
+						# @TODO! What else do we need to do to clean this up?
+						if not validDrop:
+							gameMap.renders.remove(mouseCarrying)
+							gameMap.selectedVillage.balance += 10
+						mouseCarrying = None	
 				elif event.type == MOUSEMOTION:
 					if mouseCarrying != None:
 						mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()
@@ -472,8 +483,10 @@ def main():
 				new = False
 			i = random.randint(0,6)
 			if new:
-				pawn.spin += 1
-				screen.blit(pygame.transform.rotate(sparks,pawn.spin),(pawn.x,pawn.y))
+				pawn.spin += 2
+				offset = abs(pawn.spin % 90 - 45)/7.5 - 6
+				
+				screen.blit(pygame.transform.rotate(sparks,pawn.spin),(pawn.x+offset,pawn.y+offset))
 			screen.blit(pawn.image,(pawn.x,pawn.y))
 		allsprites.draw(screen)
 		pygame.display.flip()
