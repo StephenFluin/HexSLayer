@@ -124,12 +124,12 @@ class Pawn(pygame.sprite.Sprite):
 			self.image = pygame.image.load("knight.png")
 			self.upkeep = 50
 	def kill(self,tile):
-		
-		self.gameMap.renders.remove(self)
-		tile.pawn = None
-		tile.grave = Grave(self.gameMap,tile.x,tile.y)
-		self.gameMap.renders.insert(0,tile.grave)
-		#print "Removed a pawn and added a grave."
+		if(self in self.gameMap.renders):
+			self.gameMap.renders.remove(self)
+			tile.pawn = None
+			tile.grave = Grave(self.gameMap,tile.x,tile.y)
+			self.gameMap.renders.insert(0,tile.grave)
+			#print "Removed a pawn and added a grave."
 			
 # Takes in tile coordinates, not x/y coordinates
 class Villager(Pawn):

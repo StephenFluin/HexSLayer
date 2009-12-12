@@ -368,10 +368,6 @@ class Map():
 							
 						
 
-						
-						
-							
-						
 
 			
 	
@@ -461,6 +457,8 @@ def main():
 												
 						# @TODO! What else do we need to do to clean this up?
 						if not validDrop:
+							if mouseCarrying.startTile:
+								mouseCarrying.startTile.pawn = None
 							gameMap.renders.remove(mouseCarrying)
 							gameMap.selectedVillage.balance += 10
 						mouseCarrying = None	
