@@ -280,8 +280,11 @@ class Map():
 						dest =tile.realm[random.randrange(len(tile.realm))]
 						dest.village = Village(dest.gameMap,dest.xloc,dest.yloc)
 					
+					# Too many villages, add the gold from the removed village to a remaining village.
 					while len(villages) > 1 or ( len(villages) > 0 and len(tile.realm) < 2):
 						dest = villages.pop(random.randrange(len(villages)))
+						if len(villages) >= 1:
+							villages[0].village.balance += dest.village.balance
 						self.renders.remove(dest.village)
 						dest.village = None
 		#compensate for "human" selections.
@@ -431,7 +434,7 @@ def main():
 					if(x>400 and y > 450):
 						gameMap.newTurn()
 					if(x<400 and x > 250 and y > 450):
-						print "Spawning a new villager, and deducting from bank."
+						#print "Spawning a new villager, and deducting from bank."
 						if gameMap.selectedVillage.balance >= 10:
 							mouseCarrying = Villager(gameMap,350,450)
 							gameMap.selectedVillage.balance -= 10
@@ -439,7 +442,7 @@ def main():
 							gameMap.renders.append(mouseCarrying)
 				elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
 					if mouseCarrying:
-						print "At mouse up, Mousecarrying is %s" % (mouseCarrying)
+						#print "At mouse up, Mousecarrying is %s" % (mouseCarrying)
 						validDrop = False
 						for row in gameMap.tiles:
 							for tile in row:
