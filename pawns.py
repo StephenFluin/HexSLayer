@@ -22,7 +22,8 @@ class Pawn(pygame.sprite.Sprite):
 		self.spin = 0
 		self.player = -1
 		
-		
+	def getHasMoved(self):
+		return self.moved
 		
 		
 	def setPos(self,x,y):
@@ -61,7 +62,10 @@ class Pawn(pygame.sprite.Sprite):
 							
 							while self.level <= dest.pawn.level and self != dest.pawn:
 								print "Upgrading because self level is %s and dest pawn level is %s." % (self.level, dest.pawn.level)
-								self.upgrade()
+								if self.upgrade():
+									return True
+								else:
+									return False
 							if dest.pawn not in self.gameMap.renders:
 								print "Found a weird fringe case where the unit we are upgrading isn't being rendered!!!!"
 							self.gameMap.renders.remove(dest.pawn)
@@ -123,6 +127,7 @@ class Pawn(pygame.sprite.Sprite):
 		elif self.level == 4:
 			self.image = pygame.image.load("knight.png")
 			self.upkeep = 50
+		return True
 	def kill(self,tile):
 		if(self in self.gameMap.renders):
 			self.gameMap.renders.remove(self)
@@ -137,6 +142,15 @@ class Villager(Pawn):
 		Pawn.__init__(self,gameMap,xloc,yloc,1)
 		self.image = pygame.image.load("villager.png")
 		self.upkeep = 2
+		
+class Castle(Pawn):
+	def __init__(self,gameMap,xloc,yloc):
+		Pawn.__init__(self,gameMap,xloc,yloc,1)
+		self.image = pygame.image.load("castle.png")
+		self.upkeep = 0
+		self.level = 2
+	def getHasMoved(self):
+		return True
 		
 	
 

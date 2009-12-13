@@ -172,7 +172,7 @@ class Map():
 		retval = None
 		#print "Clicked tile: %sx%s" % (self.tiles[y][x].xloc,self.tiles[y][x].yloc)
 		clickedTile = self.tiles[y][x]
-		if(clickedTile.pawn != None and clickedTile.pawn.moved == False):
+		if(clickedTile.pawn != None and clickedTile.pawn.getHasMoved() == False):
 			retval = clickedTile.pawn
 			
 		
@@ -434,10 +434,16 @@ def main():
 					if(x>400 and y > 450):
 						gameMap.newTurn()
 					if(x<400 and x > 250 and y > 450):
+						print "got click at in the store%sx%s" %(x,y)
 						#print "Spawning a new villager, and deducting from bank."
-						if gameMap.selectedVillage.balance >= 10:
+						if gameMap.selectedVillage.balance >= 10 and x < 325:
 							mouseCarrying = Villager(gameMap,350,450)
 							gameMap.selectedVillage.balance -= 10
+							mouseCarrying.startTile = gameMap.selectedSet[0]
+							gameMap.renders.append(mouseCarrying)
+						if gameMap.selectedVillage.balance >= 20 and x > 325:
+							mouseCarrying = Castle(gameMap,350,450)
+							gameMap.selectedVillage.balance -= 20
 							mouseCarrying.startTile = gameMap.selectedSet[0]
 							gameMap.renders.append(mouseCarrying)
 				elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
@@ -477,7 +483,7 @@ def main():
 		# A nice spinning graphic 
 		screen.blit(background, (0, 0))
 		for pawn in gameMap.renders:
-			if isinstance(pawn,Pawn) and not pawn.moved and pawn.player == 0:
+			if isinstance(pawn,Pawn) and not pawn.getHasMoved() and pawn.player == 0:
 				new = True
 			elif isinstance(pawn,Village) and pawn.balance >= 10 and pawn.player == 0:
 				new = True

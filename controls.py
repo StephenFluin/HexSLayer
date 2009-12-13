@@ -34,11 +34,14 @@ class PurchaseUnits(pygame.sprite.Sprite):
 		self.income = 0
 		self.draw()
 	def draw(self):
-		self.image = pygame.Surface((50,30))
+		self.image = pygame.Surface((85,30))
 		self.image.fill(pygame.Color("#FFFFFF"))
-		if(self.gameMap.selectedVillage and self.gameMap.selectedVillage.balance >= 10):
-			# TODO: Make sure this doesn't load on each call of draw
-			self.image.blit(pygame.image.load("villager.png"),(0,0))
+		if self.gameMap.selectedVillage:
+			if self.gameMap.selectedVillage.balance >= 10:
+				# TODO: Make sure this doesn't load on each call of draw
+				self.image.blit(pygame.image.load("villager.png"),(0,0))
+			if self.gameMap.selectedVillage.balance >= 20:
+				self.image.blit(pygame.image.load("castle.png"),(45,0))
 			
 		
 		#if(self.gameMap.balance() > 8):
