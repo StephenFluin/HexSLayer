@@ -36,7 +36,7 @@ class PurchaseUnits(pygame.sprite.Sprite):
 	def draw(self):
 		self.image = pygame.Surface((85,30))
 		self.image.fill(pygame.Color("#FFFFFF"))
-		if self.gameMap.selectedVillage:
+		if self.gameMap.selectedVillage and self.gameMap.selectedVillage.player == 0:
 			if self.gameMap.selectedVillage.balance >= 10:
 				# TODO: Make sure this doesn't load on each call of draw
 				self.image.blit(pygame.image.load("villager.png"),(0,0))

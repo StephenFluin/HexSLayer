@@ -172,7 +172,7 @@ class Map():
 		retval = None
 		#print "Clicked tile: %sx%s" % (self.tiles[y][x].xloc,self.tiles[y][x].yloc)
 		clickedTile = self.tiles[y][x]
-		if(clickedTile.pawn != None and clickedTile.pawn.getHasMoved() == False):
+		if(clickedTile.pawn != None and clickedTile.pawn.getHasMoved() == False and clickedTile.player == 0):
 			retval = clickedTile.pawn
 			
 		
