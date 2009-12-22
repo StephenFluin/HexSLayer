@@ -63,7 +63,7 @@ class Pawn(pygame.sprite.Sprite):
 							while self.level <= dest.pawn.level and self != dest.pawn:
 								print "Upgrading because self level is %s and dest pawn level is %s." % (self.level, dest.pawn.level)
 								if self.upgrade():
-									return True
+									pass
 								else:
 									return False
 							if dest.pawn not in self.gameMap.renders:
