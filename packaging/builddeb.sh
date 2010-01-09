@@ -9,4 +9,4 @@ mv ../*.pyc debian/usr/share/games/hexslayer
 
 
 
-dpkg -b debian hexslayer-`date +%Y%m%d`.deb`
+dpkg -b debian hexslayer-`date +%Y%m%d`.deb
