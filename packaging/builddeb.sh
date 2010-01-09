@@ -1,4 +1,12 @@
-mkdir -p usr/share/pixmaps
-cp ../gameicon.png usr/share/pixmaps/hexslayer.png
+mkdir -p debian/usr/share/pixmaps
+mkdir -p debian/usr/share/games/hexslayer
 
-dpkg -b filesystem hexslayer-`date +%Y%m%d`.deb`
+cp ../gameicon.png debian/usr/share/pixmaps/hexslayer.png
+
+py_compilefiles ../*.py
+mv ../*.pyc debian/usr/share/games/hexslayer
+
+
+
+
+dpkg -b debian hexslayer-`date +%Y%m%d`.deb`

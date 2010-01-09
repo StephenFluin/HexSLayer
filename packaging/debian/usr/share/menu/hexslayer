@@ -1,0 +1,6 @@
+?package(hexslayer): \
+    needs="X11" \
+    section="Games/Strategy" \
+    title="HexSLayer" \
+    command="/usr/games/hexslayer" \
+    icon="/usr/share/pixmaps/hexslayer.png"
