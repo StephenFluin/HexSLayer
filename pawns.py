@@ -21,6 +21,7 @@ class Pawn(pygame.sprite.Sprite):
 		self.level = level
 		self.spin = 0
 		self.player = -1
+		self.justPurchased = False
 		
 	def getHasMoved(self):
 		return self.moved
@@ -28,7 +29,8 @@ class Pawn(pygame.sprite.Sprite):
 		
 	def setPos(self,x,y):
 		self.x,self.y = convertGridPosition(self.gameMap,x,y)
-		self.startTile.pawn = None
+		if not self.justPurchased:
+			self.startTile.pawn = None
 		self.gameMap.getTile((x,y)).pawn = self
 		self.gameMap.getTile((x,y)).draw()
 		
@@ -61,7 +63,7 @@ class Pawn(pygame.sprite.Sprite):
 						if self.level == 1 and dest.pawn.level <= 4:
 							
 							while self.level <= dest.pawn.level and self != dest.pawn:
-								print "Upgrading because self level is %s and dest pawn level is %s." % (self.level, dest.pawn.level)
+								#print "Upgrading because self level is %s and dest pawn level is %s." % (self.level, dest.pawn.level)
 								if self.upgrade():
 									pass
 								else:

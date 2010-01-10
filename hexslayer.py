@@ -398,8 +398,24 @@ class Map():
 		self.turn += 1
 		pygame.display.set_caption("HexSLayer - Turn %s" % (str(self.turn)))
 		self.runAI()
+		self.reRender()
 		
-		#@TODO, decide if I want to keep this refreshing of renders, or manage it like malloc
+
+		
+		
+		
+	# Process AI calls for each player. 
+	# TODO Make this use a model of handing an AI class a gamemap and have the AI take a single turn.
+	def runAI(self):
+		#The game currently has no protections from cheating, but do we need them if all of the AI's have moved every turn?
+		#yes, we will need protections for the networked versions, also, if the AI wants to save money, we need to stop
+		#others from spending their gold.
+		for player in range(0,6):
+			#print "Running ai for player %s" % (player)
+			self.players[player].takeTurn(self,player)
+			
+	def reRender(self):
+			#@TODO, decide if I want to keep this refreshing of renders, or manage it like malloc
 		self.renders = []
 		for row in self.tiles:
 			for tile in row:
@@ -417,18 +433,6 @@ class Map():
 		self.infobar.draw()
 		self.store.draw()
 		self.score.draw()
-		
-		
-		
-	# Process AI calls for each player. 
-	# TODO Make this use a model of handing an AI class a gamemap and have the AI take a single turn.
-	def runAI(self):
-		#The game currently has no protections from cheating, but do we need them if all of the AI's have moved every turn?
-		#yes, we will need protections for the networked versions, also, if the AI wants to save money, we need to stop
-		#others from spending their gold.
-		for player in range(0,6):
-			#print "Running ai for player %s" % (player)
-			self.players[player].takeTurn(self,player)
 			
 							
 						
@@ -481,7 +485,7 @@ def main():
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					gameMap.newTurn()
 				elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-					#print "Looking for collisions"
+					# Picking something up
 					if not mouseCarrying:
 						for row in gameMap.tiles:
 							for tile in row:
@@ -492,40 +496,50 @@ def main():
 										mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
 										if mouseCarrying:
 											mouseCarrying.startTile = tile
-											#print "I have set the startTile of the carry."
+											print "I have set the startTile of the carry."
 										break
-					x,y =pygame.mouse.get_pos()
-					if(x>430 and y > 450):
-						gameMap.newTurn()
-					if(x<430 and x > 280 and y > 450):
-						print "got click at in the store%sx%s" %(x,y)
-						#print "Spawning a new villager, and deducting from bank."
-						if gameMap.selectedVillage.balance >= 10 and x < 355:
-							mouseCarrying = Villager(gameMap,350,450)
-							gameMap.selectedVillage.balance -= 10
-							mouseCarrying.startTile = gameMap.selectedSet[0]
-							gameMap.renders.append(mouseCarrying)
-						if gameMap.selectedVillage.balance >= 20 and x > 355:
-							mouseCarrying = Castle(gameMap,350,450)
-							gameMap.selectedVillage.balance -= 20
-							mouseCarrying.startTile = gameMap.selectedSet[0]
-							gameMap.renders.append(mouseCarrying)
+						x,y =pygame.mouse.get_pos()
+						if(x>430 and y > 450):
+							gameMap.newTurn()
+						if(x<430 and x > 280 and y > 450):
+							print "got click at in the store%sx%s" %(x,y)
+							#print "Spawning a new villager, and deducting from bank."
+							if gameMap.selectedVillage.balance >= 10 and x < 355:
+								mouseCarrying = Villager(gameMap,350,450)
+								mouseCarrying.justPurchased = True
+								gameMap.selectedVillage.balance -= 10
+								mouseCarrying.startTile = gameMap.selectedSet[0]
+								gameMap.renders.append(mouseCarrying)
+							if gameMap.selectedVillage.balance >= 20 and x > 355:
+								mouseCarrying = Castle(gameMap,350,450)
+								mouseCarrying.justPurchased = True
+								gameMap.selectedVillage.balance -= 20
+								mouseCarrying.startTile = gameMap.selectedSet[0]
+								gameMap.renders.append(mouseCarrying)
+					else:
+						print "Why are we mousing down if we are carrying %s??!?!?!" % (mouseCarrying)
+					
 				elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
 					if mouseCarrying:
 						#print "At mouse up, Mousecarrying is %s" % (mouseCarrying)
 						validDrop = False
 						for row in gameMap.tiles:
 							for tile in row:
-								if tile.rect.collidepoint(pygame.mouse.get_pos()):
-									if tile.checkHexCollision(pygame.mouse.get_pos()):
+								if tile.rect.collidepoint(pygame.mouse.get_pos()) and tile.checkHexCollision(pygame.mouse.get_pos()):
+								
+									
+									validDrop = True
+									if(mouseCarrying.attack(tile.xloc,tile.yloc)):
+										#print "Attack of this square was successful, dropping player there."
+										gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
+										mouseCarrying.justPurchased = False
+									elif not mouseCarrying.justPurchased:
+										print "SetPos because we haven't just purchased"
+										mouseCarrying.setPos( mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc)
+									else:
+										# We just purchased this pawn and couldn't place it, refund it!
+										validDrop = False
 										
-										validDrop = True
-										if(mouseCarrying.attack(tile.xloc,tile.yloc)):
-											#print "Attack of this square was successful, dropping player there."
-											gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
-											
-										else:
-											mouseCarrying.setPos( mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc)
 											
 												
 						# @TODO! What else do we need to do to clean this up?
@@ -533,8 +547,13 @@ def main():
 							if mouseCarrying.startTile:
 								mouseCarrying.startTile.pawn = None
 							gameMap.renders.remove(mouseCarrying)
-							gameMap.selectedVillage.balance += 10
+							if isinstance(mouseCarrying,Castle):
+								value = 20
+							else:
+								value = 10
+							gameMap.selectedVillage.balance += value
 						mouseCarrying = None	
+					gameMap.reRender()
 				elif event.type == MOUSEMOTION:
 					if mouseCarrying != None:
 						mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()

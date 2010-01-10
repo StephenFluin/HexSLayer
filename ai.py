@@ -134,10 +134,10 @@ class AIPlus(AI):
 						direction = random.randint(0,6)
 						for i in range(0,6):
 							dest = candidate.getAdjacentTile((direction + i) % 6)
-							if not(not dest or dest.player == tile.player or dest.xloc < 0 or dest.yloc < 0 or dest.xloc >= gameMap.width or dest.yloc >= gameMap.height or (dest.getProtection() >= tile.pawn.level)):
+							if dest and dest.player != tile.player and dest.getProtection() < tile.pawn.level:
 								target = dest
-								print "Attacking a hum0n with protection of %s." % (dest.getProtection())
-								print "this hum0n has a %s and a %s." % (dest.village, dest.pawn)
+								#print "Attacking a hum0n with protection of %s-%s." % (dest.getProtectionPair())
+								#print "this hum0n has a %s and a %s." % (dest.village, dest.pawn)
 								break
 						if target:
 							break
@@ -154,5 +154,5 @@ class AIPlus(AI):
 							target.redRing()
 
 					else:
-						break
+						#print "This unit had no one to attack."
 		
