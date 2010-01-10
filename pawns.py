@@ -83,9 +83,13 @@ class Pawn(pygame.sprite.Sprite):
 					self.moved = False
 					return False
 
+				#Weird edge case experienced on 20100109
+				if dest.pawn and dest.pawn not in self.gameMap.renders:
+					print "WEIRD EDGE CASE WITH %s and %s." % (dest.pawn, self.gamemap.renders)
+					
 					
 				# Step 4. Kill whatever is left with your movement.
-				if dest.pawn:
+				if dest.pawn and dest.pawn in self.gameMap.renders:
 					self.gameMap.renders.remove(dest.pawn)
 					dest.pawn = None
 				if dest.village:

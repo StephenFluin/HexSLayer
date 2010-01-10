@@ -130,23 +130,39 @@ class Tile(pygame.sprite.Sprite):
 		return False
 		
 	def getProtection(self):
+		return self.getProtectionPair()[0]
+		
+	def getProtectionPair(self):
+	
 		level = 0
+		protectors = []
 		
 		# Diagnose powerful allies
 		if self.pawn:
 			level = max(level, self.pawn.level)
+			protectors.append((self.pawn.level,self.pawn))
 		for i in range(0,6):
 			if self.getAdjacentTile(i) and self.getAdjacentTile(i).player == self.player and  self.getAdjacentTile(i).pawn:
 				level = max(level, self.getAdjacentTile(i).pawn.level)
+				protectors.append((self.getAdjacentTile(i).pawn.level,self.getAdjacentTile(i).pawn))
+			elif self.getAdjacentTile(i) and self.getAdjacentTile(i).pawn and  self.getAdjacentTile(i).pawn.level >1:
+				pass
+			else:
+				if self.getAdjacentTile(i):
+					if self.getAdjacentTile(i).pawn:
+						pass
+						
 		
 		# Diagnose villages near.
 		if self.village:
 			level = max(level,1)
+			protectors.append(self.village)
 		for i in range(0,6):
 			if self.getAdjacentTile(i) and self.getAdjacentTile(i).player == self.player and self.getAdjacentTile(i).village:
 				level = max(level,1)
-				
-		return level
+				protectors.append(self.getAdjacentTile(i).village)
+		return (level,protectors)
+		
 			
 	def select(self):
 		#print "Selecting tile."
@@ -164,8 +180,8 @@ class Tile(pygame.sprite.Sprite):
 
 class Map():
 	def __init__(self):
-		self.width = 7#13
-		self.height = 16#25
+		self.width = 8#13
+		self.height = 17#25
 		self.x = 5
 		self.y = 30
 		
@@ -383,6 +399,21 @@ class Map():
 		pygame.display.set_caption("HexSLayer - Turn %s" % (str(self.turn)))
 		self.runAI()
 		
+		#@TODO, decide if I want to keep this refreshing of renders, or manage it like malloc
+		self.renders = []
+		for row in self.tiles:
+			for tile in row:
+				if tile.village:
+					self.renders.append(tile.village)
+				if tile.pawn:
+					self.renders.append(tile.pawn)
+				if tile.grave:
+					self.renders.append(tile.grave)
+					
+		self.renders.append(self.infobar)
+		self.renders.append(self.store)
+		self.renders.append(self.score)
+		
 		self.infobar.draw()
 		self.store.draw()
 		self.score.draw()
@@ -447,6 +478,8 @@ def main():
 					return
 				elif event.type == KEYDOWN and event.key == K_ESCAPE:
 					return
+				elif event.type == KEYDOWN and event.key == K_RETURN:
+					gameMap.newTurn()
 				elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
 					#print "Looking for collisions"
 					if not mouseCarrying:

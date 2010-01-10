@@ -154,6 +154,5 @@ class AIPlus(AI):
 							target.redRing()
 
 					else:
-						print "No candidate for attack in %s tiles, I bet we won!" % (len(tile.realm))
 						break
 		
