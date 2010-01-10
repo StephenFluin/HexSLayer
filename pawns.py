@@ -1,6 +1,6 @@
 #
 # HexSLayer
-# copyright (C) Stephen Fluin 2009
+# copyright (C) Stephen Fluin 2010
 #
 
 # Pawns Classfiles
@@ -77,25 +77,12 @@ class Pawn(pygame.sprite.Sprite):
 					return True
 					
 				
-				# Step 2. Block movement by more powerful units
-				fail = False
-				if dest.pawn and dest.pawn.level >= self.level:
-					fail = True
-				for i in range(0,6):
-					if dest.getAdjacentTile(i) and dest.getAdjacentTile(i).player == dest.player and  dest.getAdjacentTile(i).pawn and dest.getAdjacentTile(i).pawn.level >= self.level:
-						fail = True
-				
-				# Step 3. Block movement by villages
-				if self.level < 2:
-					if dest.village:
-						fail = True
-					for i in range(0,6):
-						if dest.getAdjacentTile(i) and dest.getAdjacentTile(i).player == dest.player and  dest.getAdjacentTile(i).village:
-							fail = True
-						
-				if fail:
+				#Step 2 & # Block movement by protection
+				if self.level <= dest.getProtection():
+					
 					self.moved = False
 					return False
+
 					
 				# Step 4. Kill whatever is left with your movement.
 				if dest.pawn:
@@ -151,6 +138,10 @@ class Castle(Pawn):
 		self.level = 2
 	def getHasMoved(self):
 		return True
+	def kill(self,tile):
+		print "About to kill a legendary castle, my protection is:%s" % (tile.getProtection())
+		Pawn.kill(self,tile)
+		
 		
 	
 

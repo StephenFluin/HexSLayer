@@ -1,6 +1,6 @@
 #
 # HexSLayer
-# copyright (C) Stephen Fluin 2009
+# copyright (C) Stephen Fluin 2010
 #
 import pygame, random
 from pygame.locals import *
@@ -20,7 +20,7 @@ class VillageData(pygame.sprite.Sprite):
 		if(self.gameMap.selectedSetIncome > 0):
 			msg = "Village Income:+"+str(self.gameMap.selectedSetIncome)+",-"+str(self.gameMap.selectedSetUpkeep)+"="+str(self.gameMap.selectedSetIncome-self.gameMap.selectedSetUpkeep)
 			if(self.gameMap.selectedVillage.balance > 0):
-				msg += "  Balance:"+str(self.gameMap.selectedVillage.balance)
+				msg += "  Balance:%s" % (self.gameMap.selectedVillage.balance)
 				
 			font = pygame.font.Font(None, 22)
 			text = font.render(msg,1,(10,10,10))

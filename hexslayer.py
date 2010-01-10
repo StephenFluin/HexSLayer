@@ -1,8 +1,15 @@
 #!/usr/bin/python
 #
 # HexSLayer
-# copyright (C) Stephen Fluin 2009
+# copyright (C) Stephen Fluin 2010
 #
+
+# Todo: Make sure you don't buy a villager/castle when you try to drag/drop one onto a territory you don't have selected.
+# Todo: Doug has experienced castle and wizard stomping (wizards killing castles or wizards), fix this!
+# Todo: AIPlus doesn't seem to always attack when it could, make it so it does.
+# Todo: Build a smarter AI that can build any level units and castles.
+# Todo: Build a networked branch of the game so you can play online with friends.
+# Todo: Build a "restart"/"new Game" button.
 
 import pygame, random, time
 from pygame.locals import *
@@ -75,15 +82,20 @@ class Tile(pygame.sprite.Sprite):
 	def setPlayer(self,player):
 		self.player = player
 		self.color = pygame.Color(playerColors[self.player])
-		self.draw()	
+		self.draw()
 		
 		
 	def draw(self):
 		rect = pygame.draw.polygon(background,self.color,self.getHex(),0)
 		pygame.draw.polygon(background,pygame.Color("#000000"),self.getHex(),1)
-		#pygame.display.update()
 		
 		return rect
+		
+	def redRing(self):
+		pygame.draw.polygon(background,pygame.Color("#FF0000"),self.getHex(),3)
+	
+	def blueRing(self):
+		pygame.draw.polygon(background,pygame.Color("#0000FF"),self.getHex(),3)
 	
 	def getHex(self):
 		return getHexAt(self.x,self.y)
@@ -116,6 +128,25 @@ class Tile(pygame.sprite.Sprite):
 				#print "Target was adjacent to this square"
 				return True
 		return False
+		
+	def getProtection(self):
+		level = 0
+		
+		# Diagnose powerful allies
+		if self.pawn:
+			level = max(level, self.pawn.level)
+		for i in range(0,6):
+			if self.getAdjacentTile(i) and self.getAdjacentTile(i).player == self.player and  self.getAdjacentTile(i).pawn:
+				level = max(level, self.getAdjacentTile(i).pawn.level)
+		
+		# Diagnose villages near.
+		if self.village:
+			level = max(level,1)
+		for i in range(0,6):
+			if self.getAdjacentTile(i) and self.getAdjacentTile(i).player == self.player and self.getAdjacentTile(i).village:
+				level = max(level,1)
+				
+		return level
 			
 	def select(self):
 		#print "Selecting tile."
@@ -392,7 +423,7 @@ def main():
 	clock = pygame.time.Clock()
 	allsprites = pygame.sprite.RenderPlain(())
 	
-	background.blit(pygame.image.load("endturn.png"),(400,450))
+	background.blit(pygame.image.load("endturn.png"),(430,450))
 	
 	
 	gameMap.infobar = VillageData(gameMap,infobarLocation[0],infobarLocation[1])

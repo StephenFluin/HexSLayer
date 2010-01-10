@@ -1,6 +1,6 @@
 #
 # HexSLayer
-# copyright (C) Stephen Fluin 2009
+# copyright (C) Stephen Fluin 2010
 #
 
 # AIs placed in a modular framework. They don't currently leverage state, but they could.
@@ -121,25 +121,35 @@ class AIPlus(AI):
 						#print "Large army wasn't detected,%s in the army." % (len(army))
 		
 		
-		# move units where appropriate
+		# move units where appropriate		
 		for row in gameMap.tiles:
 			for tile in row:
 				
 				if tile.player == player and tile.pawn and not tile.pawn.moved:
+
+
+					#print "Moving AI at %sx%s for player %s." % (tile.xloc,tile.yloc, tile.player)
 					target = None
 					for candidate in tile.realm:
 						direction = random.randint(0,6)
 						for i in range(0,6):
 							dest = candidate.getAdjacentTile((direction + i) % 6)
-							if not(not dest or dest.player == tile.player or dest.xloc < 0 or dest.yloc < 0 or dest.xloc >= gameMap.width or dest.yloc >= gameMap.height):
+							if not(not dest or dest.player == tile.player or dest.xloc < 0 or dest.yloc < 0 or dest.xloc >= gameMap.width or dest.yloc >= gameMap.height or (dest.getProtection() >= tile.pawn.level)):
 								target = dest
-							
-					
-						
+								break
+
 					if target:
 						tile.pawn.startTile = tile
 						if tile.pawn.attack(target.xloc,target.yloc):
 							tile.pawn.moved = True
 							tile.pawn.setPos(target.xloc,target.yloc)
+							#print "Attack of %sx%s successful." % (target.xloc, target.yloc)
+						else:
+							#print "Attack of %sx%s failed! :(" % (target.xloc,target.yloc)
+							tile.blueRing()
+							target.redRing()
+
 					else:
-						print "No candidate for attack, I bet we won!"
+						print "No candidate for attack in %s tiles, I bet we won!" % (len(tile.realm))
+						break
+		

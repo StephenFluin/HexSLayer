@@ -1,6 +1,6 @@
 #
 # HexSLayer
-# copyright (C) Stephen Fluin 2009
+# copyright (C) Stephen Fluin 2010
 #
 
 from hexconfig import *
