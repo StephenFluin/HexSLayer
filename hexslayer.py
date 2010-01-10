@@ -467,12 +467,12 @@ def main():
 					if(x<430 and x > 280 and y > 450):
 						print "got click at in the store%sx%s" %(x,y)
 						#print "Spawning a new villager, and deducting from bank."
-						if gameMap.selectedVillage.balance >= 10 and x < 325:
+						if gameMap.selectedVillage.balance >= 10 and x < 355:
 							mouseCarrying = Villager(gameMap,350,450)
 							gameMap.selectedVillage.balance -= 10
 							mouseCarrying.startTile = gameMap.selectedSet[0]
 							gameMap.renders.append(mouseCarrying)
-						if gameMap.selectedVillage.balance >= 20 and x > 325:
+						if gameMap.selectedVillage.balance >= 20 and x > 355:
 							mouseCarrying = Castle(gameMap,350,450)
 							gameMap.selectedVillage.balance -= 20
 							mouseCarrying.startTile = gameMap.selectedSet[0]
