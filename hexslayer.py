@@ -462,9 +462,9 @@ def main():
 											#print "I have set the startTile of the carry."
 										break
 					x,y =pygame.mouse.get_pos()
-					if(x>400 and y > 450):
+					if(x>430 and y > 450):
 						gameMap.newTurn()
-					if(x<400 and x > 250 and y > 450):
+					if(x<430 and x > 280 and y > 450):
 						print "got click at in the store%sx%s" %(x,y)
 						#print "Spawning a new villager, and deducting from bank."
 						if gameMap.selectedVillage.balance >= 10 and x < 325:
