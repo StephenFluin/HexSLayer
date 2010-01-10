@@ -149,7 +149,6 @@ class Grave(pygame.sprite.Sprite):
 	def __init__(self,gameMap,x,y):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load("dead.png")
-		self.upkeep = 2
 		self.x = x
 		self.y = y
 		print "Grave is created at %sx%s." % (x,y)

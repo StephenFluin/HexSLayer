@@ -370,7 +370,7 @@ class Map():
 					# Kill all of the pawns in case of negative balance
 					if tile.village.balance < 0:
 						for space in realm:
-							if space.pawn:
+							if space.pawn and not isinstance(space.pawn,Castle):
 								space.pawn.kill(space)
 								tile.village.balance = 0
 					

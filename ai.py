@@ -136,7 +136,11 @@ class AIPlus(AI):
 							dest = candidate.getAdjacentTile((direction + i) % 6)
 							if not(not dest or dest.player == tile.player or dest.xloc < 0 or dest.yloc < 0 or dest.xloc >= gameMap.width or dest.yloc >= gameMap.height or (dest.getProtection() >= tile.pawn.level)):
 								target = dest
+								print "Attacking a hum0n with protection of %s." % (dest.getProtection())
+								print "this hum0n has a %s and a %s." % (dest.village, dest.pawn)
 								break
+						if target:
+							break
 
 					if target:
 						tile.pawn.startTile = tile
