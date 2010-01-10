@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=HexSLayer
+GenericName=HexSLayer Tile Game
+Comment=Win the game by conquering territory and taking over the whole map
+Icon=hexslayer
+Exec=hexslayer
+Terminal=false
+Categories=Game
