@@ -10,3 +10,8 @@ mv ../*.pyc debian/usr/share/games/hexslayer
 
 
 dpkg -b debian hexslayer-`date +%Y%m%d`.deb
+
+#Clean Up
+rm debian/usr/share/pixmaps/hexslayer.png
+rm debian/usr/share/games/hexslayer/*.png
+rm debian/usr/share/games/hexslayer/*.pyc

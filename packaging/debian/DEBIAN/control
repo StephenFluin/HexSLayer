@@ -1,10 +1,10 @@
 Package: hexslayer
-Version: 0.5.3
+Version: 0.5.5
 Section: games
 Priority: optional
 Architecture: all
 Essential: no
 Depends: python,python-pygame
-Installed-Size: 19k
+Installed-Size: 180k
 Maintainer: Stephen Fluin [stephen.fluin@gmail.com]
 Description: Tile-based strategy and territory game.

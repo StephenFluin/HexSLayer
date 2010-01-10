@@ -1,0 +1,3 @@
+HexSLayer is a strategy game written in python using pygame.
+
+This package also includes a packaging for debian, and possibly other systems in the future.
