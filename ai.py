@@ -155,4 +155,5 @@ class AIPlus(AI):
 
 					else:
 						#print "This unit had no one to attack."
+						pass
 		

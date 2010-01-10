@@ -419,12 +419,13 @@ class Map():
 		self.renders = []
 		for row in self.tiles:
 			for tile in row:
+			
+				if tile.grave:
+					self.renders.append(tile.grave)
 				if tile.village:
 					self.renders.append(tile.village)
 				if tile.pawn:
 					self.renders.append(tile.pawn)
-				if tile.grave:
-					self.renders.append(tile.grave)
 					
 		self.renders.append(self.infobar)
 		self.renders.append(self.store)
@@ -496,7 +497,7 @@ def main():
 										mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
 										if mouseCarrying:
 											mouseCarrying.startTile = tile
-											print "I have set the startTile of the carry."
+											#print "I have set the startTile of the carry."
 										break
 						x,y =pygame.mouse.get_pos()
 						if(x>430 and y > 450):

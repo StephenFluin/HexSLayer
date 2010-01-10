@@ -64,7 +64,7 @@ class Pawn(pygame.sprite.Sprite):
 							
 							while self.level <= dest.pawn.level and self != dest.pawn:
 								#print "Upgrading because self level is %s and dest pawn level is %s." % (self.level, dest.pawn.level)
-								if self.upgrade():
+								if not isinstance(dest.pawn,Castle) and self.upgrade():
 									pass
 								else:
 									return False
@@ -109,7 +109,7 @@ class Pawn(pygame.sprite.Sprite):
 		return False
 		
 	def upgrade(self):
-		print "Upgrading this pawn from level ",self.level
+		#print "Upgrading this pawn from level ",self.level
 		self.level += 1
 		if self.level == 2:
 			self.image = pygame.image.load("wizard.png")
