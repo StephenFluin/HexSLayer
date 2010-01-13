@@ -4,12 +4,12 @@
 # copyright (C) Stephen Fluin 2010
 #
 
-# Todo: Make sure you don't buy a villager/castle when you try to drag/drop one onto a territory you don't have selected.
-# Todo: Doug has experienced castle and wizard stomping (wizards killing castles or wizards), fix this!
-# Todo: AIPlus doesn't seem to always attack when it could, make it so it does.
 # Todo: Build a smarter AI that can build any level units and castles.
 # Todo: Build a networked branch of the game so you can play online with friends.
 # Todo: Build a "restart"/"new Game" button.
+# Todo: Try to prevent villages from popping up on people
+# Todo: Add trees (or other fun concept)
+# Todo: Add interesting maps
 
 import pygame, random, time
 from pygame.locals import *
@@ -18,7 +18,8 @@ from pygame.locals import *
 
 
 if not pygame.font: print 'Warning, fonts disabled'
-if not pygame.mixer: print 'Warning, sound disabled'
+if not pygame.mixer: 
+	print 'Warning, sound disabled'
 
 
 
@@ -342,8 +343,9 @@ class Map():
 		#@TODO! We currently assume the map has a [0][0] tile.
 		if len(self.tiles[0][0].realm) == self.width * self.height:
 			print "Player %s won the game!" % (self.tiles[0][0].player)
-			self.renders.append(GameOver(self,50,300,self.tiles[0][0].player))
+			
 			self.gameOver = True
+			self.reRender()
 			
 		
 					
@@ -431,6 +433,9 @@ class Map():
 		self.renders.append(self.store)
 		self.renders.append(self.score)
 		
+		if self.gameOver:
+			self.renders.append(GameOver(self,50,300,self.tiles[0][0].player))
+		
 		self.infobar.draw()
 		self.store.draw()
 		self.score.draw()
@@ -485,7 +490,7 @@ def main():
 					return
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					gameMap.newTurn()
-				elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+				elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] and not gameMap.gameOver:
 					# Picking something up
 					if not mouseCarrying:
 						for row in gameMap.tiles:
