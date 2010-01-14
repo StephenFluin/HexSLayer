@@ -214,6 +214,18 @@ class Map():
 		for i in range(0,4):
 			self.players.append(NaiveAI())
 		self.players.append(AIPlus())
+		
+		
+		
+		self.infobar = VillageData(self,infobarLocation[0],infobarLocation[1])
+		self.store = PurchaseUnits(self,storeLocation[0],storeLocation[1])
+		self.score = ScoreCard(self,scoreLocation[0],scoreLocation[1])
+		self.renders.append(self.infobar)
+		self.renders.append(self.store)
+		self.renders.append(self.score)
+		self.cleanUpGame()
+		
+		self.newTurn()
 
 			
 	def hexClicked(self,x,y):
@@ -433,8 +445,12 @@ class Map():
 		self.renders.append(self.store)
 		self.renders.append(self.score)
 		
+		
+		
 		if self.gameOver:
-			self.renders.append(GameOver(self,50,300,self.tiles[0][0].player))
+			self.newGame = NewGame(20,355)
+			self.renders.append(GameOver(self,20,325,self.tiles[0][0].player))
+			self.renders.append(self.newGame)
 		
 		self.infobar.draw()
 		self.store.draw()
@@ -467,15 +483,7 @@ def main():
 	background.blit(pygame.image.load("endturn.png"),(430,450))
 	
 	
-	gameMap.infobar = VillageData(gameMap,infobarLocation[0],infobarLocation[1])
-	gameMap.store = PurchaseUnits(gameMap,storeLocation[0],storeLocation[1])
-	gameMap.score = ScoreCard(gameMap,scoreLocation[0],scoreLocation[1])
-	gameMap.renders.append(gameMap.infobar)
-	gameMap.renders.append(gameMap.store)
-	gameMap.renders.append(gameMap.score)
-	gameMap.cleanUpGame()
-	
-	gameMap.newTurn()
+
 	
 	sparks = pygame.image.load("sparks.png")
 
@@ -490,40 +498,55 @@ def main():
 					return
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					gameMap.newTurn()
-				elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] and not gameMap.gameOver:
-					# Picking something up
-					if not mouseCarrying:
-						for row in gameMap.tiles:
-							for tile in row:
-								if tile.rect.collidepoint(pygame.mouse.get_pos()):
-									
-									if tile.checkHexCollision(pygame.mouse.get_pos()):
+				elif event.type == KEYDOWN and event.key == K_BACKSPACE:
+					gameMap.gameOver = True
+					gameMap.reRender()
+				elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+					
+					if not gameMap.gameOver:
+						# Picking something up
+						if not mouseCarrying:
+							for row in gameMap.tiles:
+								for tile in row:
+									if tile.rect.collidepoint(pygame.mouse.get_pos()):
 										
-										mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
-										if mouseCarrying:
-											mouseCarrying.startTile = tile
-											#print "I have set the startTile of the carry."
-										break
-						x,y =pygame.mouse.get_pos()
-						if(x>430 and y > 450):
-							gameMap.newTurn()
-						if(x<430 and x > 280 and y > 450):
-							print "got click at in the store%sx%s" %(x,y)
-							#print "Spawning a new villager, and deducting from bank."
-							if gameMap.selectedVillage.balance >= 10 and x < 355:
-								mouseCarrying = Villager(gameMap,350,450)
-								mouseCarrying.justPurchased = True
-								gameMap.selectedVillage.balance -= 10
-								mouseCarrying.startTile = gameMap.selectedSet[0]
-								gameMap.renders.append(mouseCarrying)
-							if gameMap.selectedVillage.balance >= 20 and x > 355:
-								mouseCarrying = Castle(gameMap,350,450)
-								mouseCarrying.justPurchased = True
-								gameMap.selectedVillage.balance -= 20
-								mouseCarrying.startTile = gameMap.selectedSet[0]
-								gameMap.renders.append(mouseCarrying)
+										if tile.checkHexCollision(pygame.mouse.get_pos()):
+											
+											mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
+											if mouseCarrying:
+												mouseCarrying.startTile = tile
+												#print "I have set the startTile of the carry."
+											break
+							x,y =pygame.mouse.get_pos()
+							if(x>430 and y > 450):
+								gameMap.newTurn()
+							if(x<430 and x > 280 and y > 450):
+								print "got click at in the store%sx%s" %(x,y)
+								#print "Spawning a new villager, and deducting from bank."
+								if gameMap.selectedVillage.balance >= 10 and x < 355:
+									mouseCarrying = Villager(gameMap,350,450)
+									mouseCarrying.justPurchased = True
+									gameMap.selectedVillage.balance -= 10
+									mouseCarrying.startTile = gameMap.selectedSet[0]
+									gameMap.renders.append(mouseCarrying)
+								if gameMap.selectedVillage.balance >= 20 and x > 355:
+									mouseCarrying = Castle(gameMap,350,450)
+									mouseCarrying.justPurchased = True
+									gameMap.selectedVillage.balance -= 20
+									mouseCarrying.startTile = gameMap.selectedSet[0]
+									gameMap.renders.append(mouseCarrying)
+						else:
+							print "Why are we mousing down if we are carrying %s??!?!?!" % (mouseCarrying)
 					else:
-						print "Why are we mousing down if we are carrying %s??!?!?!" % (mouseCarrying)
+						x,y = pygame.mouse.get_pos()
+						box = (gameMap.newGame.x,gameMap.newGame.y,gameMap.newGame.image.get_width(),gameMap.newGame.image.get_height())
+						
+						if pygame.Rect(box).collidepoint((x,y)):
+							print "New Game Time"
+							gameMap = Map()
+						else:
+							print "Not a new game. because %sx%s didn't match %s" % (x,y,gameMap.newGame.image.get_rect())
+						
 					
 				elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
 					if mouseCarrying:

@@ -56,11 +56,24 @@ class GameOver(pygame.sprite.Sprite):
 		print "Winner of game is %s." % (self.winner)
 		self.draw()
 	def draw(self):
-		self.image = pygame.Surface((600,60))
+		self.image = pygame.Surface((560,100))
 		self.image.fill(pygame.Color("#FFFFFF"))
-		font = pygame.font.Font(None,40)
+		font = pygame.font.Font(None,38)
 		text = font.render("Player %s (%s) won! Congratulations!" % (self.winner,self.gameMap.players[self.winner].getName()),1,(10,10,10))
-		self.image.blit(text,(10,10))
+		self.image.blit(text,(0,0))
+
+class NewGame(pygame.sprite.Sprite):
+	def __init__(self,x,y):
+		pygame.sprite.Sprite.__init__(self)
+		self.x,self.y = x,y
+		self.draw()
+	def draw(self):
+		self.image = pygame.Surface((300,40))
+		self.image.fill(pygame.Color("#FFFFFF"))
+		font = pygame.font.Font(None,32)
+		text = font.render("Start Another Game",1,(10,10,10))
+		self.rect = pygame.draw.rect(self.image,(0,0,0),(0,0,300,40),1)
+		self.image.blit(text,(30,5))
 		
 class ScoreCard(pygame.sprite.Sprite):
 	def __init__(self,gameMap,x,y):
