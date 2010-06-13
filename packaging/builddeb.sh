@@ -5,6 +5,7 @@ cp ../gameicon.png debian/usr/share/pixmaps/hexslayer.png
 cp ../*.png debian/usr/share/games/hexslayer/
 py_compilefiles ../*.py
 mv ../*.pyc debian/usr/share/games/hexslayer
+V=`cat ../version.txt`;sed -i "s,Version:.*,Version: ${V}," debian/DEBIAN/control 
 
 
 
