@@ -10,6 +10,7 @@
 # Todo: Try to prevent villages from popping up on people
 # Todo: Add trees (or other fun concept)
 # Todo: Add interesting maps
+# Todo: Add map generation
 
 import pygame, random, time
 from pygame.locals import *
@@ -211,9 +212,10 @@ class Map():
 		self.players.append(HumanIntelligence())
 				
 		# Add some AIs to the game.
-		for i in range(0,4):
+		for i in range(0,3):
 			self.players.append(NaiveAI())
 		self.players.append(AIPlus())
+		self.players.append(FullAI())
 		
 		
 		
