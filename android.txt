@@ -1,0 +1,4 @@
+title=HexSLayer
+author=Stephen Fluin
+api=1
+orientation=landscape
