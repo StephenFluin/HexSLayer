@@ -158,13 +158,13 @@ def main():
 					if mouseCarrying:
 						print "At mouse up, Mousecarrying is %s at %sx%s" % (mouseCarrying,x,y)
 						validDrop = False
+						x = mouseCarrying.x+15
+						y = mouseCarrying.y+15
+						
 						for row in gameMap.tiles:
-							print "Interating through rows"
 							for tile in row:
-								print "Interating through tiles in row"
-								if tile.rect.collidepoint(pygame.mouse.get_pos()) and tile.checkHexCollision(pygame.mouse.get_pos()):
-									print "Rectangle collision happened"
-									
+								if tile.rect.collidepoint((x,y)) and tile.checkHexCollision((x,y)):
+									print "Passed collision test"
 									validDrop = True
 									if(mouseCarrying.attack(tile.xloc,tile.yloc)):
 										print "Attack of this square was successful, dropping player there."
@@ -177,8 +177,8 @@ def main():
 										# We just purchased this pawn and couldn't place it, refund it!
 										print "Couldn't drop purchased pawn."
 										validDrop = False
-										
-											
+									
+									
 												
 						# @TODO! What else do we need to do to clean this up?
 						if not validDrop:
@@ -340,6 +340,7 @@ class Tile(pygame.sprite.Sprite):
 		
 		if ((2*x + y) <  s/2) or ((2*x + (s-y)) < s/2) or ((2*(s-x)+y) < s/2) or ((2*(s-x)+(s-y)) < s/2):
 			# Failed hitdetection on hex
+			print "Failed hitdetection on hex %sx%s-%s compared to %sx%s." % (x,y,s,point[0],point[1])
 			return 0
 		else:
 			return 1
