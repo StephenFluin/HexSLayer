@@ -1,0 +1,109 @@
+================
+Testing the Game
+================
+
+Testing a game on Android is a three-step process. The first step is
+to create files that control how your game is displayed. Then, your
+game can be pushed onto the device using the adb tool that comes with
+the Android SDK. Finally, the game can be run using the Pygame Subset
+tool.
+
+Files
+=====
+
+The android.txt, icon.png, and .nomedia files are required to ensure
+your game displays property in the Pygame Subset tool. These files
+should be placed in the same directory as the main.py file. If the
+game is in the mygame directory, a sensible layout would be:
+
+* mygame/android.txt
+* mygame/icon.ong
+* mygame/main.py
+* mygame/.nomedia
+
+(Data files used by the game should go in the same directory as
+main.py, as well.)
+
+android.txt
+-----------
+
+The android.txt file is a file that's used to control how your game is
+displayed, both in the list of pygame games and when the game itself
+is running. It is a Java Properties file, which consists of a list of
+keys separated from values by an equals sign. An example android.txt
+file is::
+
+    title=Color Touch
+    author=Pygame Subset for Android
+    api=1
+    orientation=portrait
+
+The following keys are supported:
+
+name
+    The title of the game. Displayed in the Pygame Subset tool's list
+    of games.
+
+author
+    The author of the game. Displayed in the Pygame Subset too's list
+    of games.
+
+api
+    The version of the Pygame Subset API that this game uses. This
+    should always be 1. If set to a newer version, the user will be
+    asked to upgrade to that newer version (which doesn't exist yet).
+
+orientation
+    One of "portrait" or "landscape". This controls the orientation
+    of the game on the device.
+
+
+icon.png
+--------
+
+The icon.png file should be a small png file. It's used as an icon in
+the Pygame Subset tool.
+
+.nomedia
+--------
+
+The .nomedia file should be an empty file. It's used to tell Android
+not to scan this directory for media files. If it didn't exist, then
+image and audio files used by the game would be indexed and added
+to the various galleries on the device.
+
+
+Pushing to the Device
+=====================
+
+To push the game to the device, use the adb tool, which can be
+downloaded as part of the `Android SDK
+<http://developer.android.com/sdk/index.html>`_. It's useful to place
+the adb command into your path.
+
+The game must be placed into a directory underneath the pygame
+directory on the device's sdcard, using a command like::
+
+   adb push mygame /sdcard/pygame/mygame
+
+Once that's done, the game will show up in the list of games
+in the Pygame Subset tool.
+
+Running the Game
+================
+
+Once the game shows up in the Pygame Subset for Android tool, it can
+be run. Touch the name of the game in the list of games to run it.
+
+Debug messages can be seen using the adb logcat command. It may make
+sense to limit the messages to those originating from python, using::
+
+   adb logcat -s python:*
+
+If that doesn't help in diagnosing the problem, use adb logcat to
+display all messages::
+
+   adb logcat
+
+
+

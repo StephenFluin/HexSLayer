@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="appName">HexSLayer</string>
+<string name="iconName">HexSLayer</string>
+
+<string name="private_version">1324734991.55</string>
+
+
+<string name="urlScheme">pygame</string>
+</resources>

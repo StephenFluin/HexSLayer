@@ -156,16 +156,18 @@ def main():
 					
 				elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
 					if mouseCarrying:
-						#print "At mouse up, Mousecarrying is %s" % (mouseCarrying)
+						print "At mouse up, Mousecarrying is %s at %sx%s" % (mouseCarrying,x,y)
 						validDrop = False
 						for row in gameMap.tiles:
+							print "Interating through rows"
 							for tile in row:
+								print "Interating through tiles in row"
 								if tile.rect.collidepoint(pygame.mouse.get_pos()) and tile.checkHexCollision(pygame.mouse.get_pos()):
-								
+									print "Rectangle collision happened"
 									
 									validDrop = True
 									if(mouseCarrying.attack(tile.xloc,tile.yloc)):
-										#print "Attack of this square was successful, dropping player there."
+										print "Attack of this square was successful, dropping player there."
 										gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
 										mouseCarrying.justPurchased = False
 									elif not mouseCarrying.justPurchased:
@@ -173,6 +175,7 @@ def main():
 										mouseCarrying.setPos( mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc)
 									else:
 										# We just purchased this pawn and couldn't place it, refund it!
+										print "Couldn't drop purchased pawn."
 										validDrop = False
 										
 											

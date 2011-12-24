@@ -1,0 +1,210 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Testing the Game &mdash; Pygame Subset for Android</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pygame Subset for Android" href="index.html" />
+    <link rel="next" title="Packaging &amp; Releasing" href="releasing.html" />
+    <link rel="prev" title="Writing a Game" href="writing.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="releasing.html" title="Packaging &amp; Releasing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="writing.html" title="Writing a Game"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Pygame Subset for Android</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="testing-the-game">
+<h1>Testing the Game<a class="headerlink" href="#testing-the-game" title="Permalink to this headline">¶</a></h1>
+<p>Testing a game on Android is a three-step process. The first step is
+to create files that control how your game is displayed. Then, your
+game can be pushed onto the device using the adb tool that comes with
+the Android SDK. Finally, the game can be run using the Pygame Subset
+tool.</p>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h2>
+<p>The android.txt, icon.png, and .nomedia files are required to ensure
+your game displays property in the Pygame Subset tool. These files
+should be placed in the same directory as the main.py file. If the
+game is in the mygame directory, a sensible layout would be:</p>
+<ul class="simple">
+<li>mygame/android.txt</li>
+<li>mygame/icon.ong</li>
+<li>mygame/main.py</li>
+<li>mygame/.nomedia</li>
+</ul>
+<p>(Data files used by the game should go in the same directory as
+main.py, as well.)</p>
+<div class="section" id="android-txt">
+<h3>android.txt<a class="headerlink" href="#android-txt" title="Permalink to this headline">¶</a></h3>
+<p>The android.txt file is a file that&#8217;s used to control how your game is
+displayed, both in the list of pygame games and when the game itself
+is running. It is a Java Properties file, which consists of a list of
+keys separated from values by an equals sign. An example android.txt
+file is:</p>
+<div class="highlight-python"><pre>title=Color Touch
+author=Pygame Subset for Android
+api=1
+orientation=portrait</pre>
+</div>
+<p>The following keys are supported:</p>
+<dl class="docutils">
+<dt>name</dt>
+<dd>The title of the game. Displayed in the Pygame Subset tool&#8217;s list
+of games.</dd>
+<dt>author</dt>
+<dd>The author of the game. Displayed in the Pygame Subset too&#8217;s list
+of games.</dd>
+<dt>api</dt>
+<dd>The version of the Pygame Subset API that this game uses. This
+should always be 1. If set to a newer version, the user will be
+asked to upgrade to that newer version (which doesn&#8217;t exist yet).</dd>
+<dt>orientation</dt>
+<dd>One of &#8220;portrait&#8221; or &#8220;landscape&#8221;. This controls the orientation
+of the game on the device.</dd>
+</dl>
+</div>
+<div class="section" id="icon-png">
+<h3>icon.png<a class="headerlink" href="#icon-png" title="Permalink to this headline">¶</a></h3>
+<p>The icon.png file should be a small png file. It&#8217;s used as an icon in
+the Pygame Subset tool.</p>
+</div>
+<div class="section" id="nomedia">
+<h3>.nomedia<a class="headerlink" href="#nomedia" title="Permalink to this headline">¶</a></h3>
+<p>The .nomedia file should be an empty file. It&#8217;s used to tell Android
+not to scan this directory for media files. If it didn&#8217;t exist, then
+image and audio files used by the game would be indexed and added
+to the various galleries on the device.</p>
+</div>
+</div>
+<div class="section" id="pushing-to-the-device">
+<h2>Pushing to the Device<a class="headerlink" href="#pushing-to-the-device" title="Permalink to this headline">¶</a></h2>
+<p>To push the game to the device, use the adb tool, which can be
+downloaded as part of the <a class="reference external" href="http://developer.android.com/sdk/index.html">Android SDK</a>. It&#8217;s useful to place
+the adb command into your path.</p>
+<p>The game must be placed into a directory underneath the pygame
+directory on the device&#8217;s sdcard, using a command like:</p>
+<div class="highlight-python"><pre>adb push mygame /sdcard/pygame/mygame</pre>
+</div>
+<p>Once that&#8217;s done, the game will show up in the list of games
+in the Pygame Subset tool.</p>
+</div>
+<div class="section" id="running-the-game">
+<h2>Running the Game<a class="headerlink" href="#running-the-game" title="Permalink to this headline">¶</a></h2>
+<p>Once the game shows up in the Pygame Subset for Android tool, it can
+be run. Touch the name of the game in the list of games to run it.</p>
+<p>Debug messages can be seen using the adb logcat command. It may make
+sense to limit the messages to those originating from python, using:</p>
+<div class="highlight-python"><pre>adb logcat -s python:*</pre>
+</div>
+<p>If that doesn&#8217;t help in diagnosing the problem, use adb logcat to
+display all messages:</p>
+<div class="highlight-python"><pre>adb logcat</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Testing the Game</a><ul>
+<li><a class="reference internal" href="#files">Files</a><ul>
+<li><a class="reference internal" href="#android-txt">android.txt</a></li>
+<li><a class="reference internal" href="#icon-png">icon.png</a></li>
+<li><a class="reference internal" href="#nomedia">.nomedia</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pushing-to-the-device">Pushing to the Device</a></li>
+<li><a class="reference internal" href="#running-the-game">Running the Game</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="writing.html"
+                        title="previous chapter">Writing a Game</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="releasing.html"
+                        title="next chapter">Packaging &amp; Releasing</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="releasing.html" title="Packaging &amp; Releasing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="writing.html" title="Writing a Game"
+             >previous</a> |</li>
+        <li><a href="index.html">Pygame Subset for Android</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2011, Tom Rothamel.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

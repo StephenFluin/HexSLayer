@@ -1,0 +1,291 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Packaging &amp; Releasing &mdash; Pygame Subset for Android</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pygame Subset for Android" href="index.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="Testing the Game" href="testing.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="testing.html" title="Testing the Game"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Pygame Subset for Android</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="packaging-releasing">
+<h1>Packaging &amp; Releasing<a class="headerlink" href="#packaging-releasing" title="Permalink to this headline">¶</a></h1>
+<p>Pygame games can be distributed through the Android Market. To do
+this, you&#8217;ll need the following tools installed on your system.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.python.org">Python 2.6 or 2.7</a></li>
+<li><a class="reference external" href="http://developer.android.com/sdk/index.html">Android SDK r08</a></li>
+<li><a class="reference external" href="http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html">Java JDK</a></li>
+<li><a class="reference external" href="http://ant.apache.org/">Apache Ant</a></li>
+</ul>
+<p>You&#8217;ll want to download and uncompress
+<a class="reference external" href="http://www.renpy.org/pygame/dl/">pygame-package-&lt;version&gt;.tar.bz2</a>.</p>
+<div class="section" id="build-py">
+<h2>Build.py<a class="headerlink" href="#build-py" title="Permalink to this headline">¶</a></h2>
+<p>The pygame package tool contains the <strong class="program">build.py</strong> script. Given
+a game directory and options, this script creates all of the files
+needed to create an android package, and then uses <strong class="program">ant</strong> to
+build that package.</p>
+<p><strong class="program">build.py</strong> expects that Python, Java, Ant, and the tools
+directory of the Android SDK are in your path. You should be able to
+run <strong class="program">python</strong>, <strong class="program">javac</strong>, <strong class="program">ant</strong>, and
+<strong class="program">android</strong> without having to give a path explicitly.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">On Windows, some of the names are different. You&#8217;ll want to be able
+to run <strong class="program">ant.bat</strong> and <strong class="program">android.bat</strong>.</p>
+</div>
+<p><strong class="program">build.py</strong> expects you to change into the directory that
+contains it before running it. It takes the following options:</p>
+<div class="topic">
+<p class="topic-title first">build.py options</p>
+<dl class="option">
+<dt id="cmdoption--dir">
+<tt class="descname">--dir</tt><tt class="descclassname"> DIR</tt><a class="headerlink" href="#cmdoption--dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A directory containing project files that will be installed
+to the SD card.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">These files will wind up on the sdcard, where it is trivially
+easy for users to get at them.</p>
+</div>
+<dl class="option">
+<dt id="cmdoption--private">
+<tt class="descname">--private</tt><tt class="descclassname"> DIR</tt><a class="headerlink" href="#cmdoption--private" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A directory containing project files that will be installed to
+a private directory on the device&#8217;s internal storage.</p>
+<p>One of &#8211;private or &#8211;dir must be given.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Despite the name, these files aren&#8217;t all that private, since
+root users can get to them.</p>
+</div>
+<dl class="option">
+<dt id="cmdoption--package">
+<tt class="descname">--package</tt><tt class="descclassname"> PACKAGE</tt><a class="headerlink" href="#cmdoption--package" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The name of the java package the project will be packaged under.</p>
+<dl class="option">
+<dt id="cmdoption--name">
+<tt class="descname">--name</tt><tt class="descclassname"> NAME</tt><a class="headerlink" href="#cmdoption--name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The human-readable name of the project.</p>
+<dl class="option">
+<dt id="cmdoption--icon-name">
+<tt class="descname">--icon-name</tt><tt class="descclassname"> NAME</tt><a class="headerlink" href="#cmdoption--icon-name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The name that will be used for the project icon that is displayed in
+the launcher.</p>
+<dl class="option">
+<dt id="cmdoption--version">
+<tt class="descname">--version</tt><tt class="descclassname"> VERSION</tt><a class="headerlink" href="#cmdoption--version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The version of the project. This should be human-readable. A
+numeric version is generated from this, but the generation is
+sensitive to the number of groups of digits, so the versions
+should always contain the same number of groups of digits.</p>
+<p>For example, 1.0 and 2.1 are fine. 1.1.2 is also fine, but shouldn&#8217;t be
+mixed in a project with 1.0</p>
+<dl class="option">
+<dt id="cmdoption--numeric-version">
+<tt class="descname">--numeric-version</tt><tt class="descclassname"> NUMBER</tt><a class="headerlink" href="#cmdoption--numeric-version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The numeric version of the project. This is optional, and if
+given, this overrides the version number that build.py would
+compute automatically.</p>
+<dl class="option">
+<dt id="cmdoption--icon">
+<tt class="descname">--icon</tt><tt class="descclassname"> FILE</tt><a class="headerlink" href="#cmdoption--icon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>If given, this should be a PNG file that contains the icon that
+will be used for the application. If not present, a default icon
+is used.</p>
+<dl class="option">
+<dt id="cmdoption--presplash">
+<tt class="descname">--presplash</tt><tt class="descclassname"> FILE</tt><a class="headerlink" href="#cmdoption--presplash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>If given, this should be a JPEG file that is used as a pre-splash
+screen that&#8217;s displayed as the application starts up. If not present,
+a default screen will be used.</p>
+<dl class="option">
+<dt id="cmdoption--orientation">
+<tt class="descname">--orientation</tt><tt class="descclassname"> ORIENTATION</tt><a class="headerlink" href="#cmdoption--orientation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The orientation that the application will be displayed in. This should
+be one of &#8220;portrait&#8221; or &#8220;landscape&#8221;. Defaults to landscape.</p>
+<dl class="option">
+<dt id="cmdoption--install-location">
+<tt class="descname">--install-location</tt><tt class="descclassname"> INSTALL_LOCATION</tt><a class="headerlink" href="#cmdoption--install-location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The default install location for the application. This should be one of
+&#8220;auto&#8221;, &#8220;preferExternal&#8221; or &#8220;internalOnly&#8221;. Defaults to auto.</p>
+<dl class="option">
+<dt id="cmdoption--permission">
+<tt class="descname">--permission</tt><tt class="descclassname"> PERMISSION</tt><a class="headerlink" href="#cmdoption--permission" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>An android permission that will be given to the packaged
+applications. Currently-useful permissions include:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">INTERNET</span></tt></dt>
+<dd>Allows the application to communicate over the Internet.</dd>
+<dt><tt class="docutils literal"><span class="pre">VIBRATE</span></tt></dt>
+<dd>Allows the application to trigger the phone&#8217;s vibration.</dd>
+</dl>
+<dl class="option">
+<dt id="cmdoption--with-sqlite3">
+<tt class="descname">--with-sqlite3</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--with-sqlite3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Includes the sqlite module as part of the package.</p>
+<dl class="option">
+<dt id="cmdoption--with-PIL">
+<tt class="descname">--with-PIL</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--with-PIL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Includes the Python Imaging Library as part of the package.</p>
+</div>
+<p><strong class="program">build.py</strong> expects one positional argument, which is the
+command to run. Useful commands include:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">debug</span></tt></dt>
+<dd>Builds a debug version of the package, placing it in bin/.</dd>
+<dt><tt class="docutils literal"><span class="pre">install</span></tt></dt>
+<dd>Builds a debug version of the package, and installs it on a
+connected device or emulator.</dd>
+<dt><tt class="docutils literal"><span class="pre">release</span></tt></dt>
+<dd>Builds a release version of the package, placing it in bin/. This
+package needs to be signed and zipaligned before it can be used.</dd>
+</dl>
+<p>A command that builds the example package is:</p>
+<div class="highlight-python"><pre>./build.py --dir example --package com.domain.example \
+    --name "Pygame Example" --version 1.0 --orientation portrait \
+    debug</pre>
+</div>
+</div>
+<div class="section" id="releasing-to-market">
+<h2>Releasing to Market<a class="headerlink" href="#releasing-to-market" title="Permalink to this headline">¶</a></h2>
+<p>Once a release version of the package is built, it needs to be signed
+and zipaligned before it can be released to the Android Market. Please
+see <a class="reference external" href="http://developer.android.com/guide/publishing/app-signing.html">the Android documentation</a> for
+more details.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Packaging &amp; Releasing</a><ul>
+<li><a class="reference internal" href="#build-py">Build.py</a></li>
+<li><a class="reference internal" href="#releasing-to-market">Releasing to Market</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="testing.html"
+                        title="previous chapter">Testing the Game</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="api.html"
+                        title="next chapter">API</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="testing.html" title="Testing the Game"
+             >previous</a> |</li>
+        <li><a href="index.html">Pygame Subset for Android</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2011, Tom Rothamel.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

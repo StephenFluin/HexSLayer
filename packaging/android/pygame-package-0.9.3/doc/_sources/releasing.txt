@@ -1,0 +1,160 @@
+=====================
+Packaging & Releasing
+=====================
+
+Pygame games can be distributed through the Android Market. To do
+this, you'll need the following tools installed on your system.
+
+* `Python 2.6 or 2.7 <http://www.python.org>`_
+* `Android SDK r08 <http://developer.android.com/sdk/index.html>`_
+* `Java JDK <http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html>`_
+* `Apache Ant <http://ant.apache.org/>`_
+
+You'll want to download and uncompress
+`pygame-package-<version>.tar.bz2 <http://www.renpy.org/pygame/dl/>`_.
+
+Build.py
+---------
+
+The pygame package tool contains the :program:`build.py` script. Given
+a game directory and options, this script creates all of the files
+needed to create an android package, and then uses :program:`ant` to
+build that package.
+
+:program:`build.py` expects that Python, Java, Ant, and the tools
+directory of the Android SDK are in your path. You should be able to
+run :program:`python`, :program:`javac`, :program:`ant`, and
+:program:`android` without having to give a path explicitly.
+
+.. note::
+
+   On Windows, some of the names are different. You'll want to be able
+   to run :program:`ant.bat` and :program:`android.bat`.
+   
+:program:`build.py` expects you to change into the directory that
+contains it before running it. It takes the following options:
+
+.. topic:: build.py options
+
+    .. option:: --dir DIR
+
+    A directory containing project files that will be installed
+    to the SD card. 
+
+    .. note::
+
+        These files will wind up on the sdcard, where it is trivially
+        easy for users to get at them.
+    
+    .. option:: --private DIR
+
+    A directory containing project files that will be installed to
+    a private directory on the device's internal storage.
+
+    One of --private or --dir must be given.
+    
+    .. note::
+
+        Despite the name, these files aren't all that private, since
+        root users can get to them.
+    
+    .. option:: --package PACKAGE
+
+    The name of the java package the project will be packaged under.
+
+    .. option:: --name NAME
+
+    The human-readable name of the project.
+
+    .. option:: --icon-name NAME
+
+    The name that will be used for the project icon that is displayed in
+    the launcher.
+    
+    .. option:: --version VERSION
+
+    The version of the project. This should be human-readable. A
+    numeric version is generated from this, but the generation is
+    sensitive to the number of groups of digits, so the versions
+    should always contain the same number of groups of digits.
+
+    For example, 1.0 and 2.1 are fine. 1.1.2 is also fine, but shouldn't be
+    mixed in a project with 1.0
+
+    .. option:: --numeric-version NUMBER
+
+    The numeric version of the project. This is optional, and if
+    given, this overrides the version number that build.py would
+    compute automatically.
+    
+    .. option:: --icon FILE
+
+    If given, this should be a PNG file that contains the icon that
+    will be used for the application. If not present, a default icon
+    is used.
+
+    .. option:: --presplash FILE
+
+    If given, this should be a JPEG file that is used as a pre-splash
+    screen that's displayed as the application starts up. If not present,
+    a default screen will be used.
+
+    .. option:: --orientation ORIENTATION
+
+    The orientation that the application will be displayed in. This should
+    be one of "portrait" or "landscape". Defaults to landscape.
+
+    .. option:: --install-location INSTALL_LOCATION
+    
+    The default install location for the application. This should be one of
+    "auto", "preferExternal" or "internalOnly". Defaults to auto.
+
+    .. option:: --permission PERMISSION
+
+    An android permission that will be given to the packaged
+    applications. Currently-useful permissions include:
+
+    ``INTERNET``
+        Allows the application to communicate over the Internet.
+
+    ``VIBRATE``
+        Allows the application to trigger the phone's vibration.
+
+    .. option:: --with-sqlite3
+
+    Includes the sqlite module as part of the package.
+
+    .. option:: --with-PIL
+
+    Includes the Python Imaging Library as part of the package.
+        
+
+:program:`build.py` expects one positional argument, which is the
+command to run. Useful commands include:
+
+``debug``
+    Builds a debug version of the package, placing it in bin/.
+
+``install``
+    Builds a debug version of the package, and installs it on a
+    connected device or emulator.
+
+``release``
+    Builds a release version of the package, placing it in bin/. This
+    package needs to be signed and zipaligned before it can be used.
+
+A command that builds the example package is::
+
+    ./build.py --dir example --package com.domain.example \
+        --name "Pygame Example" --version 1.0 --orientation portrait \
+        debug
+
+    
+Releasing to Market
+-------------------
+
+Once a release version of the package is built, it needs to be signed
+and zipaligned before it can be released to the Android Market. Please
+see `the Android documentation
+<http://developer.android.com/guide/publishing/app-signing.html>`_ for
+more details.

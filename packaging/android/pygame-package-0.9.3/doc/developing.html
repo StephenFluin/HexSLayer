@@ -1,0 +1,227 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Developer’s Guide &mdash; Pygame Subset for Android</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pygame Subset for Android" href="index.html" />
+    <link rel="next" title="Supported Devices" href="devices.html" />
+    <link rel="prev" title="API" href="api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="devices.html" title="Supported Devices"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Pygame Subset for Android</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="developer-s-guide">
+<h1>Developer&#8217;s Guide<a class="headerlink" href="#developer-s-guide" title="Permalink to this headline">¶</a></h1>
+<p>This explains how to build and change PGS4A, if that&#8217;s what you want
+to do. You don&#8217;t need this if all you&#8217;re doing is developing <em>with</em>
+PGS4A.</p>
+<div class="section" id="compiling">
+<h2>Compiling<a class="headerlink" href="#compiling" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This has only been tried on Linux, and probably won&#8217;t work on
+Windows without a lot of work.</p>
+</div>
+<p>PGS4A is built using a series of scripts. The <strong class="program">build_all.sh</strong>
+script will build all of PGS4A, by calling the scriptsi in the
+appropriate order. Beyond that:</p>
+<p><strong class="program">environment.sh</strong></p>
+<blockquote>
+<div>Is called by the other scripts, and sets up the build
+environment. It expects android-ndk-r4b and android-sdk-linux_86
+to be in the current directory.</div></blockquote>
+<p><strong class="program">build_python.sh</strong></p>
+<blockquote>
+<div>Cross-compiles python. For this to work, a host-compiled python
+and pgen must be in the Python-2.6.4 directory. If they aren&#8217;t
+there, linux-x64 binaries will be copied in - which probably won&#8217;t
+help if you use a different system.</div></blockquote>
+<p><strong class="program">build_sdl.sh</strong></p>
+<blockquote>
+<div>Builds the SDL libraries.</div></blockquote>
+<p><strong class="program">build_pygame.sh</strong></p>
+<blockquote>
+<div>Builds pygame. Build_modules.sh must be called after this is run.</div></blockquote>
+<p><strong class="program">fill_python.sh</strong></p>
+<blockquote>
+<div>Cleans the private directory, and fills it with the Python and Pygame
+modules that will be used by the program. This script contains a
+list of modules to include.</div></blockquote>
+<p><strong class="program">build_modules.sh</strong></p>
+<blockquote>
+<div>Builds the android-specific modules, and the shared library that
+contains all of the binary modules in it.</div></blockquote>
+<p><strong class="program">liblink</strong> and <cite>biglink</cite></p>
+<blockquote>
+<div><p>Shared-library python modules should be compiled using
+<strong class="program">liblink</strong> instead of <strong class="program">ld</strong>.
+<strong class="program">build_modules.sh</strong> uses <strong class="program">biglink</strong> to merge them into a
+single file, libpymodules.so.</p>
+<p>This is necessary because Android has a limitation of 64 shared
+libraries per process.</p>
+<p>Due to limitations of Python and <strong class="program">biglink</strong>, there can
+only be one shared-library module with a given name in pygame and
+the user&#8217;s code. Since <tt class="docutils literal"><span class="pre">pygame.time</span></tt> exists, the module <tt class="docutils literal"><span class="pre">mycode.time</span></tt>
+will conflict with it. This doesn&#8217;t apply to modules that are part
+of Python itself, so <tt class="docutils literal"><span class="pre">pygame.time</span></tt> can exist alongside the python
+<tt class="docutils literal"><span class="pre">time</span></tt> module.</p>
+</div></blockquote>
+</div>
+<div class="section" id="directories">
+<h2>Directories<a class="headerlink" href="#directories" title="Permalink to this headline">¶</a></h2>
+<p>A PGS4A source build includes or creates the following interesting
+directories:</p>
+<p>assets/</p>
+<blockquote>
+<div>Contains the private.mp3 and public mp3 files, containing the game
+data. These are tar.gz files, renamed to mp3 to prevent them from
+being compressed by the Android build tooks.</div></blockquote>
+<p>bin/</p>
+<blockquote>
+<div>Apk files are created here.</div></blockquote>
+<p>buildlib/</p>
+<blockquote>
+<div>This directory contains libraries used by build.py. This includes
+argparse and jinja2.</div></blockquote>
+<p>doc/</p>
+<blockquote>
+<div>Contains the sphinx source for this documentation.</div></blockquote>
+<p>jni/</p>
+<blockquote>
+<div>Contains the source and build scripts for an NDK build of the
+SDL libraries. jni/application/src/start.pyx is the Cython
+file that&#8217;s used to bootstrap Python.</div></blockquote>
+<p>private/</p>
+<blockquote>
+<div>This is where the files installed to the private areas of the
+android device live.</div></blockquote>
+<p>pygame-1.9.1release/</p>
+<blockquote>
+<div>The pygame source code.</div></blockquote>
+<p>Python-2.6.4/</p>
+<blockquote>
+<div>The python source code.</div></blockquote>
+<p>python-install/</p>
+<blockquote>
+<div>Where the cross-compiled Python is installed to after it is built.</div></blockquote>
+<p>res/</p>
+<blockquote>
+<div>Android resources.</div></blockquote>
+<p>runtimelib/</p>
+<blockquote>
+<div>Source code for Python modules that are installed to the device.</div></blockquote>
+<p>sdl/</p>
+<blockquote>
+<div>Source code for SDL. (We use SDL-1.2).</div></blockquote>
+<p>src/</p>
+<blockquote>
+<div>Java source code.</div></blockquote>
+<p>templates/</p>
+<blockquote>
+<div>This directory contains templates that are used to generate
+control files, and the default icons and presplash screens.</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Developer&#8217;s Guide</a><ul>
+<li><a class="reference internal" href="#compiling">Compiling</a></li>
+<li><a class="reference internal" href="#directories">Directories</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="api.html"
+                        title="previous chapter">API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="devices.html"
+                        title="next chapter">Supported Devices</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="devices.html" title="Supported Devices"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API"
+             >previous</a> |</li>
+        <li><a href="index.html">Pygame Subset for Android</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2011, Tom Rothamel.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
