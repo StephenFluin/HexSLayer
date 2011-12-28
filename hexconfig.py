@@ -4,10 +4,20 @@
 # copyright (C) Stephen Fluin 2009
 #
 
-tilesize = 32
+
+
+tilesize = 34
 playerColors = ("#66FF33","#003DF5","#FF3366","#33FFCC","#FFCC33","#FF6633")
 playerNames = ("Human Player", "AI 1", "AI 2", "AI 3", "AI 4", "AI 5")
 
-infobarLocation =(25,455)
-storeLocation = (320,450)
-scoreLocation = (450,30)
+masterSize = (800,480)
+
+infobarLocation =(10,masterSize[1]-40)
+
+scoreLocation = (masterSize[0]-210,30)
+endTurnLocation = (masterSize[0]-210,masterSize[1]-40)
+storeLocation = (endTurnLocation[0]-70,masterSize[1]-40)
+
+tileSpaceX = masterSize[0]-210-20
+tileSpaceY = masterSize[1]-40-20-30
+tilesize = tileSpaceY /9

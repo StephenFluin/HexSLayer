@@ -15,7 +15,7 @@ class Pawn(pygame.sprite.Sprite):
 	def __init__(self,gameMap,x,y,level):
 		self.gameMap = gameMap
 		pygame.sprite.Sprite.__init__(self)
-		self.x,self.y = convertGridPosition(self.gameMap,x,y)
+		self.x,self.y = convertGridPawnPosition(self.gameMap,x,y)
 		self.startTile = None
 		self.moved = False
 		self.level = level
@@ -28,7 +28,7 @@ class Pawn(pygame.sprite.Sprite):
 		
 		
 	def setPos(self,x,y):
-		self.x,self.y = convertGridPosition(self.gameMap,x,y)
+		self.x,self.y = convertGridPawnPosition(self.gameMap,x,y)
 		if not self.justPurchased:
 			self.startTile.pawn = None
 		self.gameMap.getTile((x,y)).pawn = self

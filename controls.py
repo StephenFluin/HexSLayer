@@ -15,7 +15,7 @@ class VillageData(pygame.sprite.Sprite):
 
 		self.draw()
 	def draw(self):
-		self.image = pygame.Surface((325,30))
+		self.image = pygame.Surface((500,30))
 		self.image.fill(pygame.Color("#FFFFFF"))
 		if(self.gameMap.selectedSetIncome > 0):
 			msg = "Village Income:+"+str(self.gameMap.selectedSetIncome)+",-"+str(self.gameMap.selectedSetUpkeep)+"="+str(self.gameMap.selectedSetIncome-self.gameMap.selectedSetUpkeep)
@@ -34,14 +34,14 @@ class PurchaseUnits(pygame.sprite.Sprite):
 		self.income = 0
 		self.draw()
 	def draw(self):
-		self.image = pygame.Surface((85,30))
+		self.image = pygame.Surface((60,30))
 		self.image.fill(pygame.Color("#FFFFFF"))
 		if self.gameMap.selectedVillage and self.gameMap.selectedVillage.player == 0:
 			if self.gameMap.selectedVillage.balance >= 10:
 				# TODO: Make sure this doesn't load on each call of draw
 				self.image.blit(pygame.image.load("villager.png"),(0,0))
 			if self.gameMap.selectedVillage.balance >= 20:
-				self.image.blit(pygame.image.load("castle.png"),(45,0))
+				self.image.blit(pygame.image.load("castle.png"),(30,0))
 			
 		
 		#if(self.gameMap.balance() > 8):
@@ -58,7 +58,7 @@ class GameOver(pygame.sprite.Sprite):
 	def draw(self):
 		self.image = pygame.Surface((560,100))
 		self.image.fill(pygame.Color("#FFFFFF"))
-		font = pygame.font.Font("freesansbold.ttf",38)
+		font = pygame.font.Font("freesansbold.ttf",28)
 		text = font.render("Player %s (%s) won! Congratulations!" % (self.winner,self.gameMap.players[self.winner].getName()),1,(10,10,10))
 		self.image.blit(text,(0,0))
 
@@ -70,15 +70,15 @@ class NewGame(pygame.sprite.Sprite):
 	def draw(self):
 		self.image = pygame.Surface((300,40))
 		self.image.fill(pygame.Color("#FFFFFF"))
-		font = pygame.font.Font("freesansbold.ttf",32)
+		font = pygame.font.Font("freesansbold.ttf",20)
 		text = font.render("Start Another Game",1,(10,10,10))
 		self.rect = pygame.draw.rect(self.image,(0,0,0),(0,0,300,40),1)
 		self.image.blit(text,(30,5))
 		
 class ScoreCard(pygame.sprite.Sprite):
-	def __init__(self,gameMap,x,y):
+	def __init__(self,gameMap,location):
 		pygame.sprite.Sprite.__init__(self)
-		self.x,self.y = x,y
+		(self.x,self.y) = location
 		
 		self.gameMap = gameMap
 		self.draw()

@@ -192,7 +192,7 @@ class FullAI(AI):
 								#print "didn't buy anything, because %s is the balance" % (t.village.balance)
 								nothing = None
 		
-		print "Level of play determined to be %s." % (levelOfPlay)
+		# "Level of play determined to be %s." % (levelOfPlay)
 								
 		# upgrade units where appropriate
 		#If we have high income, upgrade!

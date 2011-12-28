@@ -11,8 +11,18 @@ def getHexAt(x,y):
 	r = .75
 	return ((x+l*s,y), (x+r*s,y), (x+s,y+s/2), (x+r*s,y+s), (x+l*s,y+s), (x,y+s/2))
 	
+#Converts an x, y in tiles into x, y in pixels, absolutely positioned on screen
+# Used only for rendering, hence the offset
 def convertGridPosition(map,x,y):
-	return (x*1.5*tilesize+y%2*tilesize*.75+map.x,y*tilesize/2+map.y)
+	(retX,retY) = (x*1.5*tilesize+y%2*tilesize*.75+map.x , y*tilesize/2+map.y)
+	return (retX,retY)
+	
+# Convert tile xy position to pixel xy position, take into account size of pawns for centering
+def convertGridPawnPosition(map,x,y):
+	(retX,retY) = convertGridPosition(map,x,y)
+	retX = retX + (tilesize-30)/2
+	retY = retY + (tilesize-30)/2
+	return (retX,retY)
 
 
 # We define 0 as north, then go clockwise.

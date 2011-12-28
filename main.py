@@ -44,10 +44,11 @@ mouseCarrying = None
 screen = None
 clock = None
 
+
 def main():
 	global screen, background, clock, mouseCarrying
 	pygame.init()
-	screen = pygame.display.set_mode((800,480))
+	screen = pygame.display.set_mode(masterSize)
 	pygame.display.set_caption('HexSLayer')
 	pygame.display.set_icon(pygame.image.load("gameicon.png"))
 
@@ -76,13 +77,13 @@ def main():
 	clock = pygame.time.Clock()
 	allsprites = pygame.sprite.RenderPlain(())
 	
-	background.blit(pygame.image.load("endturn.png"),(430,450))
-	
+	background.blit(pygame.image.load("endturn.png"),endTurnLocation)
+	print "Put endturn at %sx%s" % endTurnLocation
 	
 	sparks = pygame.image.load("sparks.png")
 	
 	while True:
-		clock.tick(60)
+		clock.tick(30)
 		#Handle Input Events
 		if True:
 			for event in pygame.event.get():
@@ -100,6 +101,7 @@ def main():
 					if not gameMap.gameOver:
 						# Picking something up
 						if not mouseCarrying:
+							#Select a region
 							for row in gameMap.tiles:
 								for tile in row:
 									if tile.rect.collidepoint(pygame.mouse.get_pos()):
@@ -111,20 +113,27 @@ def main():
 												mouseCarrying.startTile = tile
 												#print "I have set the startTile of the carry."
 											break
+											
 							x,y =pygame.mouse.get_pos()
-							if(x>430 and y > 450):
+							# End Turn Button
+							if(x>endTurnLocation[0] and y > endTurnLocation[1]):
 								gameMap.newTurn()
-							if(x<430 and x > 280 and y > 450):
+								
+							# Store Interaction
+							storeX = gameMap.store.x
+							storeY = gameMap.store.y
+							storeRight = gameMap.store.image.get_width() + storeX
+							if(x<storeRight and x > storeX and y > storeY):
 								print "got click at in the store%sx%s" %(x,y)
 								#print "Spawning a new villager, and deducting from bank."
-								if gameMap.selectedVillage.balance >= 10 and x < 355:
-									mouseCarrying = Villager(gameMap,350,450)
+								if gameMap.selectedVillage.balance >= 10 and x < storeX+30:
+									mouseCarrying = Villager(gameMap,storeX,storeY)
 									mouseCarrying.justPurchased = True
 									gameMap.selectedVillage.balance -= 10
 									mouseCarrying.startTile = gameMap.selectedSet[0]
 									gameMap.renders.append(mouseCarrying)
-								if gameMap.selectedVillage.balance >= 20 and x > 355:
-									mouseCarrying = Castle(gameMap,350,450)
+								if gameMap.selectedVillage.balance >= 20 and x > storeX+30:
+									mouseCarrying = Castle(gameMap,storeX,storeY)
 									mouseCarrying.justPurchased = True
 									gameMap.selectedVillage.balance -= 20
 									mouseCarrying.startTile = gameMap.selectedSet[0]
@@ -146,8 +155,8 @@ def main():
 					if mouseCarrying:
 						print "At mouse up, Mousecarrying is %s at %sx%s" % (mouseCarrying,x,y)
 						validDrop = False
-						x = mouseCarrying.x+15
-						y = mouseCarrying.y+15
+						x = mouseCarrying.x+tilesize/2
+						y = mouseCarrying.y+tilesize/2
 						
 						for row in gameMap.tiles:
 							for tile in row:
@@ -183,8 +192,8 @@ def main():
 				elif event.type == MOUSEMOTION:
 					if mouseCarrying != None:
 						mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()
-						mouseCarrying.x -= 15
-						mouseCarrying.y -= 15
+						mouseCarrying.x -= tilesize/2
+						mouseCarrying.y -= tilesize/2
 		allsprites.update()
 
 		
@@ -213,14 +222,6 @@ def main():
 			#gameMap.newTurn()
 		#time.sleep(1)
 	
-	
-	## HERE STARTS DEBUG INTERFACE, everything before was real code
-	
-	# Use a timer to control FPS.
-	pygame.time.set_timer(TIMEREVENT, 1000 / FPS)
-
-	# The color of the screen.
-	color = RED
 
 	while True:
 
@@ -261,7 +262,7 @@ def main():
 class Village(pygame.sprite.Sprite):
 	def __init__(self,gameMap,xloc,yloc):
 		pygame.sprite.Sprite.__init__(self)
-		self.x,self.y = convertGridPosition(gameMap,xloc,yloc)
+		self.x,self.y = convertGridPawnPosition(gameMap,xloc,yloc)
 		self.xloc = xloc
 		self.yloc = yloc
 		self.balance = 5
@@ -398,8 +399,8 @@ class Map():
 	def __init__(self):
 		self.width = 8#13
 		self.height = 17#25
-		self.x = 5
-		self.y = 30
+		self.x = 10
+		self.y = 35
 		
 		self.turn = 0
 		self.gameOver = False
@@ -436,7 +437,7 @@ class Map():
 		self.infobar = VillageData(self,infobarLocation[0],infobarLocation[1])
 		self.store = PurchaseUnits(self,storeLocation[0],storeLocation[1])
 		
-		self.score = ScoreCard(self,scoreLocation[0],scoreLocation[1])
+		self.score = ScoreCard(self,scoreLocation)
 		self.renders.append(self.infobar)
 		self.renders.append(self.store)
 		self.renders.append(self.score)

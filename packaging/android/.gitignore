@@ -1,0 +1,10 @@
+pygame*/AndroidManifest.xml
+pygame*/assets
+pygame*/bin
+pygame*/build.xml
+pygame*/gen
+pygame*/local.properties
+pygame*/proguard.cfg
+pygame*/project.properties
+pygame*/res/drawable/*
+pygame*/res/values/strings.xml
