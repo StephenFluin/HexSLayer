@@ -1,6 +1,6 @@
 #
 # HexSLayer
-# copyright (C) Stephen Fluin 2010
+# copyright (C) Stephen Fluin 2011
 #
 import pygame, random
 from pygame.locals import *

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
 # HexSLayer
-# copyright (C) Stephen Fluin 2010
+# copyright (C) Stephen Fluin 2011
 #
 
 # Todo: Build a smarter AI that can build any level units and castles.
@@ -44,17 +44,6 @@ mouseCarrying = None
 screen = None
 clock = None
 
-# Event constant.
-TIMEREVENT = pygame.USEREVENT
-
-# The FPS the game runs at.
-FPS = 30
-
-# Color constants.
-RED = (255, 0, 0, 255)
-GREEN = (0, 255, 0, 255)
-
-
 def main():
 	global screen, background, clock, mouseCarrying
 	pygame.init()
@@ -72,18 +61,17 @@ def main():
 	
 	background = pygame.Surface(screen.get_size())
 	background = background.convert()
-	background.fill((250, 250, 250))
+	background.fill((255, 255, 255))
 	
 	gameMap = Map()
 	
 	if pygame.font:
-		print "Fonts work."
 		font = pygame.font.Font("freesansbold.ttf", 36)
 		text = font.render("Welcome to HexSLayer",1,(10,10,10))
 		textpos = text.get_rect(centerx=background.get_width()/2)
 		background.blit(text,textpos)
 	else:
-		print "fonts don't work"
+		print "Fonts aren't supported by this system."
 		
 	clock = pygame.time.Clock()
 	allsprites = pygame.sprite.RenderPlain(())
