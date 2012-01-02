@@ -67,10 +67,10 @@ def main():
 	gameMap = Map()
 	
 	if pygame.font:
-		font = pygame.font.Font("freesansbold.ttf", 36)
-		text = font.render("Welcome to HexSLayer",1,fontColor)
-		textpos = text.get_rect(centerx=background.get_width()/2)
-		background.blit(text,textpos)
+		font = pygame.font.Font(fontName, 24)
+		text = font.render("HexSLayer",1,fontColor)
+		background.blit(text,(15,0))
+		pygame.draw.rect(background,pygame.Color("#33b5e5"),(0,30,background.get_width(),2))
 	else:
 		print "Fonts aren't supported by this system."
 		
@@ -119,20 +119,21 @@ def main():
 							if(x>endTurnLocation[0] and y > endTurnLocation[1]):
 								gameMap.newTurn()
 								
+							#We fuzz these locations because it's hard to tap on
 							# Store Interaction
-							storeX = gameMap.store.x
-							storeY = gameMap.store.y
-							storeRight = gameMap.store.image.get_width() + storeX
+							storeX = gameMap.store.x-10
+							storeY = gameMap.store.y-10
+							storeRight = gameMap.store.image.get_width() + storeX + 20
 							if(x<storeRight and x > storeX and y > storeY):
-								print "got click at in the store%sx%s" %(x,y)
+								# got click at in the store %sx%s" %(x,y)
 								#print "Spawning a new villager, and deducting from bank."
-								if gameMap.selectedVillage.balance >= 10 and x < storeX+30:
+								if gameMap.selectedVillage.balance >= 10 and x < (storeRight+storeX)/2:
 									mouseCarrying = Villager(gameMap,storeX,storeY)
 									mouseCarrying.justPurchased = True
 									gameMap.selectedVillage.balance -= 10
 									mouseCarrying.startTile = gameMap.selectedSet[0]
 									gameMap.renders.append(mouseCarrying)
-								if gameMap.selectedVillage.balance >= 20 and x > storeX+30:
+								if gameMap.selectedVillage.balance >= 20 and x > (storeRight+storeX)/2:
 									mouseCarrying = Castle(gameMap,storeX,storeY)
 									mouseCarrying.justPurchased = True
 									gameMap.selectedVillage.balance -= 20

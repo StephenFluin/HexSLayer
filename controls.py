@@ -18,11 +18,11 @@ class VillageData(pygame.sprite.Sprite):
 		self.image = pygame.Surface((500,30))
 		self.image.fill(bgColor)
 		if(self.gameMap.selectedSetIncome > 0):
-			msg = "Village Income:+"+str(self.gameMap.selectedSetIncome)+",-"+str(self.gameMap.selectedSetUpkeep)+"="+str(self.gameMap.selectedSetIncome-self.gameMap.selectedSetUpkeep)
+			msg = "Region Income:"+str(self.gameMap.selectedSetIncome)+"  Upkeep:"+str(self.gameMap.selectedSetUpkeep)
 			if(self.gameMap.selectedVillage.balance > 0):
 				msg += "  Balance:%s" % (self.gameMap.selectedVillage.balance)
 				
-			font = pygame.font.Font("freesansbold.ttf", 22)
+			font = pygame.font.Font(fontName, 22)
 			text = font.render(msg,1,fontColor)
 			self.image.blit(text,(0,0))
 			
@@ -58,7 +58,7 @@ class GameOver(pygame.sprite.Sprite):
 	def draw(self):
 		self.image = pygame.Surface((560,100))
 		self.image.fill(bgColor)
-		font = pygame.font.Font("freesansbold.ttf",28)
+		font = pygame.font.Font(fontName,28)
 		text = font.render("Player %s (%s) won! Congratulations!" % (self.winner,self.gameMap.players[self.winner].getName()),True,fontColor)
 		self.image.blit(text,(0,0))
 
@@ -70,7 +70,7 @@ class NewGame(pygame.sprite.Sprite):
 	def draw(self):
 		self.image = pygame.Surface((300,40))
 		self.image.fill(bgColor)
-		font = pygame.font.Font("freesansbold.ttf",20)
+		font = pygame.font.Font(fontName,20)
 		text = font.render("Start Another Game",True,fontColor)
 		self.rect = pygame.draw.rect(self.image,(0,0,0),(0,0,300,40),1)
 		self.image.blit(text,(30,5))
@@ -86,7 +86,7 @@ class ScoreCard(pygame.sprite.Sprite):
 		self.image = pygame.Surface((200,400))
 		self.image.fill(bgColor)
 		size = 18
-		font = pygame.font.Font("freesansbold.ttf",size)
+		font = pygame.font.Font(fontName,size)
 		tileCounts = self.gameMap.countTiles()
 		for i in range(0,6):
 			
