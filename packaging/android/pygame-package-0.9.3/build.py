@@ -140,13 +140,13 @@ def make_package(args):
         manifest_extra = '<uses-feature android:glEsVersion="0x00020000" />'        
         url_scheme = "renpy"
         default_icon = "templates/renpy-icon.png"
-        default_presplash = "templates/renpy-presplash.jpg"
+        default_presplash = "templates/renpy-presplash.png"
 
     else:
         manifest_extra = ""
         url_scheme = "pygame"
         default_icon = "templates/pygame-icon.png"
-        default_presplash = "templates/pygame-presplash.jpg"
+        default_presplash = "templates/pygame-presplash.png"
 
         
     # Figure out the version code, if necessary.
@@ -219,7 +219,7 @@ def make_package(args):
 
     # Copy over the icon and presplash files.
     shutil.copy(args.icon or default_icon, "res/drawable/icon.png")
-    shutil.copy(args.presplash or default_presplash, "res/drawable/presplash.jpg")
+    shutil.copy(args.presplash or default_presplash, "res/drawable/presplash.png")
 
     # Build.
     subprocess.call([ANT, args.command])

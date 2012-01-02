@@ -330,6 +330,11 @@ public class SDLSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
                 is.close();
             } catch (IOException e) { }
         }
+        if(bitmap == null) {
+		Log.d("renpy","Couldn't load splash bitmap.");
+	   } else {
+		Log.d("renpy","Loaded splash bitmap just fine.");
+	   }
 
         int textures[] = new int[1];
 
