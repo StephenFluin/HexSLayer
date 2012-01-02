@@ -7,7 +7,7 @@
 import pygame
 
 tilesize = 34
-playerColors = ("#717728","#A481AA","#A69781","#E5E8E6","#BCE8E6","#9C4724")
+playerColors = ("#717728","#A481AA","#A69781","#E5E8E6","#BCE8E6","#8D1F4A")
 bgColor = pygame.Color("#000000")
 fontColor = pygame.Color("#FFFFFF")
 fontName = "Roboto-Regular.ttf"

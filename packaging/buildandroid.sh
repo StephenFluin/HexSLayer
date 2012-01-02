@@ -14,8 +14,15 @@ rm bin/*
 rm build.xml
 rm -r ../tmp
 android update project -p ./ -n HexSLayer
-ant debug
-#ant release
-#/usr/lib/jvm/java-6-openjdk/bin/jarsigner -verbose -keystore /super/documents/mine/keys/hexslayer-androidmarket.keystore HexSLayer-release-unsigned.apk hexslayer
-#/opt/android-sdk/tools/zipalign -v 4 HexSLayer-release-unsigned.apk HexSlayer-release.apk
-adb install -r bin/HexSLayer-debug-unaligned.apk
+if [ "${1}" = "release" ]
+then
+	ant release
+	cd bin
+	/usr/lib/jvm/java-6-openjdk/bin/jarsigner -verbose -keystore /super/documents/mine/keys/hexslayer-androidmarket.keystore HexSLayer-release-unsigned.apk hexslayer
+	/opt/android-sdk/tools/zipalign -v 4 HexSLayer-release-unsigned.apk HexSLayer-release.apk
+	adb install -r HexSLayer-release.apk
+else
+	ant debug
+	adb install -r bin/HexSLayer-debug-unaligned.apk
+fi
+
