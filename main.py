@@ -213,7 +213,12 @@ def main():
 				offset = abs(pawn.spin % 90 - 45)/7.5 - 6
 				
 				screen.blit(pygame.transform.rotate(sparks,pawn.spin),(pawn.x+offset,pawn.y+offset))
-			screen.blit(pawn.image,(pawn.x,pawn.y))
+			
+			#Show carried item at 2x size, better for touchscreens
+			if pawn == mouseCarrying:
+				screen.blit(pygame.transform.scale2x(pawn.image),(pawn.x,pawn.y))
+			else:
+				screen.blit(pawn.image,(pawn.x,pawn.y))
 		allsprites.draw(screen)
 		pygame.display.flip()
 		

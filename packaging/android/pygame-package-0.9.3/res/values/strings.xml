@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="appName">Pygame Subset for Android</string>
-<string name="iconName">Pygame Subset for Android</string>
+<string name="appName">HexSLayer</string>
+<string name="iconName">HexSLayer</string>
 
-<string name="private_version">1304291377.46</string>
+<string name="private_version">1325107536.86</string>
 
 
 <string name="urlScheme">pygame</string>
