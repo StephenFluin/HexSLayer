@@ -62,13 +62,13 @@ def main():
 	
 	background = pygame.Surface(screen.get_size())
 	background = background.convert()
-	background.fill((255, 255, 255))
+	background.fill(bgColor)
 	
 	gameMap = Map()
 	
 	if pygame.font:
 		font = pygame.font.Font("freesansbold.ttf", 36)
-		text = font.render("Welcome to HexSLayer",1,(10,10,10))
+		text = font.render("Welcome to HexSLayer",1,fontColor)
 		textpos = text.get_rect(centerx=background.get_width()/2)
 		background.blit(text,textpos)
 	else:
