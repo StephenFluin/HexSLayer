@@ -296,8 +296,9 @@ public class SDLSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         createSurface();
 
         waitForStart();
-
+	
         nativeResize(mWidth, mHeight);
+        Log.d("renpy","Native resize just called, adjusting to " + mWidth + "x" + mHeight);
         nativeInitJavaCallbacks();
         nativeSetEnv("ANDROID_PRIVATE", mFilesDirectory);
         nativeSetEnv("ANDROID_ARGUMENT", mArgument);
@@ -333,7 +334,7 @@ public class SDLSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         if(bitmap == null) {
 		Log.d("renpy","Couldn't load splash bitmap.");
 	   } else {
-		Log.d("renpy","Loaded splash bitmap just fine.");
+		Log.d("renpy","Loaded splash bitmap just fine!");
 	   }
 
         int textures[] = new int[1];
@@ -361,6 +362,7 @@ public class SDLSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
         
         // Set up the viewport.
         gl.glViewport(0, 0, mWidth, mHeight);
+        Log.d("renpy","Viewport is at 0x0 with width and height" + mWidth + " and " + mHeight + ".");
 
         gl.glMatrixMode(gl.GL_PROJECTION);
         gl.glLoadIdentity();

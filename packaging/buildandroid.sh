@@ -26,3 +26,4 @@ else
 	adb install -r bin/HexSLayer-debug-unaligned.apk
 fi
 
+adb shell am start -a android.intent.action.MAIN -n com.mortalpowers.android.hexslayer/org.renpy.android.PythonActivity

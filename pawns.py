@@ -125,7 +125,7 @@ class Pawn(pygame.sprite.Sprite):
 		if(self in self.gameMap.renders):
 			self.gameMap.renders.remove(self)
 			tile.pawn = None
-			tile.grave = Grave(self.gameMap,tile.x,tile.y)
+			tile.grave = Grave(self.gameMap,tile.xloc,tile.yloc)
 			self.gameMap.renders.insert(0,tile.grave)
 			#print "Removed a pawn and added a grave."
 			
@@ -152,9 +152,8 @@ class Castle(Pawn):
 	
 
 class Grave(pygame.sprite.Sprite):
-	def __init__(self,gameMap,x,y):
+	def __init__(self,gameMap,xloc,yloc):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load("dead.png")
-		self.x = x
-		self.y = y
+		(self.x,self.y) = convertGridPawnPosition(gameMap,xloc,yloc)
 		#print "Grave is created at %sx%s." % (x,y)
