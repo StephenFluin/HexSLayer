@@ -575,12 +575,17 @@ class Map():
 		if(self.selectedSet and self.selectedVillage):
 			self.selectSet((self.selectedVillage.xloc,self.selectedVillage.yloc))
 		
-		#Check for endgame situation
-		#@TODO! We currently assume the map has a [0][0] tile.
-		if len(self.tiles[0][0].realm) == self.width * self.height:
-			print "Player %s won the game!" % (self.tiles[0][0].player)
-			
+		#Check for endgame / gameover situation by counting players with villages
+		foundOwners = {}
+		for row in self.tiles:
+			for tile in row:
+				if tile.village:
+					foundOwners[tile.player] = True
+		# print "Found %s as remaining village owners." % (foundOwners)
+		if len(foundOwners) == 1:
+			print "Player %s won the game!" % (foundOwners.keys()[0])
 			self.gameOver = True
+			self.winner = foundOwners.keys()[0]
 			self.reRender()
 			
 		
@@ -673,7 +678,7 @@ class Map():
 		
 		if self.gameOver:
 			self.newGame = NewGame(20,355)
-			self.renders.append(GameOver(self,20,325,self.tiles[0][0].player))
+			self.renders.append(GameOver(self,20,325,self.winner))
 			self.renders.append(self.newGame)
 		
 		self.infobar.draw()
