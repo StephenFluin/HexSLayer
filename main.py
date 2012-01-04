@@ -12,7 +12,7 @@
 # Todo: Add interesting maps
 # Todo: Add map generation
 
-import pygame, random, time
+import pygame, random, time, os
 
 from pygame.locals import *
 
@@ -29,12 +29,14 @@ if not pygame.mixer:
 
 
 
-
+# load HexSLayer modules
 from pawns import *
 from hexmath import *
 from hexconfig import *
 from controls import *
 from ai import *
+from playersettings import *
+from analytics import *
 
 
 selected = None
@@ -43,10 +45,14 @@ gameMap = None
 mouseCarrying = None
 screen = None
 clock = None
+version = "1.0.10"
+
+
 
 
 def main():
-	global screen, background, clock, mouseCarrying
+	global screen, background, clock, mouseCarrying,version
+	settings = PlayerSettings()
 	pygame.init()
 	screen = pygame.display.set_mode(masterSize)
 	pygame.display.set_caption('HexSLayer')
@@ -57,7 +63,7 @@ def main():
 		android.init()
 		android.map_key(android.KEYCODE_BACK, pygame.K_ESCAPE)
 	
-
+	trackEvent("startup",{"version":version,"android":'ANDROID_ASSETS' in os.environ,"screenSize":masterSize})
 	
 	
 	background = pygame.Surface(screen.get_size())
@@ -78,7 +84,6 @@ def main():
 	allsprites = pygame.sprite.RenderPlain(())
 	
 	background.blit(pygame.image.load("endturn.png"),endTurnLocation)
-	print "Put endturn at %sx%s" % endTurnLocation
 	
 	sparks = pygame.image.load("sparks.png")
 	
