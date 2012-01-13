@@ -143,6 +143,7 @@ def main():
 									mouseCarrying.justPurchased = True
 									gameMap.selectedVillage.balance -= 20
 									mouseCarrying.startTile = gameMap.selectedSet[0]
+									gameMap.message("Castle Purchased")
 									gameMap.renders.append(mouseCarrying)
 						else:
 							print "Why are we mousing down if we are carrying %s??!?!?!" % (mouseCarrying)
@@ -285,6 +286,7 @@ def main():
 	
 
 class Tile(pygame.sprite.Sprite):
+		
 	def __init__(self,gameMap,xloc,yloc):
 		pygame.sprite.Sprite.__init__(self)
 		#self.image = pygame.Surface([tilesize, tilesize])
@@ -402,6 +404,9 @@ class Tile(pygame.sprite.Sprite):
 	def addPawn(self,pawn):
 		self.pawn = pawn
 		return pawn
+		
+	def __repr__(self):
+		return "Tile located at %sx%s." % (self.xloc,self.yloc)
 	
 			
 
@@ -585,12 +590,17 @@ class Map():
 					if villagecount == 0 and len(tile.realm) > 1:
 						dest =tile.realm[random.randrange(len(tile.realm))]
 						dest.village = Village(dest.gameMap,dest.xloc,dest.yloc)
+						if dest.player == 0:
+							dest.gameMap.message("Your region split")
+						
 					
 					# Too many villages, add the gold from the removed village to a remaining village.
 					while len(villages) > 1 or ( len(villages) > 0 and len(tile.realm) < 2):
 						dest = villages.pop(random.randrange(len(villages)))
 						if len(villages) >= 1:
 							villages[0].village.balance += dest.village.balance
+							if dest.player == 0:
+								dest.gameMap.message("Regions merged")
 						dest.village.kill(dest)
 		
 		#compensate for "human" selections in UI
@@ -657,6 +667,8 @@ class Map():
 							if space.pawn and not isinstance(space.pawn,Castle):
 								space.pawn.starve(space)
 								tile.village.balance = 0
+								
+						self.message("One of your regions has starved!")
 					
 				if tile.pawn:
 					

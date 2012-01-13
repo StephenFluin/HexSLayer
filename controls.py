@@ -61,6 +61,7 @@ class Messenger(pygame.sprite.Sprite):
 		
 		self.gameMap.renders.append(self)
 		self.draw()
+		self.allMessagesCount = 1
 		
 		
 	def draw(self):
@@ -82,13 +83,16 @@ class Messenger(pygame.sprite.Sprite):
 			if i[1] <= 0:
 				self.messages.remove(i)
 			else:
-				text = font.render("%s. %s" % (msgCount, i[0]),True,messageColor)
+				text = font.render("%s. %s" % (i[2], i[0]),True,messageColor)
 				self.image.blit(text,(0,msgCount *fsize * 1.2))
 		
 		
 		
 	def message(self,string):
-		self.messages.append([string,self.defaultTime])
+		#Only show messages that happen after game start.
+		if self.gameMap.turn >0:
+			self.messages.append([string,self.defaultTime,self.allMessagesCount])
+			self.allMessagesCount+=1
 		
 	def tick(self):
 		for i in self.messages:
