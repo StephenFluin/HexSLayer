@@ -48,6 +48,8 @@ class Pawn(pygame.sprite.Sprite):
 		dest = self.gameMap.getTile((x,y))
 		#print "Attacking tile at %sx%s, which belongs to player %s" % (x,y,dest.player)
 		tiles = self.gameMap.getTileSet((self.startTile.xloc,self.startTile.yloc))
+		#Why am I attacking a tileset? This means you can take 2 squares at once
+		# IMPORTANT TODO
 		for tile in tiles:
 			if(tile.isAdjacent((x,y))):
 				#The attacked tile is adjacent to a tile in our starting set
@@ -105,7 +107,9 @@ class Pawn(pygame.sprite.Sprite):
 				self.gameMap.cleanUpGame()
 				
 				return True
-				
+			else:
+				self.gameMap.message("Destination must be adjacent to current region.")
+			
 		return False
 		
 	def upgrade(self):
@@ -128,9 +132,13 @@ class Pawn(pygame.sprite.Sprite):
 			self.gameMap.renders.remove(self)
 			tile.pawn = None
 			# why do we add graves in case of hunger death? :(
-			tile.grave = Grave(self.gameMap,tile.xloc,tile.yloc)
-			self.gameMap.renders.insert(0,tile.grave)
+			
 			#print "Removed a pawn and added a grave."
+	
+	def starve(self,tile):
+		tile.grave = Grave(self.gameMap,tile.xloc,tile.yloc)
+		self.gameMap.renders.insert(0,tile.grave)
+		self.kill(tile)
 			
 # Takes in tile coordinates, not x/y coordinates
 class Villager(Pawn):

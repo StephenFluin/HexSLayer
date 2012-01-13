@@ -8,11 +8,12 @@ from hexmath import *
 from hexconfig import *
 
 class VillageData(pygame.sprite.Sprite):
-	def __init__(self,gameMap,x,y):
+	def __init__(self,gameMap):
 		self.gameMap = gameMap
 		pygame.sprite.Sprite.__init__(self)
-		self.x,self.y = x,y
+		self.x,self.y = infobarLocation
 
+		self.gameMap.renders.append(self)
 		self.draw()
 	def draw(self):
 		self.image = pygame.Surface((500,30))
@@ -27,14 +28,15 @@ class VillageData(pygame.sprite.Sprite):
 			self.image.blit(text,(0,0))
 			
 class PurchaseUnits(pygame.sprite.Sprite):
-	def __init__(self,gameMap,x,y):
+	def __init__(self,gameMap):
 		pygame.sprite.Sprite.__init__(self)
 		self.gameMap = gameMap
-		self.x,self.y = x,y
-		self.income = 0
+		self.x,self.y = storeLocation
+		
+		self.gameMap.renders.append(self)
 		self.draw()
 	def draw(self):
-		self.image = pygame.Surface((60,30))
+		self.image = pygame.Surface((90,30))
 		self.image.fill(bgColor)
 		if self.gameMap.selectedVillage and self.gameMap.selectedVillage.player == 0:
 			if self.gameMap.selectedVillage.balance >= 10:
@@ -46,6 +48,53 @@ class PurchaseUnits(pygame.sprite.Sprite):
 		
 		#if(self.gameMap.balance() > 8):
 				# TODO: Castles
+				
+class Messenger(pygame.sprite.Sprite):
+	def __init__(self,gameMap):
+		pygame.sprite.Sprite.__init__(self)
+		self.gameMap = gameMap
+		self.x,self.y = messengerLocation
+		
+		self.messages = []
+		#Currently in # of frames, silly
+		self.defaultTime = 120
+		
+		self.gameMap.renders.append(self)
+		self.draw()
+		
+		
+	def draw(self):
+		self.image = pygame.Surface((200,150))
+		self.image.fill(bgColor)
+		fsize = 10
+		font = pygame.font.Font(fontName,fsize)
+		
+		msgCount = 0
+		for i in self.messages:
+			msgCount += 1
+			if i[1] > self.defaultTime / 5.0:
+				messageColor = fontColor
+			elif i[1] > 0:
+				color = int((i[1]) / (self.defaultTime /5.0)*255)
+				messageColor = pygame.Color(color,color,color,1)
+				
+			
+			if i[1] <= 0:
+				self.messages.remove(i)
+			else:
+				text = font.render("%s. %s" % (msgCount, i[0]),True,messageColor)
+				self.image.blit(text,(0,msgCount *fsize * 1.2))
+		
+		
+		
+	def message(self,string):
+		self.messages.append([string,self.defaultTime])
+		
+	def tick(self):
+		for i in self.messages:
+			i[1] -= 1
+		self.draw()
+		
 		
 class GameOver(pygame.sprite.Sprite):
 	def __init__(self,gameMap,x,y,winner):
@@ -76,11 +125,13 @@ class NewGame(pygame.sprite.Sprite):
 		self.image.blit(text,(30,5))
 		
 class ScoreCard(pygame.sprite.Sprite):
-	def __init__(self,gameMap,location):
+	def __init__(self,gameMap):
 		pygame.sprite.Sprite.__init__(self)
-		(self.x,self.y) = location
+		(self.x,self.y) = scoreLocation
 		
 		self.gameMap = gameMap
+		
+		self.gameMap.renders.append(self)
 		self.draw()
 	def draw(self):
 		self.image = pygame.Surface((200,400))

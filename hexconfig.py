@@ -32,6 +32,7 @@ infobarLocation =(10,masterSize[1]-40)
 
 scoreLocation = (masterSize[0]-210,32)
 endTurnLocation = (masterSize[0]-210,masterSize[1]-40)
+messengerLocation = (endTurnLocation[0],endTurnLocation[1]-150)
 storeLocation = (endTurnLocation[0]-120,masterSize[1]-40)
 
 tileSpaceX = masterSize[0]-210-20

@@ -136,6 +136,7 @@ def main():
 									mouseCarrying.justPurchased = True
 									gameMap.selectedVillage.balance -= 10
 									mouseCarrying.startTile = gameMap.selectedSet[0]
+									gameMap.message("Villager Purchased")
 									gameMap.renders.append(mouseCarrying)
 								if gameMap.selectedVillage.balance >= 20 and x > (storeRight+storeX)/2:
 									mouseCarrying = Castle(gameMap,storeX,storeY)
@@ -202,6 +203,9 @@ def main():
 						mouseCarrying.y -= tilesize/2
 		allsprites.update()
 
+		#Update time on messenger
+		gameMap.messenger.tick()
+		
 		
 		#Draw Everything
 		screen.blit(background, (0, 0))
@@ -218,7 +222,6 @@ def main():
 			if availableMove:
 				if not pawn.indicator:
 					pawn.indicator = AvailableMove(pawn.x,pawn.y)
-					print "Creating indicator for availablemove at %s x %s " % (pawn.x,pawn.y)
 				pawn.indicator.render(screen)
 				pawn.indicator.spin()
 				
@@ -445,13 +448,10 @@ class Map():
 		
 		
 		
-		self.infobar = VillageData(self,infobarLocation[0],infobarLocation[1])
-		self.store = PurchaseUnits(self,storeLocation[0],storeLocation[1])
-		
-		self.score = ScoreCard(self,scoreLocation)
-		self.renders.append(self.infobar)
-		self.renders.append(self.store)
-		self.renders.append(self.score)
+		self.infobar = VillageData(self)
+		self.store = PurchaseUnits(self)
+		self.messenger = Messenger(self)
+		self.score = ScoreCard(self)
 		
 		self.cleanUpGame()
 		
@@ -651,11 +651,11 @@ class Map():
 					if tile.pawn and len(tile.realm) == 1:
 						tile.pawn.kill(tile)
 					
-					# Kill all of the pawns in case of negative balance
+					# Starve all of the pawns in case of negative balance
 					if tile.village.balance < 0:
 						for space in realm:
 							if space.pawn and not isinstance(space.pawn,Castle):
-								space.pawn.kill(space)
+								space.pawn.starve(space)
 								tile.village.balance = 0
 					
 				if tile.pawn:
@@ -698,6 +698,7 @@ class Map():
 		self.renders.append(self.infobar)
 		self.renders.append(self.store)
 		self.renders.append(self.score)
+		self.renders.append(self.messenger)
 		
 		
 		
@@ -709,9 +710,11 @@ class Map():
 		self.infobar.draw()
 		self.store.draw()
 		self.score.draw()
+		self.messenger.draw()
 			
 							
-						
+	def message(self,msg):
+		self.messenger.message(msg)
 
 
 			
