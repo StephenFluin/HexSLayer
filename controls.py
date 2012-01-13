@@ -41,7 +41,7 @@ class PurchaseUnits(pygame.sprite.Sprite):
 				# TODO: Make sure this doesn't load on each call of draw
 				self.image.blit(pygame.image.load("villager.png"),(0,0))
 			if self.gameMap.selectedVillage.balance >= 20:
-				self.image.blit(pygame.image.load("castle.png"),(30,0))
+				self.image.blit(pygame.image.load("castle.png"),(55,0))
 			
 		
 		#if(self.gameMap.balance() > 8):
@@ -84,7 +84,7 @@ class ScoreCard(pygame.sprite.Sprite):
 		self.draw()
 	def draw(self):
 		self.image = pygame.Surface((200,400))
-		self.image.fill(bgColor)
+		self.image.fill(pygame.Color("#333333"))
 		size = 18
 		font = pygame.font.Font(fontName,size)
 		tileCounts = self.gameMap.countTiles()
@@ -94,5 +94,7 @@ class ScoreCard(pygame.sprite.Sprite):
 			self.image.blit(text,(30,10+(size+10)*i))
 			pygame.draw.rect(self.image,pygame.Color(playerColors[i]),pygame.Rect(0,(size+10)*i+10,15,15))
 		self.image.blit(font.render("Turn %s" % (self.gameMap.turn),True,fontColor),(30,(size+10)*6+10))
+		
+		
 		
 		

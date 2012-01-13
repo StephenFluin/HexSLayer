@@ -45,7 +45,7 @@ gameMap = None
 mouseCarrying = None
 screen = None
 clock = None
-version = "1.0.10"
+version = "1.0.11pre"
 
 
 
@@ -127,7 +127,7 @@ def main():
 							#We fuzz these locations because it's hard to tap on
 							# Store Interaction
 							storeX = gameMap.store.x-10
-							storeY = gameMap.store.y-10
+							storeY = gameMap.store.y-20
 							storeRight = gameMap.store.image.get_width() + storeX + 20
 							if(x<storeRight and x > storeX and y > storeY):
 								# got click at in the store %sx%s" %(x,y)
@@ -340,7 +340,7 @@ class Tile(pygame.sprite.Sprite):
 		
 		if ((2*x + y) <  s/2) or ((2*x + (s-y)) < s/2) or ((2*(s-x)+y) < s/2) or ((2*(s-x)+(s-y)) < s/2):
 			# Failed hitdetection on hex
-			print "Failed hitdetection on hex %sx%s-%s compared to %sx%s." % (x,y,s,point[0],point[1])
+			print "Failed hitdetection on hex %sx%s (tilesize %s) compared to %sx%s." % (x,y,s,point[0],point[1])
 			return 0
 		else:
 			return 1

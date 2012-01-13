@@ -1,3 +1,4 @@
 *.pyc
 packaging/*.deb
 packaging/*.apk
+playersettings.cnf
