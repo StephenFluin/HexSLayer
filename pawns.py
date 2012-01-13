@@ -179,15 +179,14 @@ class AvailableMove(pygame.sprite.Sprite):
 	def __init__(self,x,y):
 		pygame.sprite.Sprite.__init__(self)
 		self.image =pygame.image.load("sparks.png")
-		self.image = pygame.transform.rotozoom(self.image,0,float(tilesize)/75*.26)
+		self.image = pygame.transform.smoothscale(self.image,(tilesize,tilesize))
 		
 		self.original = self.image
 		self.rect = self.image.get_rect()
 		screen = pygame.display.get_surface()
 		self.area = screen.get_rect()
 		self.rotation = 0
-		self.rect.topleft = x,y
-		print "Availablemove is sitting at %s." % (self.rect)
+		self.rect.topleft = x-4,y-4
 		
 	def spin(self):
 		center = self.rect.center

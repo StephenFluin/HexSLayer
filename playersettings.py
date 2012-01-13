@@ -16,10 +16,8 @@ class PlayerSettings():
 		try:
 			f = open(self.settingsFile,'r')
 			self.prefs.update( json.loads(f.read()))
-			print "Loaded settings. Prefs is now %s." % (self.prefs)
 			f.close()
 		except IOError:
-			print "No such player settings file yet."
 			self.create()
 		
 	def create(self):

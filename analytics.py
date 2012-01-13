@@ -12,6 +12,5 @@ def trackEvent(event, message={}):
 			conn.request("GET","/event.php?i=%s&e=%s&m=%s" % (i,urllib.quote(event),urllib.quote(json.dumps(message))))
 			r1 = conn.getresponse()
 			conn.close()
-			print "Event posted"
 	except:
 		pass

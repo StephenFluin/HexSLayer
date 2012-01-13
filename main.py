@@ -179,6 +179,7 @@ def main():
 										# We just purchased this pawn and couldn't place it, refund it!
 										print "Couldn't drop purchased pawn."
 										validDrop = False
+									break
 									
 									
 												
@@ -330,8 +331,8 @@ class Tile(pygame.sprite.Sprite):
 		l = .25
 		x = point[0] - self.x
 		y = point[1] - self.y
-		#print "Mouse Hit:",x,"X",y," is it less than ",s/2
-		#print "1,2,3,4:",(2*x + y),",",(2*x + (s-y)),",",(2*(s-x)+y),",",(2*(s-x)+(s-y))
+		print "Mouse Hit:",x,"X",y," is it less than ",s/2
+		print "1,2,3,4:",(2*x + y),",",(2*x + (s-y)),",",(2*(s-x)+y),",",(2*(s-x)+(s-y))
 		
 		if ((2*x + y) <  s/2) or ((2*x + (s-y)) < s/2) or ((2*(s-x)+y) < s/2) or ((2*(s-x)+(s-y)) < s/2):
 			# Failed hitdetection on hex
@@ -423,6 +424,7 @@ class Map():
 		self.selectedVillage = None
 		self.infoBar = None
 		self.players = []
+		self.messenger = None
 		
 		for y in range(self.height):
 			
@@ -450,6 +452,7 @@ class Map():
 		self.renders.append(self.infobar)
 		self.renders.append(self.store)
 		self.renders.append(self.score)
+		
 		self.cleanUpGame()
 		
 		self.newTurn()
