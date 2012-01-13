@@ -1,18 +1,17 @@
 #!/usr/bin/python
 #
 # HexSLayer
-# copyright (C) Stephen Fluin 2011
+# copyright (C) Stephen Fluin 2012
 #
 
 # Todo: Build a smarter AI that can build any level units and castles.
 # Todo: Build a networked branch of the game so you can play online with friends.
-# Todo: Build a "restart"/"new Game" button.
 # Todo: Try to prevent villages from popping up on people
 # Todo: Add trees (or other fun concept)
 # Todo: Add interesting maps
 # Todo: Add map generation
 
-import pygame, random, time, os
+import pygame, random, time, os, math
 
 from pygame.locals import *
 
@@ -45,7 +44,7 @@ gameMap = None
 mouseCarrying = None
 screen = None
 clock = None
-version = "1.0.11pre"
+version = "1.0.12pre"
 
 
 
@@ -88,7 +87,7 @@ def main():
 	sparks = pygame.image.load("sparks.png")
 	
 	while True:
-		clock.tick(30)
+		clock.tick(15)
 		#Handle Input Events
 		if True:
 			for event in pygame.event.get():
@@ -204,21 +203,27 @@ def main():
 
 		
 		#Draw Everything
-		# A nice spinning graphic 
 		screen.blit(background, (0, 0))
 		for pawn in gameMap.renders:
 			if isinstance(pawn,Pawn) and not pawn.getHasMoved() and pawn.player == 0:
-				new = True
-			elif isinstance(pawn,Village) and pawn.balance >= 10 and pawn.player == 0:
-				new = True
-			else:
-				new = False
-			i = random.randint(0,6)
-			if new:
-				pawn.spin += 2
-				offset = abs(pawn.spin % 90 - 45)/7.5 - 6
+				availableMove = True
 				
-				screen.blit(pygame.transform.rotate(sparks,pawn.spin),(pawn.x+offset,pawn.y+offset))
+			elif isinstance(pawn,Village) and pawn.balance >= 10 and pawn.player == 0:
+				availableMove = True
+			else:
+				availableMove = False
+			
+			#Section handles move indicators, @TODO move to add and remove indicators at action time, not render time
+			if availableMove:
+				if not pawn.indicator:
+					pawn.indicator = AvailableMove(pawn.x,pawn.y)
+					print "Creating indicator for availablemove at %s x %s " % (pawn.x,pawn.y)
+				pawn.indicator.render(screen)
+				pawn.indicator.spin()
+				
+			elif isinstance(pawn,Pawn) and pawn.indicator:
+				pawn.indicator = None
+
 			
 			#Show carried item at 2x size, better for touchscreens
 			if pawn == mouseCarrying:
@@ -270,17 +275,7 @@ def main():
 
 
 
-class Village(pygame.sprite.Sprite):
-	def __init__(self,gameMap,xloc,yloc):
-		pygame.sprite.Sprite.__init__(self)
-		self.x,self.y = convertGridPawnPosition(gameMap,xloc,yloc)
-		self.xloc = xloc
-		self.yloc = yloc
-		self.balance = 5
-		self.spin = 0
-		self.image = pygame.image.load("village.png")
-		gameMap.renders.append(self)
-		self.player = gameMap.getTile((xloc,yloc)).player
+
 
 
 	
@@ -408,8 +403,11 @@ class Tile(pygame.sprite.Sprite):
 
 class Map():
 	def __init__(self):
+		#tile metrics
+		#@TODO WHat the? I only count 9x15?????
 		self.width = 8#13
 		self.height = 17#25
+		
 		self.x = 10
 		self.y = 35
 		
@@ -479,13 +477,23 @@ class Map():
 		carry.setPos(x,y)
 		#print "Set the position of the carry to ",x,"X",y
 		
+	# Takes in a tile coordinate, returns a tile
 	def getTile(self,point):
+		#@TODO Performance problem is here, this is called like a million times for the smallest changes
+		# Kill the cheerleader, kill the world.
 		#print "Looking for",point
+		if not point:
+			print "CRITICAL ERROR, getTile called without a point in space. point was %s" % (point) 
 		if point[1] < 0 or point[1] >= self.height or point[0] < 0 or point[0] >= self.width:
+			#print "Failed to get tile because point was out of bounds. 0-%s, 0-%s" % (self.width,self.height), point
+			#@TODO THis is weird, why do we have code repeatedly failing all of the time. perhaps this is okay?
 			return None
 		return self.tiles[point[1]][point[0]]
 		
+	# Takes in a tile x y tile location, selects the set in the UI and stores it.
 	def selectSet(self,point):
+		if not point:
+			print "CRITICAL ERROR, selectSet called without a point in space. point was %s" % (point) 
 		self.selectedSet = self.getTileSet(point)
 		
 		income = 0
@@ -510,7 +518,13 @@ class Map():
 	
 	#We are going to do a breadth first search to find all connected tiles of same color
 	def getTileSet(self,point):
+		if not point:
+			print "CRITICAL ERROR, getTileSet called without a point in space. point was %s" % (point) 
+		
 		tile = self.getTile(point)
+		
+		if not tile:
+			print "Failed to find a tile for point %s." % (point)
 		searched = []
 		toSearch = [tile]
 		found = [tile]
@@ -574,11 +588,14 @@ class Map():
 						dest = villages.pop(random.randrange(len(villages)))
 						if len(villages) >= 1:
 							villages[0].village.balance += dest.village.balance
-						self.renders.remove(dest.village)
-						dest.village = None
-		#compensate for "human" selections.
+						dest.village.kill(dest)
+		
+		#compensate for "human" selections in UI
 		if(self.selectedSet and self.selectedVillage):
-			self.selectSet((self.selectedVillage.xloc,self.selectedVillage.yloc))
+			
+			
+			villageTileLocation = (self.selectedVillage.xloc,self.selectedVillage.yloc)
+			self.selectSet(villageTileLocation)
 		
 		#Check for endgame / gameover situation by counting players with villages
 		foundOwners = {}

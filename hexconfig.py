@@ -6,6 +6,11 @@
 
 import pygame
 
+try:
+	import android
+except ImportError:
+	android = None
+
 pygame.init()
 
 tilesize = 34
@@ -18,10 +23,9 @@ playerNames = ("Human Player", "AI 1", "AI 2", "AI 3", "AI 4", "AI 5")
 
 size = pygame.display.list_modes()[0]
 masterSize = [size[0],size[1]]
-if size[0] > 1920:
-	masterSize[0] = 1280
-if size[1] > 720:
-	masterSize[1] = 720
+if not android:
+	masterSize[0] = min(800,size[0])
+	masterSize[1] = min(480,size[1])
 
 
 infobarLocation =(10,masterSize[1]-40)

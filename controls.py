@@ -84,7 +84,7 @@ class ScoreCard(pygame.sprite.Sprite):
 		self.draw()
 	def draw(self):
 		self.image = pygame.Surface((200,400))
-		self.image.fill(pygame.Color("#333333"))
+		self.image.fill(bgColor)
 		size = 18
 		font = pygame.font.Font(fontName,size)
 		tileCounts = self.gameMap.countTiles()

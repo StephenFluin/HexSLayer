@@ -22,6 +22,7 @@ class Pawn(pygame.sprite.Sprite):
 		self.spin = 0
 		self.player = -1
 		self.justPurchased = False
+		self.indicator = None
 		
 	def getHasMoved(self):
 		return self.moved
@@ -91,12 +92,11 @@ class Pawn(pygame.sprite.Sprite):
 					
 					
 				# Step 4. Kill whatever is left with your movement.
-				if dest.pawn and dest.pawn in self.gameMap.renders:
-					self.gameMap.renders.remove(dest.pawn)
-					dest.pawn = None
+				#@TODO this should only be dest.pawn
+				if dest.pawn:
+					dest.pawn.kill(dest)
 				if dest.village:
-					self.gameMap.renders.remove(dest.village)
-					dest.village = None
+					dest.village.kill(dest)
 				
 				
 
@@ -121,10 +121,13 @@ class Pawn(pygame.sprite.Sprite):
 			self.image = pygame.image.load("knight.png")
 			self.upkeep = 50
 		return True
+		
+	# Kill removes pawn from renders, deletes it from the listed tile, adds a gravesite
 	def kill(self,tile):
 		if(self in self.gameMap.renders):
 			self.gameMap.renders.remove(self)
 			tile.pawn = None
+			# why do we add graves in case of hunger death? :(
 			tile.grave = Grave(self.gameMap,tile.xloc,tile.yloc)
 			self.gameMap.renders.insert(0,tile.grave)
 			#print "Removed a pawn and added a grave."
@@ -138,18 +141,32 @@ class Villager(Pawn):
 		
 class Castle(Pawn):
 	def __init__(self,gameMap,xloc,yloc):
-		Pawn.__init__(self,gameMap,xloc,yloc,1)
+		Pawn.__init__(self,gameMap,xloc,yloc,2)
 		self.image = pygame.image.load("castle.png")
 		self.upkeep = 0
-		self.level = 2
 	def getHasMoved(self):
 		return True
 	def kill(self,tile):
 		print "About to kill a legendary castle, my protection is:%s" % (tile.getProtection())
 		Pawn.kill(self,tile)
 		
+class Village(Pawn):
+	def __init__(self,gameMap,xloc,yloc):
+		Pawn.__init__(self,gameMap,xloc,yloc,1)
+		self.upkeep = 0
+		self.balance = 5
+		self.image = pygame.image.load("village.png")
+		self.player = gameMap.getTile((xloc,yloc)).player
+		self.xloc = xloc
+		self.yloc = yloc
+	def getHasMoved(self):
+		return True
+	def kill(self,tile):
+		print "Killing a village"
+		tile.village = None
+		Pawn.kill(self,tile)
 		
-	
+
 
 class Grave(pygame.sprite.Sprite):
 	def __init__(self,gameMap,xloc,yloc):
@@ -157,3 +174,30 @@ class Grave(pygame.sprite.Sprite):
 		self.image = pygame.image.load("dead.png")
 		(self.x,self.y) = convertGridPawnPosition(gameMap,xloc,yloc)
 		#print "Grave is created at %sx%s." % (x,y)
+		
+class AvailableMove(pygame.sprite.Sprite):
+	def __init__(self,x,y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image =pygame.image.load("sparks.png")
+		self.image = pygame.transform.rotozoom(self.image,0,float(tilesize)/75*.26)
+		
+		self.original = self.image
+		self.rect = self.image.get_rect()
+		screen = pygame.display.get_surface()
+		self.area = screen.get_rect()
+		self.rotation = 0
+		self.rect.topleft = x,y
+		print "Availablemove is sitting at %s." % (self.rect)
+		
+	def spin(self):
+		center = self.rect.center
+		self.rotation += 4
+				
+		self.image = pygame.transform.rotate(self.original,self.rotation)
+		self.rect = self.image.get_rect(center=center)
+		
+	def render(self, screen):
+		screen.blit(self.image,self.rect)
+		
+		
+		

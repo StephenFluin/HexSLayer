@@ -5,6 +5,7 @@
 
 from hexconfig import *
 
+#Takes in topleft and topright position of hex, returns points of hex
 def getHexAt(x,y):
 	s = tilesize
 	l = .25
