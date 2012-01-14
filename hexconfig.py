@@ -14,7 +14,7 @@ except ImportError:
 pygame.init()
 
 tilesize = 34
-playerColors = ("#717728","#A481AA","#A69781","#E5E8E6","#BCE8E6","#8D1F4A")
+playerColors = ("#717728","#A481AA","#A69781","#E5E8E6","#ACD8E6","#8D1F4A")
 bgColor = pygame.Color("#000000")
 fontColor = pygame.Color("#FFFFFF")
 fontName = "Roboto-Regular.ttf"
