@@ -86,7 +86,7 @@ class Pawn(pygame.sprite.Sprite):
 				if self.level <= dest.getProtection():
 					
 					self.moved = False
-					self.gameMap.message("This hex is protected.")
+					self.gameMap.message("This hex is protected.",self.startTile.player)
 					return False
 
 				#Weird edge case experienced on 20100109
@@ -110,7 +110,7 @@ class Pawn(pygame.sprite.Sprite):
 				return True
 				
 			
-		self.gameMap.message("Destination must be adjacent to region.")
+		self.gameMap.message("Destination must be adjacent to region.",self.startTile.player)
 		return False
 		
 	def upgrade(self):
