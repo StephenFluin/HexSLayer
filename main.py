@@ -68,7 +68,14 @@ def main():
 	background = background.convert()
 	background.fill(bgColor)
 	
-	gameMap = Map(background)
+	gData = settings.getGameData()
+	if gData:
+		gameMap = MapDeserialize(background,settings.getGameData())
+	else:
+		gameMap = Map(background)
+	
+	
+	#gameMap.newTurn()
 	
 	if pygame.font:
 		font = pygame.font.Font(fontName, 24)

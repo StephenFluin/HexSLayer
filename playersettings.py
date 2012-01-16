@@ -33,7 +33,7 @@ class PlayerSettings():
 		except IOError as (errno, strerror):
 			print "I/O error({0}): {1}".format(errno, strerror)
 			
-	def udpate(self,name,value):
+	def update(self,name,value):
 		self.prefs[name] = value
 		self.save()
 			
@@ -44,5 +44,10 @@ class PlayerSettings():
 		return self.prefs["playerId"]
 	def isOptOut(self):
 		return "optOut" in self.prefs
+	
+	def getGameData(self):
+		if not "gameData" in self.prefs:
+			return None
+		return self.prefs["gameData"]
 		
 			

@@ -99,6 +99,7 @@ class Pawn(pygame.sprite.Sprite):
 				#@TODO this should only be dest.pawn
 				if dest.pawn:
 					dest.pawn.kill(dest)
+					print "Killing pawn because of successfull attack."
 				if dest.village:
 					dest.village.kill(dest)
 				
@@ -140,6 +141,7 @@ class Pawn(pygame.sprite.Sprite):
 	def starve(self,tile):
 		tile.grave = Grave(self.gameMap,tile.xloc,tile.yloc)
 		self.gameMap.renders.insert(0,tile.grave)
+		print "Pawn starved."
 		self.kill(tile)
 		
 	# Updates the render of the spinner around the current unit

@@ -163,7 +163,6 @@ class Map():
         self.selectedSetUpkeep = 0
         
         self.tiles = []
-        self.alltiles = []
         self.renders = []
         self.selectedSet = []
         self.selectedVillage = None
@@ -178,7 +177,6 @@ class Map():
             row = [None]*self.width
             for x in range(self.width):
                 row[x] = Tile(self,x,y)
-                self.alltiles.append(row[x])
             self.tiles.append(row)
             
         # Add Human to the game.
@@ -199,9 +197,8 @@ class Map():
         
         self.cleanUpGame()
         
-        self.newTurn()
-
-            
+        
+          
     def hexClicked(self,x,y):
         retval = None
         #print "Clicked tile: %sx%s" % (self.tiles[y][x].xloc,self.tiles[y][x].yloc)
@@ -223,7 +220,7 @@ class Map():
         clickedTile = self.tiles[y][x]
         carry.setPos(x,y)
         #print "Set the position of the carry to ",x,"X",y
-        
+    
     # Takes in a tile coordinate, returns a tile
     def getTile(self,point):
         #@TODO Performance problem is here, this is called like a million times for the smallest changes
@@ -407,6 +404,7 @@ class Map():
                                 tile.village.balance = 0
                                 
                         self.message("One of your regions has starved!",tile.player)
+                        print "Region belonging to %s starved." % (tile.player)
                     
                 if tile.pawn:
                     
@@ -417,6 +415,11 @@ class Map():
         pygame.display.set_caption("HexSLayer - Turn %s" % (str(self.turn)))
         self.runAI()
         self.reRender()
+        
+        settings = PlayerSettings()
+        gameData = self.serialize()
+        settings.update("gameData",gameData)
+        
         
 
         
@@ -466,6 +469,75 @@ class Map():
     def message(self,msg,player=0):
         if player == 0:
             self.messenger.message(msg)
+        
+    #Returns a a simple dict of map that can be saved
+    def serialize(self):
+        ret = {}
+        ret["MapFormat"] = 1
+        ret["Tiles"] = []
+        for row in self.tiles:
+            rowData = []
+            for tile in row:
+                tileData = {}
+                tileData["player"] = tile.player
+                if tile.pawn:
+                    tileData["pawn"] = tile.pawn.level
+                    if isinstance(tile.pawn,Castle):
+                        tileData["pawn"] += .1
+                if tile.village:
+                    tileData["village"] = tile.village.balance
+                rowData.append(tileData)
+            ret["Tiles"].append(rowData)
+                
+        print ret
+        return ret
+    
+def MapDeserialize(background,data):
+    m = Map(background)
+    m.renders = []
+    #print "Map tiles before load are ",m.tiles
+    #print "length of tiles in data is %s" % (len(data["Tiles"]))
+    rc = 0
+    for row in data["Tiles"]:
+        tc = 0
+        for tile in row:
+            
+            m.tiles[rc][tc].setPlayer(tile["player"])
+            if "pawn" in tile:
+                if tile["pawn"] >= 1:
+                    m.tiles[rc][tc].pawn = Villager(m,tc,rc)
+                    print "Creating villager %s" % (tile["pawn"])
+                if tile["pawn"] >= 2:
+                    m.tiles[rc][tc].pawn.upgrade()
+                    print "upgrading pawn to wizard."
+                if tile["pawn"] >= 3:
+                    m.tiles[rc][tc].pawn.upgrade()
+                    print "upgrading pawn to swords."
+                if tile["pawn"] >= 4:
+                    m.tiles[rc][tc].pawn.upgrade()
+                    print "upgrading pawn to knight."
+                
+                if tile["pawn"] == 2.1:
+                    m.tiles[rc][tc].pawn = Castle(m,tc,rc)
+                    
+                m.renders.append(m.tiles[rc][tc].pawn)
+            else:
+                m.tiles[rc][tc].pawn = None
+                
+            if "village" in tile:
+                m.tiles[rc][tc].village = Village(m,tc,rc)
+                m.renders.append(m.tiles[rc][tc].village)
+                m.tiles[rc][tc].village.balance = tile["village"]
+            else:
+                m.tiles[rc][tc].village = None
+            
+            
+            tc += 1
+        rc += 1
+    m.reRender()
+    return m
+            
+     
 
 
             
