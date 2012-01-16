@@ -43,7 +43,7 @@ gameMap = None
 mouseCarrying = None
 screen = None
 clock = None
-version = "1.0.12pre"
+version = "1.0.13pre"
 
 
 
@@ -160,26 +160,27 @@ def main():
 				elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
 					if mouseCarrying:
 						x,y = event.pos
-						print "Event is %s and has %s." % (event, event.dict)
-						print "At mouse up, Mousecarrying is %s at %sx%s" % (mouseCarrying,x,y)
 						validDrop = False
 						
 						for row in gameMap.tiles:
 							for tile in row:
 								if tile.rect.collidepoint((x,y)) and tile.checkHexCollision((x,y)):
-									print "Passed collision test"
 									validDrop = True
 									if(mouseCarrying.attack(tile.xloc,tile.yloc)):
-										print "Attack of this square was successful, dropping player there."
+										#print "Attack of this square was successful, dropping player there."
 										gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
 										mouseCarrying.justPurchased = False
+										
 									elif not mouseCarrying.justPurchased:
-										print "SetPos because we haven't just purchased"
+										#print "SetPos because we haven't just purchased"
 										mouseCarrying.setPos( mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc)
 									else:
 										# We just purchased this pawn and couldn't place it, refund it!
-										print "Couldn't drop purchased pawn."
+										#print "Couldn't drop purchased pawn."
 										validDrop = False
+									
+									if not mouseCarrying.moved:
+										mouseCarrying.makeIndicator()
 									break
 									
 									
@@ -196,6 +197,11 @@ def main():
 							gameMap.selectedVillage.balance += value
 						mouseCarrying = None	
 					gameMap.reRender()
+				elif event.type == MOUSEMOTION:
+					if mouseCarrying != None:
+						mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()
+						mouseCarrying.x -= tilesize/2
+						mouseCarrying.y -= tilesize/2
 		allsprites.update()
 
 		#Update time on messenger
@@ -216,7 +222,7 @@ def main():
 			#Section handles move indicators, @TODO move to add and remove indicators at action time, not render time
 			if availableMove:
 				if not pawn.indicator:
-					pawn.indicator = AvailableMove(pawn.x,pawn.y)
+					pawn.makeIndicator()
 				pawn.indicator.render(screen)
 				pawn.indicator.spin()
 				

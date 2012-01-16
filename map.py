@@ -1,3 +1,8 @@
+#
+# HexSLayer
+# copyright (C) Stephen Fluin 2012
+#
+
 import pygame, random, time, os, math
 
 from pygame.locals import *
@@ -67,12 +72,10 @@ class Tile(pygame.sprite.Sprite):
         l = .25
         x = point[0] - self.x
         y = point[1] - self.y
-        print "Mouse Hit:",x,"X",y," is it less than ",s/2
-        print "1,2,3,4:",(2*x + y),",",(2*x + (s-y)),",",(2*(s-x)+y),",",(2*(s-x)+(s-y))
         
         if ((2*x + y) <  s/2) or ((2*x + (s-y)) < s/2) or ((2*(s-x)+y) < s/2) or ((2*(s-x)+(s-y)) < s/2):
             # Failed hitdetection on hex
-            print "Failed hitdetection on hex %sx%s (tilesize %s) compared to %sx%s." % (x,y,s,point[0],point[1])
+            #print "Failed hitdetection on hex %sx%s (tilesize %s) compared to %sx%s." % (x,y,s,point[0],point[1])
             return 0
         else:
             return 1
@@ -430,7 +433,7 @@ class Map():
             self.players[player].takeTurn(self,player)
             
     def reRender(self):
-            #@TODO, decide if I want to keep this refreshing of renders, or manage it like malloc
+        #@TODO, decide if I want to keep this refreshing of renders, or manage it like malloc
         self.renders = []
         for row in self.tiles:
             for tile in row:

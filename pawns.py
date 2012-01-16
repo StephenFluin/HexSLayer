@@ -1,6 +1,6 @@
 #
 # HexSLayer
-# copyright (C) Stephen Fluin 2010
+# copyright (C) Stephen Fluin 2012
 #
 
 # Pawns Classfiles
@@ -12,10 +12,11 @@ from pygame.locals import *
 from hexmath import *
 
 class Pawn(pygame.sprite.Sprite):
-	def __init__(self,gameMap,x,y,level):
+	def __init__(self,gameMap,xloc,yloc,level):
 		self.gameMap = gameMap
 		pygame.sprite.Sprite.__init__(self)
-		self.x,self.y = convertGridPawnPosition(self.gameMap,x,y)
+		self.x,self.y = convertGridPawnPosition(self.gameMap,xloc,yloc)
+		self.xloc,self.yloc = xloc,yloc
 		self.startTile = None
 		self.moved = False
 		self.level = level
@@ -28,30 +29,31 @@ class Pawn(pygame.sprite.Sprite):
 		return self.moved
 		
 		
-	def setPos(self,x,y):
-		self.x,self.y = convertGridPawnPosition(self.gameMap,x,y)
+	def setPos(self,xloc,yloc):
+		self.xloc,self.yloc = xloc,yloc
+		self.x,self.y = convertGridPawnPosition(self.gameMap,xloc,yloc)
 		if not self.justPurchased:
 			self.startTile.pawn = None
-		self.gameMap.getTile((x,y)).pawn = self
-		self.gameMap.getTile((x,y)).draw()
+		self.gameMap.getTile((xloc,yloc)).pawn = self
+		self.gameMap.getTile((xloc,yloc)).draw()
 		
 		# Is this good enough to set the player for all pawns?
-		if(self.gameMap.getTile((x,y))):
-			self.player = self.gameMap.getTile((x,y)).player
+		if(self.gameMap.getTile((xloc,yloc))):
+			self.player = self.gameMap.getTile((xloc,yloc)).player
 		
 	# Returns true if attack was successful (movement taken, or false if nothing happened)
 	# Should handle moving of sprites, reallocation of space, destruction of victims.
-	def attack(self,x,y):
+	def attack(self,xloc,yloc):
 		
 		#print "Testing if we can attack this tile"
 		#print "Returning the pawn to " , self.startTile.xloc,"X",self.startTile.yloc
-		dest = self.gameMap.getTile((x,y))
+		dest = self.gameMap.getTile((xloc,yloc))
 		#print "Attacking tile at %sx%s, which belongs to player %s" % (x,y,dest.player)
 		tiles = self.gameMap.getTileSet((self.startTile.xloc,self.startTile.yloc))
 
 		#Iterate over current set to determine if x,y are adjacent.
 		for tile in tiles:
-			if(tile.isAdjacent((x,y))):
+			if(tile.isAdjacent((xloc,yloc))):
 				#The attacked tile is adjacent to a tile in our starting set
 				
 				
@@ -77,7 +79,6 @@ class Pawn(pygame.sprite.Sprite):
 							
 							return True
 						return False
-						
 						
 					return True
 					
@@ -141,6 +142,10 @@ class Pawn(pygame.sprite.Sprite):
 		self.gameMap.renders.insert(0,tile.grave)
 		self.kill(tile)
 		
+	# Updates the render of the spinner around the current unit
+	def makeIndicator(self):
+		self.indicator = AvailableMove(self.x,self.y)
+		
 			
 # Takes in tile coordinates, not x/y coordinates
 class Villager(Pawn):
@@ -172,7 +177,6 @@ class Village(Pawn):
 	def getHasMoved(self):
 		return True
 	def kill(self,tile):
-		print "Killing a village"
 		tile.village = None
 		Pawn.kill(self,tile)
 		
