@@ -43,7 +43,7 @@ gameMap = None
 mouseCarrying = None
 screen = None
 clock = None
-version = "1.0.13pre"
+version = "1.0.14pre"
 
 
 
