@@ -2,3 +2,5 @@
 packaging/*.deb
 packaging/*.apk
 playersettings.cnf
+.project
+.pydevproject
