@@ -43,7 +43,7 @@ gameMap = None
 mouseCarrying = None
 screen = None
 clock = None
-version = "1.0.14pre"
+version = open('version.txt','r').read()
 
 
 
@@ -89,9 +89,7 @@ def main():
 	allsprites = pygame.sprite.RenderPlain(())
 	
 	background.blit(pygame.image.load("endturn.png"),endTurnLocation)
-	
-	sparks = pygame.image.load("sparks.png")
-	
+		
 	while True:
 		clock.tick(15)
 		#Handle Input Events
@@ -111,6 +109,18 @@ def main():
 					if not gameMap.gameOver:
 						# Picking something up
 						if not mouseCarrying:
+							x,y =pygame.mouse.get_pos()
+							
+							#Allow menu click
+							if not gameMap.menu.open:
+									if x>menuButtonLocation[0]-10 and y < 32:
+										gameMap.menu.click(x-menuButtonLocation[0],y-menuButtonLocation[1])
+							else:
+									if not pygame.Rect(gameMap.menu.x,gameMap.menu.y,gameMap.menu.image.get_width(),gameMap.menu.image.get_height()).collidepoint(x,y):
+										gameMap.menu.open = False
+									else:
+										gameMap.menu.click(x-gameMap.menu.x,y-gameMap.menu.y)
+							
 							#Select a region
 							for row in gameMap.tiles:
 								for tile in row:
@@ -124,7 +134,7 @@ def main():
 												#print "I have set the startTile of the carry."
 											break
 											
-							x,y =pygame.mouse.get_pos()
+							
 							# End Turn Button
 							if(x>endTurnLocation[0] and y > endTurnLocation[1]):
 								gameMap.newTurn()
@@ -134,7 +144,7 @@ def main():
 							storeX = gameMap.store.x-10
 							storeY = gameMap.store.y-20
 							storeRight = gameMap.store.image.get_width() + storeX + 20
-							if(x<storeRight and x > storeX and y > storeY):
+							if(x<storeRight and x > storeX and y > storeY and gameMap.selectedVillage):
 								# got click at in the store %sx%s" %(x,y)
 								#print "Spawning a new villager, and deducting from bank."
 								if gameMap.selectedVillage.balance >= 10 and x < (storeRight+storeX)/2:

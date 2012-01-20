@@ -149,6 +149,41 @@ class ScoreCard(pygame.sprite.Sprite):
 			self.image.blit(text,(30,10+(size+10)*i))
 			pygame.draw.rect(self.image,pygame.Color(playerColors[i]),pygame.Rect(0,(size+10)*i+10,15,15))
 		self.image.blit(font.render("Turn %s" % (self.gameMap.turn),True,fontColor),(30,(size+10)*6+10))
+	
+class Menu(pygame.sprite.Sprite):
+	def __init__(self,gameMap):
+		pygame.sprite.Sprite.__init__(self)
+		
+		self.open = False
+		self.gameMap = gameMap
+		self.gameMap.renders.append(self)
+		self.draw()
+	def draw(self):
+		if not self.open:
+			(self.x,self.y) = menuButtonLocation
+			self.image = pygame.Surface((32,30))
+			
+			self.image.fill(bgColor)
+			pygame.draw.rect(self.image,fontColor,(14,6,4,4))
+			pygame.draw.rect(self.image,fontColor,(14,14,4,4))
+			pygame.draw.rect(self.image,fontColor,(14,22,4,4))
+
+		else:
+			(self.x,self.y) = 50,50
+			self.rect = (self.x,self.y,masterSize[0]-100,masterSize[1]-100)
+			self.image = pygame.Surface((self.rect[2],self.rect[3]))
+			
+			self.image.fill(pygame.Color("#333333"))
+			size = 20
+			font = pygame.font.Font(fontName,size)
+			
+			text = font.render("Message SuperMessage",True,fontColor)
+			self.image.blit(text,(0,0))
+			
+	def click(self,x,y):
+		self.open = True
+		
+		
 		
 		
 		

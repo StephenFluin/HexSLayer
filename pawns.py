@@ -44,6 +44,7 @@ class Pawn(pygame.sprite.Sprite):
 	# Returns true if attack was successful (movement taken, or false if nothing happened)
 	# Should handle moving of sprites, reallocation of space, destruction of victims.
 	def attack(self,xloc,yloc):
+		print "Attacking xloc %s yloc %s" % (xloc,yloc)
 		
 		#print "Testing if we can attack this tile"
 		#print "Returning the pawn to " , self.startTile.xloc,"X",self.startTile.yloc
@@ -131,6 +132,7 @@ class Pawn(pygame.sprite.Sprite):
 		
 	# Kill removes pawn from renders, deletes it from the listed tile, adds a gravesite
 	def kill(self,tile):
+		print "Pawn at %sx%s is now dead." % (self.xloc, self.yloc)
 		if(self in self.gameMap.renders):
 			self.gameMap.renders.remove(self)
 			tile.pawn = None

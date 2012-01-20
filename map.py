@@ -194,6 +194,7 @@ class Map():
         self.store = PurchaseUnits(self)
         self.messenger = Messenger(self)
         self.score = ScoreCard(self)
+        self.menu = Menu(self)
         
         self.cleanUpGame()
         
@@ -395,6 +396,7 @@ class Map():
                     # Kill any pawns without a village
                     if tile.pawn and len(tile.realm) == 1:
                         tile.pawn.kill(tile)
+                        print "Pawn killed because it has no village."
                     
                     # Starve all of the pawns in case of negative balance
                     if tile.village.balance < 0:
@@ -411,6 +413,7 @@ class Map():
                     tile.pawn.moved = False
                     if(len(tile.realm) == 1):
                         tile.pawn.kill(tile)
+                        print "Pawn killed because it lived alone."
         self.turn += 1
         pygame.display.set_caption("HexSLayer - Turn %s" % (str(self.turn)))
         self.runAI()
@@ -452,18 +455,22 @@ class Map():
         self.renders.append(self.store)
         self.renders.append(self.score)
         self.renders.append(self.messenger)
+        self.renders.append(self.menu)
         
         
         
         if self.gameOver:
             self.newGame = NewGame(20,355)
             self.renders.append(GameOver(self,20,325,self.winner))
+            trackEvent("gameover",{"winner":self.winner})
             self.renders.append(self.newGame)
         
         self.infobar.draw()
         self.store.draw()
         self.score.draw()
         self.messenger.draw()
+        self.menu.draw()
+        
             
                             
     def message(self,msg,player=0):
@@ -474,6 +481,7 @@ class Map():
     def serialize(self):
         ret = {}
         ret["MapFormat"] = 1
+        ret["Turn"] = self.turn
         ret["Tiles"] = []
         for row in self.tiles:
             rowData = []
@@ -489,7 +497,6 @@ class Map():
                 rowData.append(tileData)
             ret["Tiles"].append(rowData)
                 
-        print ret
         return ret
     
 def MapDeserialize(background,data):
@@ -497,6 +504,8 @@ def MapDeserialize(background,data):
     m.renders = []
     #print "Map tiles before load are ",m.tiles
     #print "length of tiles in data is %s" % (len(data["Tiles"]))
+    if "Turn" in data:
+        m.turn = data["Turn"]
     rc = 0
     for row in data["Tiles"]:
         tc = 0
@@ -505,17 +514,21 @@ def MapDeserialize(background,data):
             m.tiles[rc][tc].setPlayer(tile["player"])
             if "pawn" in tile:
                 if tile["pawn"] >= 1:
+                    #print "Creating villager %s" % (tile["pawn"])
                     m.tiles[rc][tc].pawn = Villager(m,tc,rc)
-                    print "Creating villager %s" % (tile["pawn"])
+                    
                 if tile["pawn"] >= 2:
+                    #print "upgrading pawn to wizard."
                     m.tiles[rc][tc].pawn.upgrade()
-                    print "upgrading pawn to wizard."
+                    
                 if tile["pawn"] >= 3:
+                    #print "upgrading pawn to swords."
                     m.tiles[rc][tc].pawn.upgrade()
-                    print "upgrading pawn to swords."
+                    
                 if tile["pawn"] >= 4:
+                    # upgrading pawn to knight.
                     m.tiles[rc][tc].pawn.upgrade()
-                    print "upgrading pawn to knight."
+                    
                 
                 if tile["pawn"] == 2.1:
                     m.tiles[rc][tc].pawn = Castle(m,tc,rc)
@@ -534,6 +547,7 @@ def MapDeserialize(background,data):
             
             tc += 1
         rc += 1
+    m.cleanUpGame()
     m.reRender()
     return m
             

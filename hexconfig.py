@@ -29,6 +29,7 @@ if not android:
 
 
 infobarLocation =(10,masterSize[1]-40)
+menuButtonLocation = (masterSize[0]-32,0)
 
 scoreLocation = (masterSize[0]-210,32)
 endTurnLocation = (masterSize[0]-210,masterSize[1]-40)
