@@ -194,7 +194,7 @@ class Map():
         self.store = PurchaseUnits(self)
         self.messenger = Messenger(self)
         self.score = ScoreCard(self)
-        self.menu = Menu(self)
+        self.menubutton = MenuButton(self)
         
         self.cleanUpGame()
         
@@ -396,7 +396,6 @@ class Map():
                     # Kill any pawns without a village
                     if tile.pawn and len(tile.realm) == 1:
                         tile.pawn.kill(tile)
-                        print "Pawn killed because it has no village."
                     
                     # Starve all of the pawns in case of negative balance
                     if tile.village.balance < 0:
@@ -406,14 +405,12 @@ class Map():
                                 tile.village.balance = 0
                                 
                         self.message("One of your regions has starved!",tile.player)
-                        print "Region belonging to %s starved." % (tile.player)
                     
                 if tile.pawn:
                     
                     tile.pawn.moved = False
                     if(len(tile.realm) == 1):
                         tile.pawn.kill(tile)
-                        print "Pawn killed because it lived alone."
         self.turn += 1
         pygame.display.set_caption("HexSLayer - Turn %s" % (str(self.turn)))
         self.runAI()
@@ -438,6 +435,8 @@ class Map():
             #print "Running ai for player %s" % (player)
             self.players[player].takeTurn(self,player)
             
+            
+    # Iterates over tiles, villages, pawns, and add them to renders. Completely re-renders screen.
     def reRender(self):
         #@TODO, decide if I want to keep this refreshing of renders, or manage it like malloc
         self.renders = []
@@ -455,7 +454,9 @@ class Map():
         self.renders.append(self.store)
         self.renders.append(self.score)
         self.renders.append(self.messenger)
-        self.renders.append(self.menu)
+        self.renders.append(self.menubutton)
+        if self.menubutton.open:
+            self.renders.append(self.menubutton.open)
         
         
         
@@ -469,7 +470,6 @@ class Map():
         self.store.draw()
         self.score.draw()
         self.messenger.draw()
-        self.menu.draw()
         
             
                             

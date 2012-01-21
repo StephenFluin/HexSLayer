@@ -43,9 +43,7 @@ class Pawn(pygame.sprite.Sprite):
 		
 	# Returns true if attack was successful (movement taken, or false if nothing happened)
 	# Should handle moving of sprites, reallocation of space, destruction of victims.
-	def attack(self,xloc,yloc):
-		print "Attacking xloc %s yloc %s" % (xloc,yloc)
-		
+	def attack(self,xloc,yloc):		
 		#print "Testing if we can attack this tile"
 		#print "Returning the pawn to " , self.startTile.xloc,"X",self.startTile.yloc
 		dest = self.gameMap.getTile((xloc,yloc))

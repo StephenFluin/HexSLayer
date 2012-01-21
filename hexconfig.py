@@ -34,7 +34,7 @@ menuButtonLocation = (masterSize[0]-32,0)
 scoreLocation = (masterSize[0]-210,32)
 endTurnLocation = (masterSize[0]-210,masterSize[1]-40)
 messengerLocation = (endTurnLocation[0],endTurnLocation[1]-150)
-storeLocation = (endTurnLocation[0]-120,masterSize[1]-40)
+storeLocation = (endTurnLocation[0]-120,masterSize[1]-50)
 
 tileSpaceX = masterSize[0]-210-20
 tileSpaceY = masterSize[1]-40-20-30
