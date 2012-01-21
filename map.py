@@ -533,6 +533,8 @@ def MapDeserialize(background,data):
                 if tile["pawn"] == 2.1:
                     m.tiles[rc][tc].pawn = Castle(m,tc,rc)
                     
+                m.tiles[rc][tc].pawn.player = tile["player"]
+                    
                 m.renders.append(m.tiles[rc][tc].pawn)
             else:
                 m.tiles[rc][tc].pawn = None

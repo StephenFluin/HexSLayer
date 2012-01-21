@@ -195,7 +195,7 @@ class AvailableMove(pygame.sprite.Sprite):
 	def __init__(self,x,y):
 		pygame.sprite.Sprite.__init__(self)
 		self.image =pygame.image.load("sparks.png")
-		self.image = pygame.transform.smoothscale(self.image,(tilesize,tilesize))
+		self.image = pygame.transform.smoothscale(self.image,(40,40))
 		
 		self.original = self.image
 		self.rect = self.image.get_rect()
