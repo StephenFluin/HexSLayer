@@ -7,10 +7,11 @@ cp ../../*.py tmp/
 cp ../../*.png tmp/
 #cp ../../main.py tmp/
 cp ../../*.ttf tmp/
+cp ../../version.txt tmp/
 
 cd pygame-package-0.9.3
 rm bin/*
-./build.py --package "com.mortalpowers.android.hexslayer" --name "HexSLayer" --version "`cat ../../../version.txt`" --numeric-version 8 --private ../tmp --permission INTERNET --icon /super/workspace/HexSLayer/gameicon.png debug
+./build.py --package "com.mortalpowers.android.hexslayer" --name "HexSLayer" --version "`cat ../../../version.txt`" --numeric-version 9 --private ../tmp --permission INTERNET --icon /super/workspace/HexSLayer/gameicon.png debug
 rm build.xml
 rm -r ../tmp
 android update project -p ./ -n HexSLayer
