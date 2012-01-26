@@ -1,0 +1,152 @@
+#
+# HexSLayer
+# copyright (C) Stephen Fluin 2012
+#
+
+# Pawns Classfiles
+# provides objects representing different UI elements that interact with the user
+#
+
+import pygame, random
+from pygame.locals import *
+from hexmath import *
+
+class UI(pygame.sprite.Sprite):
+	def __init__(self,gameMap):
+		pygame.sprite.Sprite.__init__(self)
+		self.gameMap = gameMap
+		self.x,self.y = 0,0
+		
+		
+	# Call this as often as you like, it will make sure the UI matches world state.
+	# Static methods should have no update functionality
+	def update(self):
+		pass
+	
+	
+	# Each interface item should know how to handle clicks on it, starting from it's own xy
+	def click(self,x,y):
+		pass
+	
+
+class VillageData(UI):
+	def __init__(self,gameMap):
+		UI.__init__(self,gameMap)
+		
+		self.x,self.y = infobarLocation
+
+		self.update()
+	def update(self):
+		self.image = pygame.Surface((500,30))
+		self.image.fill(bgColor)
+		if(self.gameMap.selectedSetIncome > 0):
+			msg = "Region Income:"+str(self.gameMap.selectedSetIncome)+"  Upkeep:"+str(self.gameMap.selectedSetUpkeep)
+			if(self.gameMap.selectedVillage.balance > 0):
+				msg += "  Balance:%s" % (self.gameMap.selectedVillage.balance)
+				
+			font = pygame.font.Font(fontName, 22)
+			text = font.render(msg,1,fontColor)
+			self.image.blit(text,(0,0))
+			
+class PurchaseUnits(UI):
+	def __init__(self,gameMap):
+		UI.__init__(self,gameMap)
+		self.x,self.y = storeLocation
+		
+		self.update()
+	def update(self):
+		self.image = pygame.Surface((90,30))
+		self.image.fill(bgColor)
+		if self.gameMap.selectedVillage and self.gameMap.selectedVillage.player == 0:
+			if self.gameMap.selectedVillage.balance >= 10:
+				# TODO: Make sure this doesn't load on each call of draw
+				self.image.blit(pygame.image.load("villager.png"),(0,0))
+			if self.gameMap.selectedVillage.balance >= 20:
+				self.image.blit(pygame.image.load("castle.png"),(55,0))
+				
+class ScoreCard(UI):
+	def __init__(self,gameMap):
+		UI.__init__(self,gameMap)
+		self.x,self.y = scoreLocation
+		
+		
+		self.update()
+	def update(self):
+		self.image = pygame.Surface((200,400))
+		self.image.fill(bgColor)
+		size = 18
+		font = pygame.font.Font(fontName,size)
+		tileCounts = self.gameMap.countTiles()
+		for i in range(0,6):
+			
+			text = font.render("%s - %s" % (self.gameMap.players[i].getName(),tileCounts[i]),True,fontColor)
+			self.image.blit(text,(30,10+(size+10)*i))
+			pygame.draw.rect(self.image,pygame.Color(playerColors[i]),pygame.Rect(0,(size+10)*i+10,15,15))
+		self.image.blit(font.render("Turn %s" % (self.gameMap.turn),True,fontColor),(30,(size+10)*6+10))
+		
+class MenuButton(UI):
+	def __init__(self,gameMap):
+		UI.__init__(self,gameMap)
+		self.x,self.y = menuButtonLocation
+		
+		self.open = False
+		self.draw()
+
+		
+		self.image = pygame.Surface((32,30))
+		
+		self.image.fill(bgColor)
+		pygame.draw.rect(self.image,fontColor,(14,6,4,4))
+		pygame.draw.rect(self.image,fontColor,(14,14,4,4))
+		pygame.draw.rect(self.image,fontColor,(14,22,4,4))
+		
+		
+class Messenger(pygame.sprite.Sprite):
+	def __init__(self,gameMap):
+		UI.__init__(self,gameMap)
+		
+		self.x,self.y = messengerLocation
+		
+		self.messages = []
+		#Currently in # of frames, silly
+		self.defaultTime = 120
+		
+		self.gameMap.renders.append(self)
+		self.update()
+		self.allMessagesCount = 1
+		
+		
+	def update(self):
+		self.image = pygame.Surface((200,150))
+		self.image.fill(bgColor)
+		fsize = 10
+		font = pygame.font.Font(fontName,fsize)
+		
+		msgCount = 0
+		for i in self.messages:
+			msgCount += 1
+			if i[1] > self.defaultTime / 5.0:
+				messageColor = fontColor
+			elif i[1] > 0:
+				color = int((i[1]) / (self.defaultTime /5.0)*255)
+				messageColor = pygame.Color(color,color,color,1)
+				
+			
+			if i[1] <= 0:
+				self.messages.remove(i)
+			else:
+				text = font.render("%s. %s" % (i[2], i[0]),True,messageColor)
+				self.image.blit(text,(0,msgCount *fsize * 1.2))
+		
+		
+		
+	def message(self,string):
+		#Only show messages that happen after game start.
+		if self.gameMap.turn >0:
+			self.messages.append([string,self.defaultTime,self.allMessagesCount])
+			self.allMessagesCount+=1
+		
+	def tick(self):
+		for i in self.messages:
+			i[1] -= 1
+		self.draw()

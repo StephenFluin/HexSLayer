@@ -32,6 +32,7 @@ from pawns import *
 from hexmath import *
 from hexconfig import *
 from controls import *
+from interface import *
 from ai import *
 from playersettings import *
 from analytics import *
@@ -42,14 +43,11 @@ background = None
 gameMap = None
 mouseCarrying = None
 screen = None
-clock = None
 version = open('version.txt','r').read()
 
 
-
-
 def main():
-	global screen, background, clock, mouseCarrying,version
+	global screen, background, mouseCarrying,version
 	settings = PlayerSettings()
 	pygame.init()
 	screen = pygame.display.set_mode(masterSize)
@@ -73,9 +71,14 @@ def main():
 		gameMap = MapDeserialize(background,settings.getGameData())
 	else:
 		gameMap = Map(background)
+
 	
-	
-	#gameMap.newTurn()
+	interface = []
+	interface.append(VillageData(gameMap))
+	interface.append(PurchaseUnits(gameMap))
+	interface.append(Messenger(gameMap))
+	interface.append(ScoreCard(gameMap))
+	interface.append(MenuButton(gameMap))
 	
 	if pygame.font:
 		font = pygame.font.Font(fontName, 24)
@@ -104,18 +107,21 @@ def main():
 				gameMap.gameOver = True
 				gameMap.reRender()
 			elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-				
+				x,y = pygame.mouse.get_pos()
+				for i in range(len(interface)-1,-1,-1):
+					interface[i].click(x-interface[i].x,y-interface[i].y)
+					
 				if not gameMap.gameOver:
 					# Picking something up
 					if not mouseCarrying:
-						x,y = pygame.mouse.get_pos()
+						
 						
 						#Allow menu click
-						if not gameMap.menubutton.open:
+						if not menubutton.open:
 							if x>menuButtonLocation[0]-10 and y < 32:
 								print "Click on menubutton"
-								gameMap.menubutton.open = Menu(gameMap) 
-								gameMap.renders.append(gameMap.menubutton.open)
+								menubutton.open = Menu(gameMap) 
+								gameMap.renders.append(menubutton.open)
 						
 						
 							#Select a region
@@ -161,12 +167,12 @@ def main():
 						# Menu already open
 						else:
 							print "menu open"
-							if not pygame.Rect(gameMap.menubutton.open.x,gameMap.menubutton.open.y,gameMap.menubutton.open.image.get_width(),gameMap.menubutton.open.image.get_height()).collidepoint(x,y):
-								print "Menu closing, rect was %sx%s %s,%s compared to %sx%s" % (gameMap.menubutton.open.x,gameMap.menubutton.open.y,gameMap.menubutton.image.get_width(),gameMap.menubutton.image.get_height(),x,y)
+							if not pygame.Rect(menubutton.open.x,menubutton.open.y,menubutton.open.image.get_width(),menubutton.open.image.get_height()).collidepoint(x,y):
+								print "Menu closing, rect was %sx%s %s,%s compared to %sx%s" % (menubutton.open.x,menubutton.open.y,menubutton.image.get_width(),menubutton.image.get_height(),x,y)
 								
-								gameMap.menubutton.open = False
+								menubutton.open = False
 							else:
-								result = gameMap.menubutton.open.click(x-gameMap.menubutton.open.x,y-gameMap.menubutton.open.y)
+								result = menubutton.open.click(x-menubutton.open.x,y-menubutton.open.y)
 								if result == "NewGame":
 									gameMap = Map(gameMap.background)
 					else:
@@ -229,9 +235,6 @@ def main():
 					mouseCarrying.y -= tilesize/2
 		allsprites.update()
 
-		#Update time on messenger
-		gameMap.messenger.tick()
-		
 		
 		#Draw Everything
 		screen.blit(background, (0, 0))
@@ -260,6 +263,12 @@ def main():
 				screen.blit(pygame.transform.scale2x(pawn.image),(pawn.x,pawn.y))
 			else:
 				screen.blit(pawn.image,(pawn.x,pawn.y))
+		
+		
+		for face in interface:
+			face.update()
+			screen.blit(face.image,(face.x,face.y))
+			
 		allsprites.draw(screen)
 		pygame.display.flip()
 		
@@ -267,9 +276,7 @@ def main():
 		#if not gameMap.gameOver:
 			#gameMap.newTurn()
 		#time.sleep(1)
-	
-		
 
 
 if __name__ == "__main__":
-    main()
+	main()
