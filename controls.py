@@ -7,6 +7,7 @@ from pygame.locals import *
 from hexmath import *
 from hexconfig import *
 
+
 class VillageData(pygame.sprite.Sprite):
 	def __init__(self,gameMap):
 		self.gameMap = gameMap
@@ -149,6 +150,69 @@ class ScoreCard(pygame.sprite.Sprite):
 			self.image.blit(text,(30,10+(size+10)*i))
 			pygame.draw.rect(self.image,pygame.Color(playerColors[i]),pygame.Rect(0,(size+10)*i+10,15,15))
 		self.image.blit(font.render("Turn %s" % (self.gameMap.turn),True,fontColor),(30,(size+10)*6+10))
+
+class MenuButton(pygame.sprite.Sprite):
+	def __init__(self,gameMap):
+		pygame.sprite.Sprite.__init__(self)
+		
+		self.open = False
+		self.gameMap = gameMap
+		self.gameMap.renders.append(self)
+		self.draw()
+	def draw(self):
+
+		(self.x,self.y) = menuButtonLocation
+		self.image = pygame.Surface((32,30))
+		
+		self.image.fill(bgColor)
+		pygame.draw.rect(self.image,fontColor,(14,6,4,4))
+		pygame.draw.rect(self.image,fontColor,(14,14,4,4))
+		pygame.draw.rect(self.image,fontColor,(14,22,4,4))
+	
+
+class Menu(pygame.sprite.Sprite):
+	def __init__(self,gameMap):
+		pygame.sprite.Sprite.__init__(self)
+
+		self.gameMap = gameMap
+		self.gameMap.renders.append(self)
+		def newGame(game):
+			return "NewGame"
+		items = [["New Game", newGame]]
+		self.fontSize = 20
+		
+		self.draw()
+		self.setup(items)
+	def draw(self):
+		(self.x,self.y) = 50,50
+		self.rect = (self.x,self.y,masterSize[0]-100,masterSize[1]-100)
+		self.image = pygame.Surface((self.rect[2],self.rect[3]))
+		
+		self.image.fill(pygame.Color("#333333"))
+		
+			
+	def click(self,x,y):
+		itemCount = 0
+		for i in range(self.fontSize,self.rect[3],int(self.fontSize*1.2)):
+			if y < i and len(self.items) > itemCount:
+				return self.items[itemCount][1](self.gameMap)
+			itemCount += 1
+		return False
+		
+	def setup(self,itemList):
+		height = 0
+		for item in itemList:
+			font = pygame.font.Font(fontName,self.fontSize)
+			text = font.render(item[0],True,fontColor)
+			self.image.blit(text,(0,height))
+			height += self.fontSize*1.2
+		self.items = itemList
+			
+			
+			
+		
+		
+		
 		
 		
 		

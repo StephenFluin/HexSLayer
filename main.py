@@ -43,7 +43,7 @@ gameMap = None
 mouseCarrying = None
 screen = None
 clock = None
-version = "1.0.14pre"
+version = open('version.txt','r').read()
 
 
 
@@ -89,28 +89,35 @@ def main():
 	allsprites = pygame.sprite.RenderPlain(())
 	
 	background.blit(pygame.image.load("endturn.png"),endTurnLocation)
-	
-	sparks = pygame.image.load("sparks.png")
-	
+		
 	while True:
 		clock.tick(15)
 		#Handle Input Events
-		if True:
-			for event in pygame.event.get():
-				if event.type == QUIT:
-					return
-				elif event.type == KEYDOWN and event.key == K_ESCAPE:
-					return
-				elif event.type == KEYDOWN and event.key == K_RETURN:
-					gameMap.newTurn()
-				elif event.type == KEYDOWN and event.key == K_BACKSPACE:
-					gameMap.gameOver = True
-					gameMap.reRender()
-				elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-					
-					if not gameMap.gameOver:
-						# Picking something up
-						if not mouseCarrying:
+		for event in pygame.event.get():
+			if event.type == QUIT:
+				return
+			elif event.type == KEYDOWN and event.key == K_ESCAPE:
+				return
+			elif event.type == KEYDOWN and event.key == K_RETURN:
+				gameMap.newTurn()
+			elif event.type == KEYDOWN and event.key == K_BACKSPACE:
+				gameMap.gameOver = True
+				gameMap.reRender()
+			elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+				
+				if not gameMap.gameOver:
+					# Picking something up
+					if not mouseCarrying:
+						x,y = pygame.mouse.get_pos()
+						
+						#Allow menu click
+						if not gameMap.menubutton.open:
+							if x>menuButtonLocation[0]-10 and y < 32:
+								print "Click on menubutton"
+								gameMap.menubutton.open = Menu(gameMap) 
+								gameMap.renders.append(gameMap.menubutton.open)
+						
+						
 							#Select a region
 							for row in gameMap.tiles:
 								for tile in row:
@@ -124,7 +131,7 @@ def main():
 												#print "I have set the startTile of the carry."
 											break
 											
-							x,y =pygame.mouse.get_pos()
+							
 							# End Turn Button
 							if(x>endTurnLocation[0] and y > endTurnLocation[1]):
 								gameMap.newTurn()
@@ -134,7 +141,7 @@ def main():
 							storeX = gameMap.store.x-10
 							storeY = gameMap.store.y-20
 							storeRight = gameMap.store.image.get_width() + storeX + 20
-							if(x<storeRight and x > storeX and y > storeY):
+							if(x<storeRight and x > storeX and y > storeY and gameMap.selectedVillage):
 								# got click at in the store %sx%s" %(x,y)
 								#print "Spawning a new villager, and deducting from bank."
 								if gameMap.selectedVillage.balance >= 10 and x < (storeRight+storeX)/2:
@@ -151,64 +158,75 @@ def main():
 									mouseCarrying.startTile = gameMap.selectedSet[0]
 									gameMap.message("Castle Purchased",gameMap.selectedVillage.player)
 									gameMap.renders.append(mouseCarrying)
+						# Menu already open
 						else:
-							print "Why are we mousing down if we are carrying %s??!?!?!" % (mouseCarrying)
-					else:
-						x,y = pygame.mouse.get_pos()
-						box = (gameMap.newGame.x,gameMap.newGame.y,gameMap.newGame.image.get_width(),gameMap.newGame.image.get_height())
-						
-						if pygame.Rect(box).collidepoint((x,y)):
-							print "New Game Time"
-							gameMap = Map(background)
-						else:
-							print "Not a new game. because %sx%s didn't match %s" % (x,y,gameMap.newGame.image.get_rect())
-						
-					
-				elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
-					if mouseCarrying:
-						x,y = event.pos
-						validDrop = False
-						
-						for row in gameMap.tiles:
-							for tile in row:
-								if tile.rect.collidepoint((x,y)) and tile.checkHexCollision((x,y)):
-									validDrop = True
-									if(mouseCarrying.attack(tile.xloc,tile.yloc)):
-										#print "Attack of this square was successful, dropping player there."
-										gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
-										mouseCarrying.justPurchased = False
-										
-									elif not mouseCarrying.justPurchased:
-										#print "SetPos because we haven't just purchased"
-										mouseCarrying.setPos( mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc)
-									else:
-										# We just purchased this pawn and couldn't place it, refund it!
-										#print "Couldn't drop purchased pawn."
-										validDrop = False
-									
-									if not mouseCarrying.moved:
-										mouseCarrying.makeIndicator()
-									break
-									
-									
-												
-						# @TODO! What else do we need to do to clean this up?
-						if not validDrop:
-							if mouseCarrying.startTile:
-								mouseCarrying.startTile.pawn = None
-							gameMap.renders.remove(mouseCarrying)
-							if isinstance(mouseCarrying,Castle):
-								value = 20
+							print "menu open"
+							if not pygame.Rect(gameMap.menubutton.open.x,gameMap.menubutton.open.y,gameMap.menubutton.open.image.get_width(),gameMap.menubutton.open.image.get_height()).collidepoint(x,y):
+								print "Menu closing, rect was %sx%s %s,%s compared to %sx%s" % (gameMap.menubutton.open.x,gameMap.menubutton.open.y,gameMap.menubutton.image.get_width(),gameMap.menubutton.image.get_height(),x,y)
+								
+								gameMap.menubutton.open = False
 							else:
-								value = 10
-							gameMap.selectedVillage.balance += value
-						mouseCarrying = None	
-					gameMap.reRender()
-				elif event.type == MOUSEMOTION:
-					if mouseCarrying != None:
-						mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()
-						mouseCarrying.x -= tilesize/2
-						mouseCarrying.y -= tilesize/2
+								result = gameMap.menubutton.open.click(x-gameMap.menubutton.open.x,y-gameMap.menubutton.open.y)
+								if result == "NewGame":
+									gameMap = Map(gameMap.background)
+					else:
+						print "Why are we mousing down if we are carrying %s??!?!?!" % (mouseCarrying)
+				else:
+					x,y = pygame.mouse.get_pos()
+					box = (gameMap.newGame.x,gameMap.newGame.y,gameMap.newGame.image.get_width(),gameMap.newGame.image.get_height())
+					
+					if pygame.Rect(box).collidepoint((x,y)):
+						print "New Game Time"
+						gameMap = Map(background)
+					else:
+						print "Not a new game. because %sx%s didn't match %s" % (x,y,gameMap.newGame.image.get_rect())
+					
+				
+			elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
+				if mouseCarrying:
+					x,y = event.pos
+					validDrop = False
+					
+					for row in gameMap.tiles:
+						for tile in row:
+							if tile.rect.collidepoint((x,y)) and tile.checkHexCollision((x,y)):
+								validDrop = True
+								if(mouseCarrying.attack(tile.xloc,tile.yloc)):
+									#print "Attack of this square was successful, dropping player there."
+									gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
+									mouseCarrying.justPurchased = False
+									
+								elif not mouseCarrying.justPurchased:
+									#print "SetPos because we haven't just purchased"
+									mouseCarrying.setPos( mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc)
+								else:
+									# We just purchased this pawn and couldn't place it, refund it!
+									#print "Couldn't drop purchased pawn."
+									validDrop = False
+								
+								if not mouseCarrying.moved:
+									mouseCarrying.makeIndicator()
+								break
+								
+								
+											
+					# @TODO! What else do we need to do to clean this up?
+					if not validDrop:
+						if mouseCarrying.startTile:
+							mouseCarrying.startTile.pawn = None
+						gameMap.renders.remove(mouseCarrying)
+						if isinstance(mouseCarrying,Castle):
+							value = 20
+						else:
+							value = 10
+						gameMap.selectedVillage.balance += value
+					mouseCarrying = None	
+				gameMap.reRender()
+			elif event.type == MOUSEMOTION:
+				if mouseCarrying != None:
+					mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()
+					mouseCarrying.x -= tilesize/2
+					mouseCarrying.y -= tilesize/2
 		allsprites.update()
 
 		#Update time on messenger

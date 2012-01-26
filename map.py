@@ -194,6 +194,7 @@ class Map():
         self.store = PurchaseUnits(self)
         self.messenger = Messenger(self)
         self.score = ScoreCard(self)
+        self.menubutton = MenuButton(self)
         
         self.cleanUpGame()
         
@@ -404,7 +405,6 @@ class Map():
                                 tile.village.balance = 0
                                 
                         self.message("One of your regions has starved!",tile.player)
-                        print "Region belonging to %s starved." % (tile.player)
                     
                 if tile.pawn:
                     
@@ -435,6 +435,8 @@ class Map():
             #print "Running ai for player %s" % (player)
             self.players[player].takeTurn(self,player)
             
+            
+    # Iterates over tiles, villages, pawns, and add them to renders. Completely re-renders screen.
     def reRender(self):
         #@TODO, decide if I want to keep this refreshing of renders, or manage it like malloc
         self.renders = []
@@ -452,18 +454,23 @@ class Map():
         self.renders.append(self.store)
         self.renders.append(self.score)
         self.renders.append(self.messenger)
+        self.renders.append(self.menubutton)
+        if self.menubutton.open:
+            self.renders.append(self.menubutton.open)
         
         
         
         if self.gameOver:
             self.newGame = NewGame(20,355)
             self.renders.append(GameOver(self,20,325,self.winner))
+            trackEvent("gameover",{"winner":self.winner})
             self.renders.append(self.newGame)
         
         self.infobar.draw()
         self.store.draw()
         self.score.draw()
         self.messenger.draw()
+        
             
                             
     def message(self,msg,player=0):
@@ -474,6 +481,7 @@ class Map():
     def serialize(self):
         ret = {}
         ret["MapFormat"] = 1
+        ret["Turn"] = self.turn
         ret["Tiles"] = []
         for row in self.tiles:
             rowData = []
@@ -489,7 +497,6 @@ class Map():
                 rowData.append(tileData)
             ret["Tiles"].append(rowData)
                 
-        print ret
         return ret
     
 def MapDeserialize(background,data):
@@ -497,6 +504,8 @@ def MapDeserialize(background,data):
     m.renders = []
     #print "Map tiles before load are ",m.tiles
     #print "length of tiles in data is %s" % (len(data["Tiles"]))
+    if "Turn" in data:
+        m.turn = data["Turn"]
     rc = 0
     for row in data["Tiles"]:
         tc = 0
@@ -505,20 +514,26 @@ def MapDeserialize(background,data):
             m.tiles[rc][tc].setPlayer(tile["player"])
             if "pawn" in tile:
                 if tile["pawn"] >= 1:
+                    #print "Creating villager %s" % (tile["pawn"])
                     m.tiles[rc][tc].pawn = Villager(m,tc,rc)
-                    print "Creating villager %s" % (tile["pawn"])
+                    
                 if tile["pawn"] >= 2:
+                    #print "upgrading pawn to wizard."
                     m.tiles[rc][tc].pawn.upgrade()
-                    print "upgrading pawn to wizard."
+                    
                 if tile["pawn"] >= 3:
+                    #print "upgrading pawn to swords."
                     m.tiles[rc][tc].pawn.upgrade()
-                    print "upgrading pawn to swords."
+                    
                 if tile["pawn"] >= 4:
+                    # upgrading pawn to knight.
                     m.tiles[rc][tc].pawn.upgrade()
-                    print "upgrading pawn to knight."
+                    
                 
                 if tile["pawn"] == 2.1:
                     m.tiles[rc][tc].pawn = Castle(m,tc,rc)
+                    
+                m.tiles[rc][tc].pawn.player = tile["player"]
                     
                 m.renders.append(m.tiles[rc][tc].pawn)
             else:
@@ -534,6 +549,7 @@ def MapDeserialize(background,data):
             
             tc += 1
         rc += 1
+    m.cleanUpGame()
     m.reRender()
     return m
             
