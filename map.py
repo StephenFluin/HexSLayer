@@ -189,13 +189,6 @@ class Map():
         self.players.append(FullAI())
         
         
-        
-        self.infobar = VillageData(self)
-        self.store = PurchaseUnits(self)
-        self.messenger = Messenger(self)
-        self.score = ScoreCard(self)
-        self.menubutton = MenuButton(self)
-        
         self.cleanUpGame()
         
         
@@ -364,8 +357,7 @@ class Map():
 
     def changeIncome(self,income):
         self.selectedSetIncome = income
-        self.infobar.draw()
-        self.store.draw()
+
         
     def newTurn(self):
         #End turn case
@@ -450,15 +442,6 @@ class Map():
                 if tile.pawn:
                     self.renders.append(tile.pawn)
                     
-        self.renders.append(self.infobar)
-        self.renders.append(self.store)
-        self.renders.append(self.score)
-        self.renders.append(self.messenger)
-        self.renders.append(self.menubutton)
-        if self.menubutton.open:
-            self.renders.append(self.menubutton.open)
-        
-        
         
         if self.gameOver:
             self.newGame = NewGame(20,355)
@@ -466,16 +449,11 @@ class Map():
             trackEvent("gameover",{"winner":self.winner})
             self.renders.append(self.newGame)
         
-        self.infobar.draw()
-        self.store.draw()
-        self.score.draw()
-        self.messenger.draw()
-        
-            
                             
     def message(self,msg,player=0):
         if player == 0:
-            self.messenger.message(msg)
+            pass
+           #self.messenger.message(msg)
         
     #Returns a a simple dict of map that can be saved
     def serialize(self):

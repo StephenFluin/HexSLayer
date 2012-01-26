@@ -4,3 +4,4 @@ packaging/*.apk
 playersettings.cnf
 .project
 .pydevproject
+*~
