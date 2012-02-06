@@ -161,7 +161,10 @@ def main():
 							value = 20
 						else:
 							value = 10
-						gameMap.selectedVillage.balance += value
+						for t in gameMap.mouseCarrying.startTile.realm:
+							if t.village:
+								gameMap.message("Unit sold")
+								t.village.balance += value
 					gameMap.mouseCarrying = None	
 				gameMap.reRender()
 			elif event.type == MOUSEMOTION:
@@ -196,8 +199,8 @@ def main():
 			elif isinstance(pawn,Pawn) and pawn.indicator:
 				pawn.indicator = None
 
-			
-			screen.blit(pawn.image,(pawn.x,pawn.y))
+			if not gameMap.mouseCarrying == pawn:
+				screen.blit(pawn.image,(pawn.x,pawn.y))
 		
 		#Draw interface first so that mousecarryings can go on top
 		for face in gameMap.interfaces:

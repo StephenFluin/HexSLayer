@@ -99,12 +99,11 @@ class Menu(UI):
 			for i in self.items:
 				
 				if y < (itemCount+1)*self.fontSize*1.2:
-					print "Running the thing for this item."
+					
 					i[1](self.gameMap)
 					self.close()
 					return True
-				else:
-					print "Didn't run the thing for the item"
+					
 				itemCount += 1
 			return True
 		
