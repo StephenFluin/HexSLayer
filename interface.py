@@ -128,18 +128,21 @@ class Messenger(UI):
 		
 		self.x,self.y = messengerLocation
 		
+		self.image = pygame.Surface((200,150))
+		
 		self.messages = []
 		#Currently in # of frames, silly
 		self.defaultTime = 120
-		
-		self.gameMap.renders.append(self)
+	
 		self.update()
 		self.allMessagesCount = 1
 		
 		
 	def update(self):
-		self.image = pygame.Surface((200,150))
+		self.tick()
 		self.image.fill(bgColor)
+		#self.image.fill(pygame.Color("#88DD88"))
+		
 		fsize = 10
 		font = pygame.font.Font(fontName,fsize)
 		
@@ -170,24 +173,22 @@ class Messenger(UI):
 	def tick(self):
 		for i in self.messages:
 			i[1] -= 1
-		self.draw()	
 
 			
 class PurchaseUnits(UI):
 	def __init__(self,gameMap):
 		UI.__init__(self,gameMap)
-		self.x,self.y = storeLocation
+		self.x,self.y = (endTurnLocation[0]-120,masterSize[1]-50)
 		
 		self.update()
 	def update(self):
-		self.image = pygame.Surface((90,30))
-		self.image.fill(bgColor)
+		self.image = pygame.Surface((120,40))
 		if self.gameMap.selectedVillage and self.gameMap.selectedVillage.player == 0:
 			if self.gameMap.selectedVillage.balance >= 10:
 				# TODO: Make sure this doesn't load on each call of draw
-				self.image.blit(pygame.image.load("villager.png"),(0,0))
+				self.image.blit(pygame.image.load("villager.png"),(0,10))
 			if self.gameMap.selectedVillage.balance >= 20:
-				self.image.blit(pygame.image.load("castle.png"),(55,0))
+				self.image.blit(pygame.image.load("castle.png"),(65,10))
 				
 	def click(self,x,y):
 		#We fuzz these locations because it's hard to tap on
@@ -200,12 +201,15 @@ class PurchaseUnits(UI):
 			#print "Spawning a new villager, and deducting from bank."
 			if g.selectedVillage.balance >= 10 and x < self.image.get_width()/2:
 				g.mouseCarrying = Villager(g,self.x+x,self.y+y)
+				g.mouseCarrying.x,g.mouseCarrying.y = self.x+x-tilesize/2,self.y+y-tilesize/2
+									
 				g.mouseCarrying.justPurchased = True
 				g.selectedVillage.balance -= 10
 				g.mouseCarrying.startTile = g.selectedSet[0]
 				g.message("Villager Purchased",g.selectedVillage.player)
 			if g.selectedVillage.balance >= 20 and x > self.image.get_width()/2:
 				g.mouseCarrying = Castle(g,self.x+x,self.y+y)
+				g.mouseCarrying.x,g.mouseCarrying.y = self.x+x-tilesize/2,self.y+y-tilesize/2
 				g.mouseCarrying.justPurchased = True
 				g.selectedVillage.balance -= 20
 				g.mouseCarrying.startTile = g.selectedSet[0]
@@ -219,9 +223,10 @@ class ScoreCard(UI):
 		
 		self.update()
 	def update(self):
-		self.image = pygame.Surface((200,400))
-		self.image.fill(bgColor)
 		size = 18
+		self.image = pygame.Surface((200,int(10+(size+10)*(len(self.gameMap.players)+1))))
+		
+		
 		font = pygame.font.Font(fontName,size)
 		tileCounts = self.gameMap.countTiles()
 		for i in range(0,6):

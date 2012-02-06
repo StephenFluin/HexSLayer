@@ -336,9 +336,8 @@ class Map():
         
                             
     def message(self,msg,player=0):
-        if player == 0:
-            pass
-           #self.messenger.message(msg)
+        if player == 0 and self.messenger:
+            self.messenger.message(msg)
         
     #Returns a a simple dict of map that can be saved
     def serialize(self):

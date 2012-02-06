@@ -108,8 +108,7 @@ def main():
 						captured = interface[i].click(x-interface[i].x,y-interface[i].y)
 						if captured:
 							break
-						
-						
+											
 				#@todo: Perhaps we should move this elsewhere
 				if not gameMap.mouseCarrying:
 					#Select a region
@@ -124,12 +123,6 @@ def main():
 										gameMap.mouseCarrying.startTile = tile
 										#print "I have set the startTile of the carry."
 									break
-					
-						
-				else:
-					print "Why are we mousing down if we are carrying %s??!?!?!" % (gameMap.mouseCarrying)
-				
-					
 				
 			elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
 				if gameMap.mouseCarrying:
@@ -163,7 +156,7 @@ def main():
 					if not validDrop:
 						if gameMap.mouseCarrying.startTile:
 							gameMap.mouseCarrying.startTile.pawn = None
-						gameMap.renders.remove(gameMap.mouseCarrying)
+						
 						if isinstance(gameMap.mouseCarrying,Castle):
 							value = 20
 						else:
@@ -229,7 +222,8 @@ def setupUI(gameMap):
 	interface = []
 	interface.append(VillageData(gameMap))
 	interface.append(PurchaseUnits(gameMap))
-	interface.append(Messenger(gameMap))
+	gameMap.messenger = Messenger(gameMap)
+	interface.append(gameMap.messenger)
 	interface.append(ScoreCard(gameMap))
 	interface.append(TopBar(gameMap))
 	interface.append(EndTurn(gameMap))
