@@ -11,7 +11,7 @@
 # Todo: Add interesting maps
 # Todo: Add map generation
 
-import pygame, random, time, os, math
+import pygame, random, time, os, math, sys
 
 from pygame.locals import *
 
@@ -93,7 +93,15 @@ def main():
 			if event.type == QUIT:
 				return
 			elif event.type == KEYDOWN and event.key == K_ESCAPE:
-				return
+				interface = gameMap.interfaces
+				captured = False
+				for i in range(len(interface)-1,-1,-1):
+					if interface[i].back():
+						captured = True
+						break
+				if not captured:
+					print "Wasn't captured, quitting."
+					sys.exit()
 			elif event.type == KEYDOWN and event.key == K_RETURN:
 				gameMap.newTurn()
 			elif event.type == KEYDOWN and event.key == K_BACKSPACE:

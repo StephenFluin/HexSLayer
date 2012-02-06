@@ -75,6 +75,7 @@ class Map():
         
         
         self.cleanUpGame()
+        self.reRender()
         
         
           

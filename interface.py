@@ -33,6 +33,39 @@ class UI(pygame.sprite.Sprite):
 	def getRect(self):
 		return Rect(self.x,self.y,self.image.get_width(),self.image.get_height())
 	
+	# Corresponds with escape / back key
+	def back(self):
+		return False
+	
+class Dialog(UI):
+	def __init__(self,gameMap, msg):
+		UI.__init__(self,gameMap)
+
+		(self.x,self.y) = 0,0
+		self.fontSize = 20
+		self.image = pygame.Surface(masterSize)
+		
+		self.interface = pygame.Surface((masterSize[0]-100,masterSize[1]-100))
+		self.interface.fill(pygame.Color("#333333"))
+		
+		font = pygame.font.Font(fontName,28)
+		text = font.render(msg ,True,fontColor)
+		self.image.blit(text,(0,0))
+		
+		self.image.blit(self.interface,(50,50))
+		
+			
+	def click(self,x,y):
+		return self.close()
+		
+	def back(self):
+		return self.close()
+		
+	def close(self):
+		self.gameMap.interfaces.remove(self)
+		return True
+		
+
 class EndTurn(UI):
 	def __init__(self,gameMap):
 		UI.__init__(self,gameMap)
@@ -107,6 +140,10 @@ class Menu(UI):
 					
 				itemCount += 1
 			return True
+		
+	def back(self):
+		self.close()
+		return True
 		
 	def close(self):
 		self.gameMap.interfaces.remove(self)
