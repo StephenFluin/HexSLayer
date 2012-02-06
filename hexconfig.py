@@ -31,7 +31,7 @@ if not android:
 
 
 scoreLocation = (masterSize[0]-210,32)
-endTurnLocation = (masterSize[0]-210,masterSize[1]-40)
+endTurnLocation = (masterSize[0]-210,masterSize[1]-50)
 messengerLocation = (endTurnLocation[0],endTurnLocation[1]-150)
 
 

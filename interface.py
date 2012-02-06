@@ -37,8 +37,9 @@ class EndTurn(UI):
 	def __init__(self,gameMap):
 		UI.__init__(self,gameMap)
 		self.x,self.y = endTurnLocation
-		
-		self.image = pygame.image.load("endturn.png")
+		img = pygame.image.load("endturn.png")
+		self.image = pygame.Surface((img.get_width(),img.get_height()+20))
+		self.image.blit(img,(0,10))
 		
 	def click(self,x,y):
 		self.gameMap.newTurn()
