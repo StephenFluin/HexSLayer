@@ -1,5 +1,6 @@
 #!/bin/bash
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/
+VERSION=`cat ../version.txt`
 cd ../
 python -c "import main"
 cd packaging/android
@@ -11,22 +12,28 @@ cp ../../*.ttf tmp/
 cp ../../version.txt tmp/
 
 cd pygame-package-0.9.3
-rm bin/*
-./build.py --package "com.mortalpowers.android.hexslayer" --name "HexSLayer" --version "`cat ../../../version.txt`" --numeric-version 10 --private ../tmp --permission INTERNET --icon /super/workspace/HexSLayer/gameicon.png debug
-rm build.xml
-rm -r ../tmp
-android update project -p ./ -n HexSLayer
+
+rm bin/HexSLayer*
+rm bin/classes.*
 adb uninstall com.mortalpowers.android.hexslayer
-if [ "${1}" = "release" ]
+TYPE="release"
+if [ "${1}" != "release" ]
 then
-	ant release
+    TYPE="debug"
+fi
+./build.py --package "com.mortalpowers.android.hexslayer" --name "HexSLayer" --version "$VERSION" --numeric-version 10 --private ../tmp --permission INTERNET --icon /super/workspace/HexSLayer/gameicon.png ${TYPE}
+rm -r ../tmp
+
+if [ "${TYPE}" = "release" ]
+then
+	
 	cd bin
-	/usr/lib/jvm/java-6-openjdk/bin/jarsigner -verbose -keystore /super/documents/mine/keys/hexslayer-androidmarket.keystore HexSLayer-release-unsigned.apk hexslayer
-	/opt/android-sdk/tools/zipalign -v 4 HexSLayer-release-unsigned.apk HexSLayer-release.apk
-	adb install -r HexSLayer-release.apk
+	/usr/lib/jvm/java-6-openjdk/bin/jarsigner -verbose -keystore /super/documents/mine/keys/hexslayer-androidmarket.keystore HexSLayer-$VERSION-release-unsigned.apk hexslayer
+	/opt/android-sdk/tools/zipalign -v 4 HexSLayer-$VERSION-release-unsigned.apk HexSLayer-$VERSION-release.apk
+	adb install -r HexSLayer-$VERSION-release.apk
 else
-	ant debug
-	adb install -r bin/HexSLayer-debug-unaligned.apk
+	
+	adb install -r bin/HexSLayer-$VERSION-debug.apk
 fi
 
 adb shell am start -a android.intent.action.MAIN -n com.mortalpowers.android.hexslayer/org.renpy.android.PythonActivity

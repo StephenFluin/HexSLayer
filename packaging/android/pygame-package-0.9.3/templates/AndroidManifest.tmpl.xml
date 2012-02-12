@@ -48,8 +48,7 @@
     {% endif %}
       
   </application>
-
-  <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="5"/>
+  <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="16"/>
   <uses-permission android:name="android.permission.WAKE_LOCK" /> 
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
