@@ -16,7 +16,6 @@ except ImportError:
 from pawns import *
 from hexmath import *
 from hexconfig import *
-from controls import *
 from ai import *
 from playersettings import *
 from analytics import *

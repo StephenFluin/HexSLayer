@@ -31,7 +31,6 @@ if not pygame.mixer:
 from pawns import *
 from hexmath import *
 from hexconfig import *
-from controls import *
 from interface import *
 from ai import *
 from playersettings import *
@@ -238,6 +237,8 @@ def setupUI(gameMap):
 	interface.append(ScoreCard(gameMap))
 	interface.append(TopBar(gameMap))
 	interface.append(EndTurn(gameMap))
+	if PlayerSettings().getShowTutorialFlag():
+		interface.append(Tutorial(gameMap))
 	return interface
 
 if __name__ == "__main__":

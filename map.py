@@ -16,7 +16,6 @@ except ImportError:
 from pawns import *
 from hexmath import *
 from hexconfig import *
-from controls import *
 from interface import *
 from ai import *
 from playersettings import *
@@ -333,13 +332,26 @@ class Map():
             self.gameOver = False
             self.interfaces.append(GameOver(self,self.winner))
             trackEvent("gameover",{"winner":self.winner})
-        
+            ps = PlayerSettings()
+            wins = ps.getPlayerStat("wins");
+            losses = ps.getPlayerStat("losses")
+            games = ps.getPlayerStat("games")
+            if self.winner == 0:
+                wins += 1
+            else:
+                losses += 1
+            games += 1
+            ps.setPlayerStat("wins",wins)
+            ps.setPlayerStat("losses",losses)
+            ps.setPlayerStat("games",games)
+                    
         
                             
     def message(self,msg,player=0):
         if player == 0 and self.messenger:
             self.messenger.message(msg)
-        
+            
+       
     #Returns a a simple dict of map that can be saved
     def serialize(self):
         ret = {}

@@ -40,7 +40,7 @@ class PlayerSettings():
 	def getPlayerId(self):
 		if not "playerId" in self.prefs:
 			self.prefs["playerId"] = random.randint(1000,1000000000000)
-		self.save()
+			self.save()
 		return self.prefs["playerId"]
 	def isOptOut(self):
 		return "optOut" in self.prefs
@@ -49,5 +49,26 @@ class PlayerSettings():
 		if not "gameData" in self.prefs:
 			return None
 		return self.prefs["gameData"]
+
+	def getShowTutorialFlag(self):
+		if not "tutorialFlag" in self.prefs:
+			self.prefs["showTutorialFlag"] = True
+			self.save()
+		return self.prefs["showTutorialFlag"]
 		
+	def getPlayerStat(self,stat):
+		if not "playerStats" in self.prefs:
+			self.prefs["playerStats"] = {}
+			self.save()
+		if stat in self.prefs["playerStats"]:
+			return self.prefs["playerStats"][stat]
+		else:
+			return 0
+	def setPlayerStat(self,stat,value):
+		if not "playerStats" in self.prefs:
+			self.prefs["playerStats"] = {}
+			self.save()
+		self.prefs["playerStats"][stat] = value
+		self.save()
+	
 			
