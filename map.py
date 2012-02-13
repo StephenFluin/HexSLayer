@@ -72,9 +72,8 @@ class Map():
         self.players.append(AIPlus())
         self.players.append(FullAI())
         
-        
         self.cleanUpGame()
-        self.reRender()
+        self.newTurn()
         
         
           
@@ -293,9 +292,7 @@ class Map():
         self.runAI()
         self.reRender()
         
-        settings = PlayerSettings()
-        gameData = self.serialize()
-        settings.update("gameData",gameData)
+        self.save()
         
         
 
@@ -335,15 +332,13 @@ class Map():
             ps = PlayerSettings()
             wins = ps.getPlayerStat("wins");
             losses = ps.getPlayerStat("losses")
-            games = ps.getPlayerStat("games")
+            
             if self.winner == 0:
                 wins += 1
             else:
                 losses += 1
-            games += 1
             ps.setPlayerStat("wins",wins)
             ps.setPlayerStat("losses",losses)
-            ps.setPlayerStat("games",games)
                     
         
                             
@@ -351,7 +346,12 @@ class Map():
         if player == 0 and self.messenger:
             self.messenger.message(msg)
             
-       
+    
+    def save(self):
+        gameData = self.serialize()
+        settings = PlayerSettings()
+        settings.update("gameData",gameData)
+    
     #Returns a a simple dict of map that can be saved
     def serialize(self):
         ret = {}

@@ -68,6 +68,11 @@ def main():
 		gameMap = MapDeserialize(background,settings.getGameData())
 	else:
 		gameMap = Map(background)
+		ps = PlayerSettings()
+		games = ps.getPlayerStat("games")
+		games += 1
+		ps.setPlayerStat("games",games)
+		
 
 	
 	
@@ -86,6 +91,11 @@ def main():
 		if gameMap.startNewGame:
 			gameMap = Map(background)
 			gameMap.setInterfaces(setupUI(gameMap))
+			gameMap.save()
+			ps = PlayerSettings()
+			games = ps.getPlayerStat("games")
+			games += 1
+			ps.setPlayerStat("games",games)
 			
 		#Handle Input Events
 		for event in pygame.event.get():
@@ -238,6 +248,7 @@ def setupUI(gameMap):
 	interface.append(TopBar(gameMap))
 	interface.append(EndTurn(gameMap))
 	if PlayerSettings().getShowTutorialFlag():
+		print "Appending tutorial because flag was true (%s) " % (PlayerSettings().getShowTutorialFlag())
 		interface.append(Tutorial(gameMap))
 	return interface
 

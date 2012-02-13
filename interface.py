@@ -332,6 +332,13 @@ class Tutorial(Dialog):
 		msg = "Welcome to HexSLayer, a territory control game.\n\nYou are the green player. Each region you control will gain gold each turn. Use this gold by selecting a tile and purchasing a villager from the store at the bottom. Drag your villager into your realm, and attack unprotected enemy squares. Build your kingdom while protecting your own territory to take over the world!"
 		
 		Dialog.__init__(self, gameMap, msg)
+	
+	def click(self,x,y):
+		print "Calling tutorial click."
+		ps = PlayerSettings()
+		ps.update("showTutorialFlag", False)
+		Dialog.click(self,x,y)
+		
 		
 
 class VillageData(UI):

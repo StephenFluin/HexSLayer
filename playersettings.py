@@ -51,7 +51,7 @@ class PlayerSettings():
 		return self.prefs["gameData"]
 
 	def getShowTutorialFlag(self):
-		if not "tutorialFlag" in self.prefs:
+		if not "showTutorialFlag" in self.prefs:
 			self.prefs["showTutorialFlag"] = True
 			self.save()
 		return self.prefs["showTutorialFlag"]
