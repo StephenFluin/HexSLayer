@@ -144,10 +144,10 @@ class Menu(UI):
 		else:
 			itemCount = 0
 			# Modify for interface click
-			y -= 50
+			y -= 35
 			for i in self.items:
 				
-				if y < (itemCount + 1) * self.fontSize * 1.2:
+				if y < (itemCount + 1) * self.fontSize * 2.1:
 					
 					i[1](self.gameMap)
 					self.close()
@@ -170,7 +170,7 @@ class Menu(UI):
 			font = pygame.font.Font(fontName, self.fontSize)
 			text = font.render(item[0], True, fontColor)
 			self.interface.blit(text, (0, height))
-			height += self.fontSize * 1.2
+			height += self.fontSize * 2.1
 		self.items = itemList
 		
 		
