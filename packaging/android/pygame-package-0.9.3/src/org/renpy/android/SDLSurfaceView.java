@@ -332,10 +332,11 @@ public class SDLSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
             } catch (IOException e) { }
         }
         if(bitmap == null) {
-		Log.d("renpy","Couldn't load splash bitmap.");
+		Log.d("renpy","Couldn't load splash bitmap for texture.");
 	   } else {
-		Log.d("renpy","Loaded splash bitmap just fine!");
+		Log.d("renpy","Loaded splash bitmap for texture just fine!");
 	   }
+        int i = 3823;
 
         int textures[] = new int[1];
 
@@ -347,6 +348,7 @@ public class SDLSurfaceView extends SurfaceView implements SurfaceHolder.Callbac
 
         // The maximum dimension of the texture containing the bitmap.
         int TEXDIM = 1024;
+        
         
         gl.glBindTexture(gl.GL_TEXTURE_2D, tex);
         gl.glTexParameterf(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);

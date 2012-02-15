@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="{{ versioned_name }}" default="help">
 
-    <property file="local.properties" />
-    <property file="build.properties" />
-    <property file="default.properties" />
+	<property file="local.properties" />
+	<property file="ant.properties" />
+	<loadproperties srcFile="project.properties" />
+	
+	<fail
+	            message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through an env var"
+	            unless="sdk.dir"
+	    />
+	
 
-    <path id="android.antlibs">
-        <pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/apkbuilder.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/jarutils.jar" />
-    </path>
+	 <import file="${sdk.dir}/tools/ant/build.xml" />
 
-    <taskdef name="setup"
-        classname="com.android.ant.SetupTask"
-        classpathref="android.antlibs" />
-    <setup />
+    
+
+    
 </project>

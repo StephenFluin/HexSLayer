@@ -8,3 +8,4 @@ pygame*/proguard.cfg
 pygame*/project.properties
 pygame*/res/drawable/*
 pygame*/res/values/strings.xml
+pygame-package-0.9.3/res/values/strings.xml

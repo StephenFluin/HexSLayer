@@ -11,7 +11,7 @@
 # Todo: Add interesting maps
 # Todo: Add map generation
 
-import pygame, random, time, os, math
+import pygame, random, time, os, math, sys
 
 from pygame.locals import *
 
@@ -31,7 +31,6 @@ if not pygame.mixer:
 from pawns import *
 from hexmath import *
 from hexconfig import *
-from controls import *
 from interface import *
 from ai import *
 from playersettings import *
@@ -41,10 +40,8 @@ from map import *
 selected = None
 background = None
 gameMap = None
-mouseCarrying = None
 screen = None
 version = open('version.txt','r').read()
-
 
 def main():
 	global screen, background, mouseCarrying,version
@@ -73,34 +70,37 @@ def main():
 		gameMap = Map(background)
 
 	
-	interface = []
-	interface.append(VillageData(gameMap))
-	interface.append(PurchaseUnits(gameMap))
-	interface.append(Messenger(gameMap))
-	interface.append(ScoreCard(gameMap))
-	interface.append(MenuButton(gameMap))
 	
-	if pygame.font:
-		font = pygame.font.Font(fontName, 24)
-		text = font.render("HexSLayer",1,fontColor)
-		background.blit(text,(15,0))
-		pygame.draw.rect(background,pygame.Color("#33b5e5"),(0,30,background.get_width(),2))
-	else:
-		print "Fonts aren't supported by this system."
-		
+	
+	gameMap.setInterfaces(setupUI(gameMap))
+	
 	clock = pygame.time.Clock()
 	allsprites = pygame.sprite.RenderPlain(())
 	
-	background.blit(pygame.image.load("endturn.png"),endTurnLocation)
+	
 		
 	while True:
 		clock.tick(15)
+		
+		#If the game is over, make a new map
+		if gameMap.startNewGame:
+			gameMap = Map(background)
+			gameMap.setInterfaces(setupUI(gameMap))
+			
 		#Handle Input Events
 		for event in pygame.event.get():
 			if event.type == QUIT:
 				return
 			elif event.type == KEYDOWN and event.key == K_ESCAPE:
-				return
+				interface = gameMap.interfaces
+				captured = False
+				for i in range(len(interface)-1,-1,-1):
+					if interface[i].back():
+						captured = True
+						break
+				if not captured:
+					print "Wasn't captured, quitting."
+					sys.exit()
 			elif event.type == KEYDOWN and event.key == K_RETURN:
 				gameMap.newTurn()
 			elif event.type == KEYDOWN and event.key == K_BACKSPACE:
@@ -108,88 +108,31 @@ def main():
 				gameMap.reRender()
 			elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
 				x,y = pygame.mouse.get_pos()
+				interface = gameMap.interfaces
+				# Pass a click through all interfaces, go through opposite render order to start on top
 				for i in range(len(interface)-1,-1,-1):
-					interface[i].click(x-interface[i].x,y-interface[i].y)
-					
-				if not gameMap.gameOver:
-					# Picking something up
-					if not mouseCarrying:
-						
-						
-						#Allow menu click
-						if not menubutton.open:
-							if x>menuButtonLocation[0]-10 and y < 32:
-								print "Click on menubutton"
-								menubutton.open = Menu(gameMap) 
-								gameMap.renders.append(menubutton.open)
-						
-						
-							#Select a region
-							for row in gameMap.tiles:
-								for tile in row:
-									if tile.rect.collidepoint(pygame.mouse.get_pos()):
-										
-										if tile.checkHexCollision(pygame.mouse.get_pos()):
+					if interface[i].getRect().collidepoint(x,y):
+						captured = interface[i].click(x-interface[i].x,y-interface[i].y)
+						if captured:
+							break
 											
-											mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
-											if mouseCarrying:
-												mouseCarrying.startTile = tile
-												#print "I have set the startTile of the carry."
-											break
-											
-							
-							# End Turn Button
-							if(x>endTurnLocation[0] and y > endTurnLocation[1]):
-								gameMap.newTurn()
+				#@todo: Perhaps we should move this elsewhere
+				if not gameMap.mouseCarrying:
+					#Select a region
+					for row in gameMap.tiles:
+						for tile in row:
+							if tile.rect.collidepoint(pygame.mouse.get_pos()):
 								
-							#We fuzz these locations because it's hard to tap on
-							# Store Interaction
-							storeX = gameMap.store.x-10
-							storeY = gameMap.store.y-20
-							storeRight = gameMap.store.image.get_width() + storeX + 20
-							if(x<storeRight and x > storeX and y > storeY and gameMap.selectedVillage):
-								# got click at in the store %sx%s" %(x,y)
-								#print "Spawning a new villager, and deducting from bank."
-								if gameMap.selectedVillage.balance >= 10 and x < (storeRight+storeX)/2:
-									mouseCarrying = Villager(gameMap,storeX,storeY)
-									mouseCarrying.justPurchased = True
-									gameMap.selectedVillage.balance -= 10
-									mouseCarrying.startTile = gameMap.selectedSet[0]
-									gameMap.message("Villager Purchased",gameMap.selectedVillage.player)
-									gameMap.renders.append(mouseCarrying)
-								if gameMap.selectedVillage.balance >= 20 and x > (storeRight+storeX)/2:
-									mouseCarrying = Castle(gameMap,storeX,storeY)
-									mouseCarrying.justPurchased = True
-									gameMap.selectedVillage.balance -= 20
-									mouseCarrying.startTile = gameMap.selectedSet[0]
-									gameMap.message("Castle Purchased",gameMap.selectedVillage.player)
-									gameMap.renders.append(mouseCarrying)
-						# Menu already open
-						else:
-							print "menu open"
-							if not pygame.Rect(menubutton.open.x,menubutton.open.y,menubutton.open.image.get_width(),menubutton.open.image.get_height()).collidepoint(x,y):
-								print "Menu closing, rect was %sx%s %s,%s compared to %sx%s" % (menubutton.open.x,menubutton.open.y,menubutton.image.get_width(),menubutton.image.get_height(),x,y)
-								
-								menubutton.open = False
-							else:
-								result = menubutton.open.click(x-menubutton.open.x,y-menubutton.open.y)
-								if result == "NewGame":
-									gameMap = Map(gameMap.background)
-					else:
-						print "Why are we mousing down if we are carrying %s??!?!?!" % (mouseCarrying)
-				else:
-					x,y = pygame.mouse.get_pos()
-					box = (gameMap.newGame.x,gameMap.newGame.y,gameMap.newGame.image.get_width(),gameMap.newGame.image.get_height())
-					
-					if pygame.Rect(box).collidepoint((x,y)):
-						print "New Game Time"
-						gameMap = Map(background)
-					else:
-						print "Not a new game. because %sx%s didn't match %s" % (x,y,gameMap.newGame.image.get_rect())
-					
+								if tile.checkHexCollision(pygame.mouse.get_pos()):
+									
+									gameMap.mouseCarrying = gameMap.hexClicked(tile.xloc,tile.yloc)
+									if gameMap.mouseCarrying:
+										gameMap.mouseCarrying.startTile = tile
+										#print "I have set the startTile of the carry."
+									break
 				
 			elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
-				if mouseCarrying:
+				if gameMap.mouseCarrying:
 					x,y = event.pos
 					validDrop = False
 					
@@ -197,47 +140,53 @@ def main():
 						for tile in row:
 							if tile.rect.collidepoint((x,y)) and tile.checkHexCollision((x,y)):
 								validDrop = True
-								if(mouseCarrying.attack(tile.xloc,tile.yloc)):
+								if(gameMap.mouseCarrying.attack(tile.xloc,tile.yloc)):
 									#print "Attack of this square was successful, dropping player there."
-									gameMap.hexDropped(mouseCarrying,tile.xloc,tile.yloc)
-									mouseCarrying.justPurchased = False
+									gameMap.hexDropped(gameMap.mouseCarrying,tile.xloc,tile.yloc)
+									gameMap.mouseCarrying.justPurchased = False
 									
-								elif not mouseCarrying.justPurchased:
+								elif not gameMap.mouseCarrying.justPurchased:
 									#print "SetPos because we haven't just purchased"
-									mouseCarrying.setPos( mouseCarrying.startTile.xloc,mouseCarrying.startTile.yloc)
+									gameMap.mouseCarrying.setPos( gameMap.mouseCarrying.startTile.xloc,gameMap.mouseCarrying.startTile.yloc)
 								else:
 									# We just purchased this pawn and couldn't place it, refund it!
 									#print "Couldn't drop purchased pawn."
 									validDrop = False
 								
-								if not mouseCarrying.moved:
-									mouseCarrying.makeIndicator()
+								if not gameMap.mouseCarrying.moved:
+									gameMap.mouseCarrying.makeIndicator()
 								break
 								
 								
 											
 					# @TODO! What else do we need to do to clean this up?
 					if not validDrop:
-						if mouseCarrying.startTile:
-							mouseCarrying.startTile.pawn = None
-						gameMap.renders.remove(mouseCarrying)
-						if isinstance(mouseCarrying,Castle):
+						if gameMap.mouseCarrying.startTile:
+							gameMap.mouseCarrying.startTile.pawn = None
+						
+						if isinstance(gameMap.mouseCarrying,Castle):
 							value = 20
 						else:
 							value = 10
-						gameMap.selectedVillage.balance += value
-					mouseCarrying = None	
+						for t in gameMap.mouseCarrying.startTile.realm:
+							if t.village:
+								gameMap.message("Unit sold")
+								t.village.balance += value
+					gameMap.mouseCarrying = None	
 				gameMap.reRender()
 			elif event.type == MOUSEMOTION:
-				if mouseCarrying != None:
-					mouseCarrying.x,mouseCarrying.y = pygame.mouse.get_pos()
-					mouseCarrying.x -= tilesize/2
-					mouseCarrying.y -= tilesize/2
+				if gameMap.mouseCarrying != None:
+					gameMap.mouseCarrying.x,gameMap.mouseCarrying.y = pygame.mouse.get_pos()
+					gameMap.mouseCarrying.x -= tilesize/2
+					gameMap.mouseCarrying.y -= tilesize/2
 		allsprites.update()
 
 		
 		#Draw Everything
 		screen.blit(background, (0, 0))
+		
+			
+		
 		for pawn in gameMap.renders:
 			if isinstance(pawn,Pawn) and not pawn.getHasMoved() and pawn.player == 0:
 				availableMove = True
@@ -257,17 +206,18 @@ def main():
 			elif isinstance(pawn,Pawn) and pawn.indicator:
 				pawn.indicator = None
 
-			
-			#Show carried item at 2x size, better for touchscreens
-			if pawn == mouseCarrying:
-				screen.blit(pygame.transform.scale2x(pawn.image),(pawn.x,pawn.y))
-			else:
+			if not gameMap.mouseCarrying == pawn:
 				screen.blit(pawn.image,(pawn.x,pawn.y))
 		
-		
-		for face in interface:
+		#Draw interface first so that mousecarryings can go on top
+		for face in gameMap.interfaces:
 			face.update()
 			screen.blit(face.image,(face.x,face.y))
+			
+		#Show carried item at 2x size, better for touchscreens
+		if gameMap.mouseCarrying:
+				screen.blit(pygame.transform.scale2x(gameMap.mouseCarrying.image),(gameMap.mouseCarrying.x,gameMap.mouseCarrying.y))
+		
 			
 		allsprites.draw(screen)
 		pygame.display.flip()
@@ -277,6 +227,19 @@ def main():
 			#gameMap.newTurn()
 		#time.sleep(1)
 
+
+def setupUI(gameMap):
+	interface = []
+	interface.append(VillageData(gameMap))
+	interface.append(PurchaseUnits(gameMap))
+	gameMap.messenger = Messenger(gameMap)
+	interface.append(gameMap.messenger)
+	interface.append(ScoreCard(gameMap))
+	interface.append(TopBar(gameMap))
+	interface.append(EndTurn(gameMap))
+	if PlayerSettings().getShowTutorialFlag():
+		interface.append(Tutorial(gameMap))
+	return interface
 
 if __name__ == "__main__":
 	main()

@@ -133,20 +133,10 @@ def make_tar(fn, source_dirs):
 def make_package(args):
     version_code = 0
 
-    # Are we doing a Ren'Py build?
-    renpy = os.path.exists("private/renpy")
-        
-    if renpy:
-        manifest_extra = '<uses-feature android:glEsVersion="0x00020000" />'        
-        url_scheme = "renpy"
-        default_icon = "templates/renpy-icon.png"
-        default_presplash = "templates/renpy-presplash.png"
-
-    else:
-        manifest_extra = ""
-        url_scheme = "pygame"
-        default_icon = "templates/pygame-icon.png"
-        default_presplash = "templates/pygame-presplash.png"
+    manifest_extra = '<uses-feature android:glEsVersion="0x00020000" />'
+    url_scheme = "pygame"
+    default_icon = "templates/pygame-icon.png"
+    default_presplash = "templates/pygame-presplash.png"
 
         
     # Figure out the version code, if necessary.
