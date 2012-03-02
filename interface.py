@@ -123,7 +123,10 @@ class Menu(UI):
 			game.renewGame()
 		def playerStats(game):
 			game.interfaces.append(PlayerStatistics(game))
-		items = [["New Game", newGame],["Player Statistics",playerStats]]
+		def tutorial(game):
+			game.interfaces.append(Tutorial(game))
+		
+		items = [["New Game", newGame],["Tutorial",tutorial],["Player Statistics",playerStats]]
 		(self.x, self.y) = 0, 0
 		self.fontSize = 20
 		self.image = pygame.Surface(masterSize)
