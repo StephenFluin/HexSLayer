@@ -15,7 +15,10 @@ cd pygame-package-0.9.3
 
 rm bin/HexSLayer*
 rm bin/classes.*
-adb uninstall com.mortalpowers.android.hexslayer
+if [ "${2}" != "headless" ]
+then
+	adb uninstall com.mortalpowers.android.hexslayer
+fi
 TYPE="release"
 if [ "${1}" != "release" ]
 then
@@ -30,10 +33,19 @@ then
 	cd bin
 	/usr/lib/jvm/java-6-openjdk/bin/jarsigner -verbose -keystore /super/documents/mine/keys/hexslayer-androidmarket.keystore HexSLayer-$VERSION-release-unsigned.apk hexslayer
 	/opt/android-sdk/tools/zipalign -v 4 HexSLayer-$VERSION-release-unsigned.apk HexSLayer-$VERSION-release.apk
-	adb install -r HexSLayer-$VERSION-release.apk
+	if [ "${2}" != "headless" ]
+	then
+		adb install -r HexSLayer-$VERSION-release.apk
+	fi
 else
 	
-	adb install -r bin/HexSLayer-$VERSION-debug.apk
+	if [ "${2}" != "headless" ]
+	then
+		adb install -r bin/HexSLayer-$VERSION-debug.apk
+	fi
 fi
 
-adb shell am start -a android.intent.action.MAIN -n com.mortalpowers.android.hexslayer/org.renpy.android.PythonActivity
+if [ "${2}" != "headless" ]
+then
+	adb shell am start -a android.intent.action.MAIN -n com.mortalpowers.android.hexslayer/org.renpy.android.PythonActivity
+fi
