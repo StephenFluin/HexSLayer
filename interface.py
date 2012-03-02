@@ -123,7 +123,10 @@ class Menu(UI):
 			game.renewGame()
 		def playerStats(game):
 			game.interfaces.append(PlayerStatistics(game))
-		items = [["New Game", newGame],["Player Statistics",playerStats]]
+		def tutorial(game):
+			game.interfaces.append(Tutorial(game))
+		
+		items = [["New Game", newGame],["Tutorial",tutorial],["Player Statistics",playerStats]]
 		(self.x, self.y) = 0, 0
 		self.fontSize = 20
 		self.image = pygame.Surface(masterSize)
@@ -144,10 +147,10 @@ class Menu(UI):
 		else:
 			itemCount = 0
 			# Modify for interface click
-			y -= 50
+			y -= 35
 			for i in self.items:
 				
-				if y < (itemCount + 1) * self.fontSize * 1.2:
+				if y < (itemCount + 1) * self.fontSize * 2.1:
 					
 					i[1](self.gameMap)
 					self.close()
@@ -170,7 +173,7 @@ class Menu(UI):
 			font = pygame.font.Font(fontName, self.fontSize)
 			text = font.render(item[0], True, fontColor)
 			self.interface.blit(text, (0, height))
-			height += self.fontSize * 1.2
+			height += self.fontSize * 2.1
 		self.items = itemList
 		
 		
@@ -332,6 +335,13 @@ class Tutorial(Dialog):
 		msg = "Welcome to HexSLayer, a territory control game.\n\nYou are the green player. Each region you control will gain gold each turn. Use this gold by selecting a tile and purchasing a villager from the store at the bottom. Drag your villager into your realm, and attack unprotected enemy squares. Build your kingdom while protecting your own territory to take over the world!"
 		
 		Dialog.__init__(self, gameMap, msg)
+	
+	def click(self,x,y):
+		print "Calling tutorial click."
+		ps = PlayerSettings()
+		ps.update("showTutorialFlag", False)
+		Dialog.click(self,x,y)
+		
 		
 
 class VillageData(UI):

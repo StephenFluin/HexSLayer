@@ -21,7 +21,7 @@ if [ "${1}" != "release" ]
 then
     TYPE="debug"
 fi
-./build.py --package "com.mortalpowers.android.hexslayer" --name "HexSLayer" --version "$VERSION" --numeric-version 10 --private ../tmp --permission INTERNET --icon /super/workspace/HexSLayer/gameicon.png ${TYPE}
+./build.py --package "com.mortalpowers.android.hexslayer" --name "HexSLayer" --version "$VERSION" --numeric-version 13 --private ../tmp --permission INTERNET --icon /super/workspace/HexSLayer/gameicon.png ${TYPE}
 rm -r ../tmp
 
 if [ "${TYPE}" = "release" ]
