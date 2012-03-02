@@ -37,4 +37,4 @@ messengerLocation = (endTurnLocation[0],endTurnLocation[1]-150)
 
 tileSpaceX = masterSize[0]-210-20
 tileSpaceY = masterSize[1]-40-20-30
-tilesize = tileSpaceY /9
+tilesize = min(tileSpaceY /9, tileSpaceX / 12)
