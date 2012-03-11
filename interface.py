@@ -125,8 +125,10 @@ class Menu(UI):
 			game.interfaces.append(PlayerStatistics(game))
 		def tutorial(game):
 			game.interfaces.append(Tutorial(game))
-		
-		items = [["New Game", newGame],["Tutorial",tutorial],["Player Statistics",playerStats]]
+		def about(game):
+			game.interfaces.append(Dialog(game,"Game created by Stephen Fluin, Version %s" %(open('version.txt','r').read())))
+			
+		items = [["New Game", newGame],["Tutorial",tutorial],["Player Statistics",playerStats], ["About",about]]
 		(self.x, self.y) = 0, 0
 		self.fontSize = 20
 		self.image = pygame.Surface(masterSize)
