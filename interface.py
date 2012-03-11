@@ -85,6 +85,7 @@ class EndTurn(UI):
 		self.x, self.y = endTurnLocation
 		img = pygame.image.load("endturn.png")
 		self.image = pygame.Surface((img.get_width(), img.get_height() + 20))
+		self.image.set_colorkey((0,0,0))
 		self.image.blit(img, (0, 10))
 		
 	def click(self, x, y):
@@ -186,6 +187,8 @@ class Messenger(UI):
 		self.x, self.y = messengerLocation
 		
 		self.image = pygame.Surface((200, 150))
+		self.image.set_colorkey((0,0,0))
+		
 		
 		self.messages = []
 		#Currently in # of frames, silly
@@ -252,6 +255,7 @@ class PurchaseUnits(UI):
 		self.update()
 	def update(self):
 		self.image = pygame.Surface((120, 40))
+		self.image.set_colorkey((0,0,0))
 		if self.gameMap.selectedVillage and self.gameMap.selectedVillage.player == 0:
 			if self.gameMap.selectedVillage.balance >= 10:
 				# TODO: Make sure this doesn't load on each call of draw
@@ -294,7 +298,7 @@ class ScoreCard(UI):
 	def update(self):
 		size = 18
 		self.image = pygame.Surface((200, int(10 + (size + 10) * (len(self.gameMap.players) + 1))))
-		
+		self.image.set_colorkey((0,0,0))
 		
 		font = pygame.font.Font(fontName, size)
 		tileCounts = self.gameMap.countTiles()
@@ -355,6 +359,7 @@ class VillageData(UI):
 		self.update()
 	def update(self):
 		self.image = pygame.Surface((500, 30))
+		self.image.set_colorkey((0,0,0))
 		self.image.fill(bgColor)
 		if(self.gameMap.selectedSetIncome > 0):
 			msg = "Region Income:" + str(self.gameMap.selectedSetIncome) + "  Upkeep:" + str(self.gameMap.selectedSetUpkeep)

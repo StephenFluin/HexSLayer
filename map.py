@@ -38,6 +38,8 @@ class Map():
         self.x = 10
         self.y = 35
         
+        self.zoom = 0
+        
         self.turn = 0
         self.gameOver = False
         self.startNewGame = False
@@ -295,7 +297,8 @@ class Map():
         self.save()
         
         
-
+    def changeZoom(self,amount):
+        self.zoom += amount
         
         
         

@@ -116,8 +116,8 @@ def main():
 			elif event.type == KEYDOWN and event.key == K_BACKSPACE:
 				gameMap.gameOver = True
 				gameMap.reRender()
-			elif event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-				x,y = pygame.mouse.get_pos()
+			elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+				x,y = event.pos
 				interface = gameMap.interfaces
 				# Pass a click through all interfaces, go through opposite render order to start on top
 				for i in range(len(interface)-1,-1,-1):
@@ -141,7 +141,7 @@ def main():
 										#print "I have set the startTile of the carry."
 									break
 				
-			elif event.type == MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
+			elif event.type == MOUSEBUTTONUP and event.button == 1:
 				if gameMap.mouseCarrying:
 					x,y = event.pos
 					validDrop = False
@@ -184,6 +184,12 @@ def main():
 								t.village.balance += value
 					gameMap.mouseCarrying = None	
 				gameMap.reRender()
+			elif event.type == MOUSEBUTTONDOWN and event.button == 4:
+				print "Zoom in!"
+				gameMap.changeZoom(1)
+			elif event.type == MOUSEBUTTONDOWN and event.button == 5:
+				print "Zoom out!"
+				gameMap.changeZoom(-1)
 			elif event.type == MOUSEMOTION:
 				if gameMap.mouseCarrying != None:
 					gameMap.mouseCarrying.x,gameMap.mouseCarrying.y = pygame.mouse.get_pos()
@@ -192,9 +198,12 @@ def main():
 		allsprites.update()
 
 		
-		#Draw Everything
-		screen.blit(background, (0, 0))
+		#Main Render Loop
 		
+		#Draw Everything
+		zoomPercent = 1 + (gameMap.zoom * .1)
+		scaledBackground = pygame.transform.scale(background,(int(background.get_width()*zoomPercent),int(background.get_height()*zoomPercent)))
+		screen.blit(scaledBackground, (0, 0))		
 			
 		
 		for pawn in gameMap.renders:
@@ -236,7 +245,7 @@ def main():
 		#if not gameMap.gameOver:
 			#gameMap.newTurn()
 		#time.sleep(1)
-
+		
 
 def setupUI(gameMap):
 	interface = []
