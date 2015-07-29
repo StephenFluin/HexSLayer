@@ -2,6 +2,7 @@
 #
 # HexSLayer
 # copyright (C) Stephen Fluin 2012
+# stephen.fluin@gmail.com
 #
 
 # Todo: Build a smarter AI that can build any level units and castles.
