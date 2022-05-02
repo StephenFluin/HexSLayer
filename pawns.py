@@ -7,6 +7,8 @@
 # provides objects representing different pawns that can be placed on the game board.
 #
 
+from __future__ import absolute_import
+from __future__ import print_function
 import pygame, random
 from pygame.locals import *
 from hexmath import *
@@ -73,7 +75,7 @@ class Pawn(pygame.sprite.Sprite):
 								else:
 									return False
 							if dest.pawn not in self.gameMap.renders:
-								print "Found a weird fringe case where the unit we are upgrading isn't being rendered!!!!"
+								print("Found a weird fringe case where the unit we are upgrading isn't being rendered!!!!")
 							self.gameMap.renders.remove(dest.pawn)
 							
 							return True
@@ -91,14 +93,14 @@ class Pawn(pygame.sprite.Sprite):
 
 				#Weird edge case experienced on 20100109
 				if dest.pawn and dest.pawn not in self.gameMap.renders:
-					print "WEIRD EDGE CASE WITH %s and %s." % (dest.pawn, self.gamemap.renders)
+					print("WEIRD EDGE CASE WITH %s and %s." % (dest.pawn, self.gamemap.renders))
 					
 					
 				# Step 4. Kill whatever is left with your movement.
 				#@TODO this should only be dest.pawn
 				if dest.pawn:
 					dest.pawn.kill(dest)
-					print "Killing pawn because of successfull attack."
+					print("Killing pawn because of successfull attack.")
 				if dest.village:
 					dest.village.kill(dest)
 				
@@ -130,7 +132,7 @@ class Pawn(pygame.sprite.Sprite):
 		
 	# Kill removes pawn from renders, deletes it from the listed tile, adds a gravesite
 	def kill(self,tile):
-		print "Pawn at %sx%s is now dead." % (self.xloc, self.yloc)
+		print("Pawn at %sx%s is now dead." % (self.xloc, self.yloc))
 		if(self in self.gameMap.renders):
 			self.gameMap.renders.remove(self)
 			tile.pawn = None
@@ -141,7 +143,7 @@ class Pawn(pygame.sprite.Sprite):
 	def starve(self,tile):
 		tile.grave = Grave(self.gameMap,tile.xloc,tile.yloc)
 		self.gameMap.renders.insert(0,tile.grave)
-		print "Pawn starved."
+		print("Pawn starved.")
 		self.kill(tile)
 		
 	# Updates the render of the spinner around the current unit
@@ -164,7 +166,7 @@ class Castle(Pawn):
 	def getHasMoved(self):
 		return True
 	def kill(self,tile):
-		print "About to kill a legendary castle, my protection is:%s" % (tile.getProtection())
+		print("About to kill a legendary castle, my protection is:%s" % (tile.getProtection()))
 		Pawn.kill(self,tile)
 		
 class Village(Pawn):

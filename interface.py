@@ -7,11 +7,14 @@
 # provides objects representing different UI elements that interact with the user
 #
 
+from __future__ import absolute_import
+from __future__ import print_function
 import pygame, random
 from pygame.locals import *
 from hexmath import *
 from pawns import *
 from playersettings import *
+from six.moves import range
 
 class UI(pygame.sprite.Sprite):
 	def __init__(self, gameMap):
@@ -97,7 +100,7 @@ class GameOver(UI):
 		UI.__init__(self, gameMap)
 		self.x, self.y = 100, 100
 		self.winner = winner
-		print "Winner of game is %s." % (self.winner)
+		print("Winner of game is %s." % (self.winner))
 		self.image = pygame.Surface((560, 140))
 		self.image.fill(bgColor)
 		font = pygame.font.Font(fontName, 28)
@@ -343,7 +346,7 @@ class Tutorial(Dialog):
 		Dialog.__init__(self, gameMap, msg)
 	
 	def click(self,x,y):
-		print "Calling tutorial click."
+		print("Calling tutorial click.")
 		ps = PlayerSettings()
 		ps.update("showTutorialFlag", False)
 		Dialog.click(self,x,y)

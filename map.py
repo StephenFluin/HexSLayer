@@ -3,9 +3,12 @@
 # copyright (C) Stephen Fluin 2012
 #
 
+from __future__ import absolute_import
+from __future__ import print_function
 import pygame, random, time, os, math
 
 from pygame.locals import *
+from six.moves import range
 
 try:
     import android
@@ -107,7 +110,7 @@ class Map():
         # Kill the cheerleader, kill the world.
         #print "Looking for",point
         if not point:
-            print "CRITICAL ERROR, getTile called without a point in space. point was %s" % (point) 
+            print("CRITICAL ERROR, getTile called without a point in space. point was %s" % (point)) 
         if point[1] < 0 or point[1] >= self.height or point[0] < 0 or point[0] >= self.width:
             #print "Failed to get tile because point was out of bounds. 0-%s, 0-%s" % (self.width,self.height), point
             #@TODO THis is weird, why do we have code repeatedly failing all of the time. perhaps this is okay?
@@ -117,7 +120,7 @@ class Map():
     # Takes in a tile x y tile location, selects the set in the UI and stores it.
     def selectSet(self,point):
         if not point:
-            print "CRITICAL ERROR, selectSet called without a point in space. point was %s" % (point) 
+            print("CRITICAL ERROR, selectSet called without a point in space. point was %s" % (point)) 
         self.selectedSet = self.getTileSet(point)
         
         income = 0
@@ -143,12 +146,12 @@ class Map():
     #We are going to do a breadth first search to find all connected tiles of same color
     def getTileSet(self,point):
         if not point:
-            print "CRITICAL ERROR, getTileSet called without a point in space. point was %s" % (point) 
+            print("CRITICAL ERROR, getTileSet called without a point in space. point was %s" % (point)) 
         
         tile = self.getTile(point)
         
         if not tile:
-            print "Failed to find a tile for point %s." % (point)
+            print("Failed to find a tile for point %s." % (point))
         searched = []
         toSearch = [tile]
         found = [tile]
@@ -233,9 +236,9 @@ class Map():
                     foundOwners[tile.player] = True
         # print "Found %s as remaining village owners." % (foundOwners)
         if len(foundOwners) == 1:
-            print "Player %s won the game!" % (foundOwners.keys()[0])
+            print("Player %s won the game!" % (list(foundOwners.keys())[0]))
             self.gameOver = True
-            self.winner = foundOwners.keys()[0]
+            self.winner = list(foundOwners.keys())[0]
             self.reRender()
             
         
@@ -247,7 +250,7 @@ class Map():
         
     def newTurn(self):
         #End turn case
-        print "End of turn %s" % (self.turn)
+        print("End of turn %s" % (self.turn))
         
         #Remove graven images
         for row in self.tiles:

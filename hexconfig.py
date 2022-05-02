@@ -4,6 +4,7 @@
 # copyright (C) Stephen Fluin 2009
 #
 
+from __future__ import absolute_import
 import pygame
 
 try:

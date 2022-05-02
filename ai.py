@@ -6,7 +6,9 @@
 # AIs placed in a modular framework. They don't currently leverage state, but they could.
 
 
+from __future__ import absolute_import
 from pawns import *
+from six.moves import range
 
 
 

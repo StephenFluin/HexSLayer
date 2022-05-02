@@ -3,9 +3,11 @@
 # copyright (C) Stephen Fluin 2012
 #
 
+from __future__ import absolute_import
 import pygame, random, time, os, math
 
 from pygame.locals import *
+from six.moves import range
 
 try:
     import android

@@ -12,9 +12,12 @@
 # Todo: Add interesting maps
 # Todo: Add map generation
 
+from __future__ import absolute_import
+from __future__ import print_function
 import pygame, random, time, os, math, sys
 
 from pygame.locals import *
+from six.moves import range
 
 try:
 	import android
@@ -23,9 +26,9 @@ except ImportError:
 
 
 
-if not pygame.font: print 'Warning, fonts disabled'
+if not pygame.font: print('Warning, fonts disabled')
 if not pygame.mixer: 
-	print 'Warning, sound disabled'
+	print('Warning, sound disabled')
 
 
 # load HexSLayer modules
@@ -110,7 +113,7 @@ def main():
 						captured = True
 						break
 				if not captured:
-					print "Wasn't captured, quitting."
+					print("Wasn't captured, quitting.")
 					sys.exit()
 			elif event.type == KEYDOWN and event.key == K_RETURN:
 				gameMap.newTurn()
@@ -186,10 +189,10 @@ def main():
 					gameMap.mouseCarrying = None	
 				gameMap.reRender()
 			elif event.type == MOUSEBUTTONDOWN and event.button == 4:
-				print "Zoom in!"
+				print("Zoom in!")
 				gameMap.changeZoom(1)
 			elif event.type == MOUSEBUTTONDOWN and event.button == 5:
-				print "Zoom out!"
+				print("Zoom out!")
 				gameMap.changeZoom(-1)
 			elif event.type == MOUSEMOTION:
 				if gameMap.mouseCarrying != None:
@@ -258,7 +261,7 @@ def setupUI(gameMap):
 	interface.append(TopBar(gameMap))
 	interface.append(EndTurn(gameMap))
 	if PlayerSettings().getShowTutorialFlag():
-		print "Appending tutorial because flag was true (%s) " % (PlayerSettings().getShowTutorialFlag())
+		print("Appending tutorial because flag was true (%s) " % (PlayerSettings().getShowTutorialFlag()))
 		interface.append(Tutorial(gameMap))
 	return interface
 

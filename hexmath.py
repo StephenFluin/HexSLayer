@@ -3,7 +3,9 @@
 # copyright (C) Stephen Fluin 2012
 #
 
+from __future__ import absolute_import
 from hexconfig import *
+from six.moves import range
 
 #Takes in topleft and topright position of hex, returns points of hex
 def getHexAt(x,y):

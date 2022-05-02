@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import json, random
 
 class PlayerSettings():
@@ -30,8 +32,9 @@ class PlayerSettings():
 			f = open(self.settingsFile,'w')
 			f.write(json.dumps(self.prefs))
 			f.close()
-		except IOError as (errno, strerror):
-			print "I/O error({0}): {1}".format(errno, strerror)
+		except IOError as xxx_todo_changeme:
+			(errno, strerror) = xxx_todo_changeme.args
+			print("I/O error({0}): {1}".format(errno, strerror))
 			
 	def update(self,name,value):
 		self.prefs[name] = value
